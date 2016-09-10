@@ -19,3 +19,13 @@ This project will make use of a few external libraries:
 - OpenCV4android SDK
 
 
+Sources
+-----------------------
+- Google Tango Docs: <https://developers.google.com/tango/>
+- OpenCV4android Docs: <http://opencv.org/platforms/android.html> 
+
+
+
+
+
+
