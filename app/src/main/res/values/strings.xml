@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Object Tracker</string>
 
+    <!-- Content Descriptions -->
+    <string name="product_icon_content_description">Product Icon in an ImageView</string>
+
     <!-- Button Texts -->
     <string name="start_tracking">Start\nTracking</string>
     <string name="preferences">Preferences</string>

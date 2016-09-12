@@ -9,6 +9,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
+    <ImageView
+        android:contentDescription="@string/product_icon_content_description"
+        android:id="@+id/product_icon"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@drawable/product_icon"
+        android:layout_centerInParent="true"
+        android:paddingBottom="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +29,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/start_tracking" />
+            android:text="@string/start_tracking"
+            android:gravity="center"/>
 
         <Button
             android:id="@+id/preferences_button"
