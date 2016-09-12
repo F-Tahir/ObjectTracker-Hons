@@ -9,8 +9,33 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/start_tracking_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/start_tracking" />
+
+        <Button
+            android:id="@+id/preferences_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/preferences" />
+
+        <Button
+            android:id="@+id/view_recordings_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/view_recordings" />
+
+    </LinearLayout>
 </RelativeLayout>

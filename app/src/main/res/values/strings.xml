@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Object Tracker</string>
+
+    <!-- Button Texts -->
+    <string name="start_tracking">Start\nTracking</string>
+    <string name="preferences">Preferences</string>
+    <string name="view_recordings">View\nRecordings</string>
+
 </resources>
