@@ -13,29 +13,37 @@
 
     <Button
         android:id="@+id/start_tracking_button"
+        android:padding="@dimen/main_button_padding"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:drawableStart="@drawable/ic_starttracking"
+        android:drawableStart="@drawable/ic_starttracking_tablet"
         android:text="@string/start_tracking"
-        android:textSize="@dimen/main_button_textsize" />
+        android:textSize="@dimen/main_button_tablet_textsize" />
 
     <Button
         android:id="@+id/preferences_button"
+        android:padding="@dimen/main_button_padding"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:drawableStart="@drawable/ic_preferences"
+        android:drawableStart="@drawable/ic_preferences_tablet"
+        android:gravity="center"
         android:text="@string/preferences"
-        android:textSize="@dimen/main_button_textsize" />
+        android:textSize="@dimen/main_button_tablet_textsize" />
 
     <Button
         android:id="@+id/view_recordings_button"
+        android:padding="@dimen/main_button_padding"
+        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:drawableStart="@drawable/ic_viewrecording"
+        android:drawableStart="@drawable/ic_viewrecording_tablet"
         android:text="@string/view_recordings"
-        android:textSize="@dimen/main_button_textsize" />
+        android:textSize="@dimen/main_button_tablet_textsize" />
 
 </LinearLayout>

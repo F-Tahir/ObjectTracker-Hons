@@ -5,8 +5,8 @@
     <string name="product_icon_content_description">Product Icon in an ImageView</string>
 
     <!-- Button Texts -->
-    <string name="start_tracking">Start\nTracking</string>
+    <string name="start_tracking">Start Tracking</string>
     <string name="preferences">Preferences</string>
-    <string name="view_recordings">View\nRecordings</string>
+    <string name="view_recordings">View Recordings</string>
 
 </resources>
