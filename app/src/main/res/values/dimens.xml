@@ -1,15 +1,13 @@
-<!-- All global measurements are held here for easy code maintenance -->
-
+<!-- This file includes dimension settings (such as screen margins) for screens screens with
+ less than 600dp minimum, in either portrait or landscape. All phones (including phablets under 7")
+ fall into this category.-->
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
+
     <dimen name="activity_horizontal_margin">8dp</dimen>
     <dimen name="activity_vertical_margin">8dp</dimen>
 
     <!-- Dimensions for button measurements on activity_main.xml. -->
-    <dimen name="main_button_margin">20dp</dimen>
-    <dimen name="main_button_padding">50dp</dimen>
-
-    <!-- Font sizes for buttons in activity_main for phone and tablet displays. -->
-    <dimen name="main_button_textsize">16sp</dimen>
-    <dimen name="main_button_tablet_textsize">40sp</dimen>
+    <dimen name="main_button_margin">8dp</dimen>  <!-- Controls spacing between buttons -->
+    <dimen name="main_button_padding">16dp</dimen>
+    <dimen name="main_button_textsize">32sp</dimen>
 </resources>

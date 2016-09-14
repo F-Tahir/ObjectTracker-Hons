@@ -10,42 +10,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
+
     <Button
+        style="@style/start_tracking_button"
         android:id="@+id/start_tracking_button"
-        android:paddingStart="@dimen/main_button_padding"
-        android:paddingEnd="@dimen/main_button_padding"
-        android:layout_marginTop="@dimen/main_button_margin"
-        android:layout_marginBottom="@dimen/main_button_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_starttracking_tablet_landscape"
-        android:text="@string/start_tracking"
-        android:textSize="@dimen/main_button_tablet_textsize" />
+        android:drawableStart="@drawable/ic_starttracking_tablet_landscape" />
 
     <Button
+        style="@style/preferences_button"
         android:id="@+id/preferences_button"
-        android:paddingStart="@dimen/main_button_padding"
-        android:paddingEnd="@dimen/main_button_padding"
-        android:layout_marginBottom="@dimen/main_button_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_preferences_tablet_landscape"
-        android:text="@string/preferences"
-        android:textSize="@dimen/main_button_tablet_textsize" />
+        android:drawableStart="@drawable/ic_preferences_tablet_landscape" />
 
     <Button
+        style="@style/view_recordings_button"
         android:id="@+id/view_recordings_button"
-        android:paddingStart="@dimen/main_button_padding"
-        android:paddingEnd="@dimen/main_button_padding"
-        android:layout_marginBottom="@dimen/main_button_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_viewrecording_tablet_landscape"
-        android:text="@string/view_recordings"
-        android:textSize="@dimen/main_button_tablet_textsize" />
+        android:drawableStart="@drawable/ic_viewrecording_tablet_landscape" />
 
 </LinearLayout>
-

@@ -12,38 +12,18 @@
 
 
     <Button
+        style="@style/start_tracking_button"
         android:id="@+id/start_tracking_button"
-        android:padding="@dimen/main_button_padding"
-        android:layout_marginTop="@dimen/main_button_margin"
-        android:layout_marginBottom="@dimen/main_button_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_starttracking_tablet"
-        android:text="@string/start_tracking"
-        android:textSize="@dimen/main_button_tablet_textsize" />
+        android:drawableStart="@drawable/ic_starttracking_tablet" />
 
     <Button
+        style="@style/preferences_button"
         android:id="@+id/preferences_button"
-        android:padding="@dimen/main_button_padding"
-        android:layout_marginBottom="@dimen/main_button_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_preferences_tablet"
-        android:gravity="center"
-        android:text="@string/preferences"
-        android:textSize="@dimen/main_button_tablet_textsize" />
+        android:drawableStart="@drawable/ic_preferences_tablet" />
 
     <Button
+        style="@style/view_recordings_button"
         android:id="@+id/view_recordings_button"
-        android:padding="@dimen/main_button_padding"
-        android:layout_marginBottom="@dimen/main_button_margin"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_viewrecording_tablet"
-        android:text="@string/view_recordings"
-        android:textSize="@dimen/main_button_tablet_textsize" />
+        android:drawableStart="@drawable/ic_viewrecording_tablet" />
 
 </LinearLayout>

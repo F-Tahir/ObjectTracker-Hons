@@ -6,9 +6,48 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorButtonNormal">@color/colorButton</item>
-
-        <item name="android:windowBackground">@color/gray_medium</item>
     </style>
+
+    <!-- Main Screen button styles. -->
+    <style name="start_tracking_button" >
+        <item name="android:padding">@dimen/main_button_padding</item>
+        <item name="android:layout_marginTop">@dimen/main_button_margin</item>
+        <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:text">@string/start_tracking</item>
+        <item name="android:textSize">@dimen/main_button_textsize</item>
+        <item name="android:background">@drawable/button_start_tracking</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="preferences_button" >
+        <item name="android:padding">@dimen/main_button_padding</item>
+        <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:text">@string/preferences</item>
+        <item name="android:textSize">@dimen/main_button_textsize</item>
+        <item name="android:background">@drawable/button_preferences</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="view_recordings_button" >
+        <item name="android:padding">@dimen/main_button_padding</item>
+        <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:text">@string/view_recordings</item>
+        <item name="android:textSize">@dimen/main_button_textsize</item>
+        <item name="android:background">@drawable/button_view_recordings</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 
 </resources>

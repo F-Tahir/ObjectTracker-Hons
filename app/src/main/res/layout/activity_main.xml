@@ -10,32 +10,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
-
     <Button
+        style="@style/start_tracking_button"
         android:id="@+id/start_tracking_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_starttracking"
-        android:text="@string/start_tracking"
-        android:textSize="@dimen/main_button_textsize" />
+        android:drawableStart="@drawable/ic_starttracking" />
 
     <Button
+        style="@style/preferences_button"
         android:id="@+id/preferences_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_preferences"
-        android:text="@string/preferences"
-        android:textSize="@dimen/main_button_textsize" />
+        android:drawableStart="@drawable/ic_preferences" />
 
     <Button
+        style="@style/view_recordings_button"
         android:id="@+id/view_recordings_button"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:drawableStart="@drawable/ic_viewrecording"
-        android:text="@string/view_recordings"
-        android:textSize="@dimen/main_button_textsize" />
+        android:drawableStart="@drawable/ic_viewrecording" />
 
 </LinearLayout>
