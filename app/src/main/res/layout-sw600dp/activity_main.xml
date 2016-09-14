@@ -14,8 +14,8 @@
     <Button
         android:id="@+id/start_tracking_button"
         android:padding="@dimen/main_button_padding"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="@dimen/main_button_margin"
+        android:layout_marginBottom="@dimen/main_button_margin"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -26,7 +26,7 @@
     <Button
         android:id="@+id/preferences_button"
         android:padding="@dimen/main_button_padding"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="@dimen/main_button_margin"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -38,7 +38,7 @@
     <Button
         android:id="@+id/view_recordings_button"
         android:padding="@dimen/main_button_padding"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="@dimen/main_button_margin"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

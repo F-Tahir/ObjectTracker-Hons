@@ -7,9 +7,9 @@
 
     <!-- Dimensions for button measurements on activity_main.xml. -->
     <dimen name="main_button_margin">20dp</dimen>
-    <dimen name="main_button_padding">60dp</dimen>
+    <dimen name="main_button_padding">50dp</dimen>
 
     <!-- Font sizes for buttons in activity_main for phone and tablet displays. -->
     <dimen name="main_button_textsize">16sp</dimen>
-    <dimen name="main_button_tablet_textsize">55sp</dimen>
+    <dimen name="main_button_tablet_textsize">40sp</dimen>
 </resources>
