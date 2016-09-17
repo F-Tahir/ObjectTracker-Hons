@@ -9,7 +9,7 @@
     </style>
 
     <!-- Main Screen button styles. -->
-    <style name="start_tracking_button" >
+    <style name="start_tracking_button">
         <item name="android:padding">@dimen/main_button_padding</item>
         <item name="android:layout_marginTop">@dimen/main_button_margin</item>
         <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
@@ -23,7 +23,7 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="preferences_button" >
+    <style name="preferences_button">
         <item name="android:padding">@dimen/main_button_padding</item>
         <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
         <item name="android:layout_width">match_parent</item>
@@ -36,7 +36,7 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="view_recordings_button" >
+    <style name="view_recordings_button">
         <item name="android:padding">@dimen/main_button_padding</item>
         <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
         <item name="android:layout_width">match_parent</item>

@@ -11,18 +11,18 @@
     tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
     <Button
-        style="@style/start_tracking_button"
         android:id="@+id/start_tracking_button"
+        style="@style/start_tracking_button"
         android:drawableStart="@drawable/ic_starttracking" />
 
     <Button
-        style="@style/preferences_button"
         android:id="@+id/preferences_button"
+        style="@style/preferences_button"
         android:drawableStart="@drawable/ic_preferences" />
 
     <Button
-        style="@style/view_recordings_button"
         android:id="@+id/view_recordings_button"
+        style="@style/view_recordings_button"
         android:drawableStart="@drawable/ic_viewrecording" />
 
 </LinearLayout>
