@@ -13,7 +13,7 @@
     <Button
         android:id="@+id/start_tracking_button"
         style="@style/start_tracking_button"
-        android:drawableStart="@drawable/ic_starttracking" />
+        android:drawableStart="@drawable/ic_starttracking"/>
 
     <Button
         android:id="@+id/preferences_button"
@@ -24,5 +24,6 @@
         android:id="@+id/view_recordings_button"
         style="@style/view_recordings_button"
         android:drawableStart="@drawable/ic_viewrecording" />
+
 
 </LinearLayout>
