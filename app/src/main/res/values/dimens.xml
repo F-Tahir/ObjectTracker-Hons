@@ -10,4 +10,8 @@
     <dimen name="main_button_margin">8dp</dimen>  <!-- Controls spacing between buttons -->
     <dimen name="main_button_padding">16dp</dimen>
     <dimen name="main_button_textsize">32sp</dimen>
+
+    <!-- Dimensions for camera preview frame -->
+    <dimen name="camera_ui_horizontal_margin">16dp</dimen>
+    <dimen name="camera_ui_vertical_margin">8dp</dimen>
 </resources>

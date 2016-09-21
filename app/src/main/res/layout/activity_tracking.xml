@@ -1,13 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#111111"
+    android:orientation="vertical"
     tools:context="uk.ac.ed.faizan.objecttracker.TrackingActivity">
 
+    <LinearLayout
+        android:id="@+id/camera_top_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/camera_ui_horizontal_margin"
+        android:paddingRight="@dimen/camera_ui_horizontal_margin"
+        android:paddingTop="@dimen/camera_ui_vertical_margin"
+        android:paddingBottom="@dimen/camera_ui_vertical_margin"
+        android:orientation="horizontal">
+
+        <Switch
+            android:id="@+id/manual_tracking_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/manual_tracking_ui"
+            android:textAllCaps="true"
+            android:textColor="@color/uiTextColor"/>
+
+    </LinearLayout>
+
     <com.google.atap.tangoservice.TangoCameraPreview
+        android:layout_weight="12"
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"/>
 
-</RelativeLayout>
+    <LinearLayout
+        android:id="@+id/camera_bottom_toolbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/camera_ui_horizontal_margin"
+        android:paddingRight="@dimen/camera_ui_horizontal_margin"
+        android:paddingTop="@dimen/camera_ui_vertical_margin"
+        android:paddingBottom="@dimen/camera_ui_vertical_margin"
+        android:orientation="horizontal">
+
+        <Switch
+            android:id="@+id/manual_tracking_switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/manual_tracking_ui"
+            android:textAllCaps="true"
+            android:textColor="@color/uiTextColor"/>
+    </LinearLayout>
+
+
+
+</LinearLayout>

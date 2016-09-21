@@ -3,6 +3,7 @@ package uk.ac.ed.faizan.objecttracker;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
@@ -34,6 +35,10 @@ public class TrackingActivity extends Activity {
 
         // Initialize the Tango's camera view to the TangoCameraPreview defined in activity_tracking.xml
         mTangoCameraPreview = (TangoCameraPreview) findViewById(R.id.camera_preview);
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LOW_PROFILE;
+        decorView.setSystemUiVisibility(uiOptions );
     }
 
     // Called after onCreate() in an Android activity lifecycle.
