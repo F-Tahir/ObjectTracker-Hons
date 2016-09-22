@@ -49,10 +49,12 @@ All dimension values in `dimens.xml`are named using underscore convention, for e
 All colours in `colours.xml` are named using camelCase convention, for example `@color/colorAccent`
 
 #### Styles
-ALl styles in `styles.xml` are named using underscore convention, e.g. `@style/start_tracking_button`
+All styles in `styles.xml` are named using underscore convention, e.g. `@style/start_tracking_button`
 
 #### Menus
-TBD
+All menu XML files in `res/menu` folder are named using underscore convention, e.g. `flash_menu.xml`
+All ID's within the XML file are also named using underscore convention, e.g. `android:id="@+id/flash_auto"`.
+
 
 ### Layout folders
 
