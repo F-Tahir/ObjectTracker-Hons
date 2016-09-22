@@ -11,7 +11,8 @@
 
     <!-- Camera UI Text -->
     <string name="manual_tracking_ui">Manual Tracking</string>
-    <string name="freeze_button">Freeze Camera</string>
+    <string name="freeze_camera">Freeze Camera</string>
+    <string name="unfreeze_camera">Unfreeze Camera</string>
     <string name="timestamp">00:00:00</string>
     <string name="flashlight_auto">Auto</string>
 

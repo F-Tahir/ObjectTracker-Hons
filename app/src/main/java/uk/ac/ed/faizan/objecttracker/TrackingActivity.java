@@ -1,11 +1,10 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.app.Activity;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.PopupMenu;
 
 import com.google.atap.tangoservice.Tango;
@@ -25,10 +24,12 @@ import java.util.ArrayList;
 public class TrackingActivity extends Activity {
 
 
-    final static String TAG = "cameraPreview"; // For debugging purposes
-    TangoCameraPreview mTangoCameraPreview;
-    Tango mTango;
-    boolean mTangoIsConnected;
+    private final static String TAG = "cameraPreview"; // For debugging purposes
+
+    private TangoCameraPreview mTangoCameraPreview;
+    private Tango mTango;
+    private boolean mTangoIsConnected = false;
+    private boolean surfacePreviewFrozen = false;
 
     // Inflate the layout and set the camera view when activity is created
     @Override
@@ -107,9 +108,12 @@ public class TrackingActivity extends Activity {
             @Override
             public void onFrameAvailable(int cameraId) {
 
-                // Check if the frame available is for the camera we want and
-                // update its frame on the camera preview.
-                if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR) {
+                // Check if the frame available is for the camera to update. onFrameAvailable() checks
+                // both the fisheye and the color camera, so must specify which camera we want to check
+                // for a frame change.
+                // If user has frozen the camera by pressing "Freeze Camera" button, this method will
+                // not listen for camera frame updates.
+                if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR && !surfacePreviewFrozen) {
                     mTangoCameraPreview.onFrameAvailable();
                 }
             }
@@ -142,6 +146,27 @@ public class TrackingActivity extends Activity {
         popup.getMenu().getItem(0).setChecked(true);
 
         popup.show();
+    }
+
+    /* This method is executed when the (Un)freeze Camera button in the camera UI is clicked.
+    * The boolean surfacePreviewFrozen is changed to True if user is freezing, and False if user is
+    * unfreezing. If the boolean is true, then the onFrameAvailable() listener will not update
+    * the surface preview, so the user can easily select a template when preview is frozen.
+    *
+    * To-do: perhaps only show the Freeze button if automatic tracking is enabled.*/
+    public void freezeSurfacePreview(View v) {
+
+        Button freezeButton = (Button) v;
+
+        // Executed if user wishes to freeze the surface preview
+        if (!surfacePreviewFrozen) {
+            surfacePreviewFrozen = true;
+            freezeButton.setText(R.string.unfreeze_camera);
+        // Executed if user wishes to unfreeze surface preview
+        } else {
+            surfacePreviewFrozen = false;
+            freezeButton.setText(R.string.freeze_camera);
+        }
     }
 
 

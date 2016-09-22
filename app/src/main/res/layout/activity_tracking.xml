@@ -23,9 +23,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:textAppearance="?android:textAppearanceMedium"
+            android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/manual_tracking_ui"
-            android:textAllCaps="true"
             android:textColor="@android:color/white"/>
 
         <Button
@@ -35,10 +34,10 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:background="?android:attr/selectableItemBackground"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:text="@string/freeze_button"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"/>
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/freeze_camera"
+            android:textColor="@android:color/white"
+            android:onClick="freezeSurfacePreview"/>
 
     </RelativeLayout>
 
@@ -63,6 +62,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:layout_marginEnd="40dp"
+            android:layout_marginStart="40dp"
             android:src="@drawable/ic_pause" />
 
         <TextView
@@ -73,7 +74,7 @@
             android:layout_toStartOf="@id/pause_button"
             android:text="@string/timestamp"
             android:textColor="@android:color/white"
-            android:textAppearance="?android:textAppearanceMedium"/>
+            android:textAppearance="?android:textAppearanceSmall"/>
 
         <ImageView
             android:id="@+id/record_button"
