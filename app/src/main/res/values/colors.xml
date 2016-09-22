@@ -18,6 +18,5 @@
     <color name="colorViewRecordingsGradEnd">#ff6d00</color>
 
     <!-- Camera Preview colours -->
-    <color name="cameraFrameColor">#000000</color>
-    <color name="uiTextColor">#FFFFFF</color>
+    <color name="cameraFrameColor">#111111</color>
 </resources>

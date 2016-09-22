@@ -1,9 +1,12 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.app.Activity;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
+import android.widget.PopupMenu;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
@@ -52,7 +55,6 @@ public class TrackingActivity extends Activity {
         // time the activity is obscured, so we must check to see if it needs binded again each time
         // onResume is called.
         if (!mTangoIsConnected) {
-            // ***********New thread possibly not needed here.*********
             mTango = new Tango(TrackingActivity.this, new Runnable() {
 
                 @Override
@@ -68,6 +70,7 @@ public class TrackingActivity extends Activity {
             });
 
         }
+
     }
 
     // Called when activity becomes obscured.
@@ -108,7 +111,6 @@ public class TrackingActivity extends Activity {
                 // update its frame on the camera preview.
                 if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR) {
                     mTangoCameraPreview.onFrameAvailable();
-                    // Can also add OpenCV code here.
                 }
             }
 
@@ -127,6 +129,19 @@ public class TrackingActivity extends Activity {
                 // We are not using OnPoseAvailable for this app
             }
         });
+    }
+
+    /* This method is called when the flash icon is clicked.
+    A popup menu is presented to select On, Off, or Auto.
+     */
+    public void showFlashPopupMenu(View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        popup.inflate(R.menu.flash_menu);
+
+        // Set "Auto" as the selected item as this is default
+        popup.getMenu().getItem(0).setChecked(true);
+
+        popup.show();
     }
 
 
