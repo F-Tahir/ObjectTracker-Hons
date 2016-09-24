@@ -101,6 +101,7 @@ Currently only hosting one drawable folder, but likely in future will also split
 ### YAML Format
 The YAML format should follow something along the lines of:
 
+`
 timestamp: 00:00:03
     x: 256
     y: 181
@@ -108,7 +109,7 @@ timestamp: 00:00:06
     x: 280 
     y: 193
 ...
-    
+`
     
     
 
