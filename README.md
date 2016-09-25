@@ -38,6 +38,7 @@ The final thesis will include:
 This project will make use of a few external libraries:
 - Google Tango SDK
 - OpenCV4android SDK
+- Color Picker by QuadFlask on GitHub. Imported as "color-picker.aar"
 
 ### Sources
 - Google Tango Docs: <https://developers.google.com/tango/>
