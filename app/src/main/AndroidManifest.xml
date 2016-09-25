@@ -29,8 +29,7 @@
         </activity>
 
         <activity
-            android:name=".TrackingActivity"
-            android:theme="@style/AppThemeFullScreen"/>
+            android:name=".TrackingActivity" />
     </application>
 
 </manifest>

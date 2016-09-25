@@ -26,5 +26,6 @@ dependencies {
     compile files('libs/TangoSDK_Vega_Java.jar')
     compile(name: 'TangoUX_Vega_Java', ext: 'aar')
     compile(name: 'TangoSupport_Vega_Java', ext: 'aar')
+    compile(name: 'color-picker', ext: 'aar')
     compile project(':openCVLibrary')
 }

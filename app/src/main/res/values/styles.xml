@@ -7,14 +7,6 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- Base application theme (fullscreen). -->
-    <style name="AppThemeFullScreen" parent="ThemeOverlay.AppCompat.Dark">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
     <!-- Main Screen button styles. -->
     <style name="start_tracking_button">
         <item name="android:padding">@dimen/main_button_padding</item>

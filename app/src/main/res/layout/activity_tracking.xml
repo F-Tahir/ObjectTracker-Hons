@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#111111"
@@ -22,9 +24,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:textAppearance="?android:textAppearanceSmall"
-            android:text="@string/manual_tracking_ui"
+            android:text="@string/manual_mode"
+            android:textColor="@android:color/white"
+            android:layout_centerVertical="true"/>
+
+        <Button
+            android:id="@+id/select_color_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/set_color"
             android:textColor="@android:color/white"/>
 
         <Button
@@ -36,8 +46,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/freeze_camera"
-            android:textColor="@android:color/white"
-            android:onClick="freezeSurfacePreview"/>
+            android:textColor="@android:color/white" />
 
     </RelativeLayout>
 
@@ -93,15 +102,7 @@
             android:src="@drawable/ic_flash_auto"
             android:onClick="showFlashPopupMenu"/>
 
-        <TextView
-            android:id="@+id/flashlight_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_toEndOf="@id/flashlight_button"
-            android:text="@string/flashlight_auto"
-            android:textColor="@android:color/white"
-            android:textAppearance="?android:textAppearanceSmall"/>
+
     </RelativeLayout>
 
 

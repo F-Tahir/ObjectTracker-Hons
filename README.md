@@ -16,8 +16,11 @@
 - [ ] Add full touch functionality to surface view **only** when user is recording
     - [ ] When user touches screen during recording, the touched location is overlayed with a circle
     - [ ] The touch coordinates as well as timestamp of touch is saved in a YML format, shown below.
+- [ ] Add full functionality to flash button
+    - [ ] Listen to users changes and store users preference
+    - [ ] Embed the actual flashlight into the application
 - [ ] Give user an option to change circle appearance
-    - [ ] Allow user to change colour of circle
+    - [x] Allow user to change colour of circle
     - [ ] Allow user to change radius of circle (*possibly*)
 
 
