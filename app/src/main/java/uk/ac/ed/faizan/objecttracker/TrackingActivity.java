@@ -11,9 +11,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+import android.media.MediaRecorder;
 
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCameraPreview;
@@ -29,6 +28,8 @@ import com.google.atap.tangoservice.TangoXyzIjData;
 import java.util.ArrayList;
 
 import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 public class TrackingActivity extends Activity implements View.OnClickListener{
 
@@ -44,7 +45,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
     private boolean isRecording = false;
     private boolean mIsPaused = false;
 
-    // Default color for overlay color when tracking objects
+    // Default color for overlay color when tracking objects (Red)
     private int overlayColor = 0xffff0000;
 
     // Inflate the layout and set the camera view when activity is created
@@ -52,9 +53,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Set up UI to make full screen, low profile soft-keys, etc.
         setupScreen();
 
-        // Inflate laoyut
+        // Inflate layout
         setContentView(R.layout.activity_tracking);
 
         // Initialize the Tango's camera view to the TangoCameraPreview defined in activity_tracking.xml
@@ -65,10 +67,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
         Button freezeButton =  (Button) findViewById(R.id.freeze_button);
         Button colorButton =  (Button) findViewById(R.id.select_color_button);
         ImageView flashButton = (ImageView) findViewById(R.id.flashlight_button);
+        ImageView recordButton = (ImageView) findViewById(R.id.record_button);
 
         freezeButton.setOnClickListener(this);
         colorButton.setOnClickListener(this);
         flashButton.setOnClickListener(this);
+        recordButton.setOnClickListener(this);
     }
 
     // Called after onCreate() in an Android activity lifecycle.
@@ -108,7 +112,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // Make hardware (back, home, recent app) buttons low profile
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
 
         // Screen never times out
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -187,8 +191,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
                 showFlashPopupMenu(flashButton);
                 break;
             case R.id.select_color_button:
-                Button colorButton  = (Button) v;
+                Button colorButton = (Button) v;
                 getColor(colorButton);
+                break;
+            case R.id.record_button:
+                ImageView recordButton = (ImageView) v;
+                getRecording(recordButton);
                 break;
         }
     }
@@ -196,8 +204,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
     /* This method is called when the flash icon is clicked.
      * A popup menu is presented to select On, Off, or Auto.
      */
-    public void showFlashPopupMenu(ImageView button) {
-        PopupMenu popup = new PopupMenu(this, button);
+    public void showFlashPopupMenu(ImageView image) {
+        PopupMenu popup = new PopupMenu(this, image);
         popup.inflate(R.menu.flash_menu);
 
 
@@ -225,6 +233,21 @@ public class TrackingActivity extends Activity implements View.OnClickListener{
             button.setText(R.string.freeze_camera);
         }
     }
+
+    /* Called if the record or stop button is clicked, changes drawable sources and starts
+    recording from the surface view.
+     */
+    public void getRecording(ImageView image) {
+
+        if (!isRecording) {
+            isRecording = true;
+            image.setImageResource(R.drawable.ic_stop);
+        } else {
+            isRecording = false;
+            image.setImageResource(R.drawable.ic_record);
+        }
+    }
+
 
     /*
      * Create a dialog to select the color for tracking overlay (e.g. a bounding box).
