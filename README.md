@@ -10,7 +10,7 @@
     - [X] The surface view is recorded until the user presses Stop
     - [ ] The surface view is recorded, and when the user presses Pause, the recording temporarily stops.
     - [ ] The record time changes during recording
-- [ ] Add full functionality to stop button
+- [X] Add full functionality to stop button
     - [X] When Stop button is pressed, recording ends
     - [X] Recording is saved to file system with default name "VID_DATETIME.mp4"
 - [ ] Add full touch functionality to surface view **only** when user is recording

@@ -4,20 +4,20 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.media.CamcorderProfile;
 import android.media.MediaScannerConnection;
-import android.net.Uri;
+import android.os.Handler;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.media.MediaRecorder;
 import android.hardware.Camera;
@@ -37,6 +37,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
     private final static String TAG = "object:tracker"; // For debugging purposes
 
     private boolean isRecording = false;
+    private boolean isRecordingPaused = false;
 
     private MediaRecorder mMediaRecorder;
     private Camera mCamera;
@@ -44,6 +45,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
     private File mOutputFile;
     private SurfaceHolder mHolder;
     private CamcorderProfile profile;
+
+    public static long startTime = 0L;
+    public static long timeInMilliseconds = 0L;
+    public static long timeSwapBuff = 0L;
+    public static long updatedTime = 0L;
+    TextView timerValue;
+    public static Handler customHandler = new Handler();
+
 
     // Default color for overlay color when tracking objects (Red)
     private int overlayColor = 0xffff0000;
@@ -58,6 +67,11 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
 
         // Inflate layout
         setContentView(R.layout.activity_tracking);
+
+        // Pass in the timestamp widget into the timer construct, so the timestamp
+        // can be updated when recording
+        timerValue = (TextView) findViewById(R.id.timestamp);
+
 
         // Initialize the Tango's camera view to the TangoCameraPreview defined in activity_tracking.xml
         mTangoCameraPreview = (SurfaceView) findViewById(R.id.camera_preview);
@@ -132,19 +146,47 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
                 getColor(colorButton);
                 break;
             case R.id.record_button:
-
                 if (isRecording) {
                     // release the MediaRecorder object, change icons, set isRecording = false;
                     releaseMediaRecorder();
                     mCamera.lock();         // take camera access back from MediaRecorder
-                    ((ImageView) v).setImageResource(R.drawable.ic_record);
+
+                    ((TextView) findViewById(R.id.timestamp)).setText(R.string.timestamp);
+                    customHandler.removeCallbacks(updateTimerThread);
+
                 } else {
                     // Prepare the camera in a separate task (as it can take time)
                     // This method is also responsible for changing isRecording, and icons
                     new MediaPrepareTask().execute(null, null, null);
+
+                    startTime = SystemClock.uptimeMillis();
+                    customHandler.postDelayed(updateTimerThread, 0);
+
+
                 }
+                break;
         }
     }
+
+    public Runnable updateTimerThread = new Runnable() {
+
+        public void run() {
+
+            timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
+            updatedTime = timeSwapBuff + timeInMilliseconds;
+
+            int secs = (int) (updatedTime / 1000);
+            int hours = secs/3600;
+            int mins = secs / 60;
+            secs = secs % 60;
+            int milliseconds = (int) (updatedTime % 1000);
+            timerValue.setText("" + hours + ":"
+                    + String.format("%02d", mins) + ":"
+                    + String.format("%02d", secs));
+            customHandler.postDelayed(this, 0);
+        }
+
+    };
 
     /* This method is called when the flash icon is clicked.
      * A popup menu is presented to select On, Off, or Auto.
