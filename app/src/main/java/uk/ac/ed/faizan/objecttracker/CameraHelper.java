@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2013 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package uk.ac.ed.faizan.objecttracker;
 
@@ -34,7 +49,7 @@ public class CameraHelper {
     public static Camera.Size getOptimalVideoSize(List<Camera.Size> supportedVideoSizes,
                                                   List<Camera.Size> previewSizes, int w, int h) {
         // Use a very small tolerance because we want an exact match.
-        final double ASPECT_TOLERANCE = 0.3;
+        final double ASPECT_TOLERANCE = 0.1;
         double targetRatio = (double) w / h;
 
         // Supported video sizes list might be null, it means that we are allowed to use the preview
@@ -144,7 +159,7 @@ public class CameraHelper {
         }
 
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "CameraSample");
+                Environment.DIRECTORY_PICTURES), "ObjectTracker");
         // This location works best if you want the created images to be shared
         // between applications and persist after your app has been uninstalled.
 
@@ -156,7 +171,7 @@ public class CameraHelper {
             }
         }
 
-        // Create a media file name
+        // Create a non-conflicting media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         File mediaFile;
         if (type == MEDIA_TYPE_IMAGE){

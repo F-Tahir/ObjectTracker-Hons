@@ -50,7 +50,7 @@
 
     </RelativeLayout>
 
-    <com.google.atap.tangoservice.TangoCameraPreview
+    <SurfaceView
         android:id="@+id/camera_preview"
         android:layout_weight="8"
         android:layout_width="match_parent"
