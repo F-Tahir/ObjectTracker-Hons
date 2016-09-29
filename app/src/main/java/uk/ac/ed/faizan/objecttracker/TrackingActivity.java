@@ -21,28 +21,11 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.media.MediaRecorder;
 import android.hardware.Camera;
-import android.os.Handler;
 
-import com.google.atap.tangoservice.Tango;
-import com.google.atap.tangoservice.TangoCameraIntrinsics;
-import com.google.atap.tangoservice.TangoCameraPreview;
-import com.google.atap.tangoservice.TangoConfig;
-import com.google.atap.tangoservice.TangoCoordinateFramePair;
-import com.google.atap.tangoservice.TangoErrorException;
-import com.google.atap.tangoservice.TangoEvent;
-import com.google.atap.tangoservice.TangoOutOfDateException;
-import com.google.atap.tangoservice.TangoPointCloudData;
-import com.google.atap.tangoservice.TangoPoseData;
-import com.google.atap.tangoservice.TangoTextureCameraPreview;
-import com.google.atap.tangoservice.TangoXyzIjData;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
-import uk.ac.ed.faizan.objecttracker.CameraHelper;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -53,8 +36,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
 
     private final static String TAG = "object:tracker"; // For debugging purposes
 
-
-    private boolean isPreviewFrozen = false;
     private boolean isRecording = false;
 
     private MediaRecorder mMediaRecorder;
@@ -102,6 +83,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
         // If the camera is connected, then disconnect the camera and unbind the Tango service
         super.onPause();
 
+        // If user presses home buttoh whilst recording, the recording will save and state set to normal.
+        // All of this is handled in releaseMediaRecorder();
         releaseMediaRecorder(); // release resources such as preview
         releaseCamera(); // release the camera so that other applications can use it
     }
@@ -111,12 +94,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
     protected void onResume() {
         Log.i(TAG, "In resume");
         super.onResume();
+
+        // Set up camera and surface view to show camera preview
         setupCameraView();
 
     }
 
     /* Called when activity is created, to make activity full screen, hide status bars, and ensure
-    that screen never times out due to user settings.
+    that screen never times out whilst recording.
      */
     public void setupScreen() {
         // Hide title and status bar
@@ -149,33 +134,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
             case R.id.record_button:
 
                 if (isRecording) {
-
-                    try {
-                        mMediaRecorder.stop();  // stop the recording
-                    } catch (RuntimeException e) {
-                        // RuntimeException is thrown when stop() is called immediately after start().
-                        // In this case the output file is not properly constructed ans should be deleted.
-                        Log.d(TAG, "RuntimeException: stop() is called immediately after start()");
-                        //noinspection ResultOfMethodCallIgnored
-                        mOutputFile.delete();
-                    }
-
-                    releaseMediaRecorder(); // release the MediaRecorder object
+                    // release the MediaRecorder object, change icons, set isRecording = false;
+                    releaseMediaRecorder();
                     mCamera.lock();         // take camera access back from MediaRecorder
                     ((ImageView) v).setImageResource(R.drawable.ic_record);
-
-                    isRecording = false;
-
-                    // Tell the media scanner about the new file so that it is
-                    // immediately available to the user.
-                    MediaScannerConnection.scanFile(this, new String[] {
-                                    mOutputFile.getPath() },
-                            new String[] { "video/mp4" }, null);
-
                 } else {
-
+                    // Prepare the camera in a separate task (as it can take time)
+                    // This method is also responsible for changing isRecording, and icons
                     new MediaPrepareTask().execute(null, null, null);
-                    ((ImageView) v).setImageResource(R.drawable.ic_stop);
                 }
         }
     }
@@ -193,7 +159,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
 
         popup.show();
     }
-
 
 
     /*
@@ -231,8 +196,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
 
 
 
+    /* Called in onResume() to set up the camera and the surfaceView associated with it. The surface
+     * view is used to preview the camera buffer before recording initializes.
+     */
     private boolean setupCameraView() {
 
+        // Calls the back camera by default
         mCamera = CameraHelper.getDefaultCameraInstance();
 
         try {
@@ -243,11 +212,37 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
         }
 
         mCamera.startPreview();
-        Log.i(TAG, "Live camere preview started");
+        Log.i(TAG, "Live camera preview started");
         return true;
     }
 
+    // Called when the recording is stopped, or if the activity was paused, so we should make sure that
+    // if the user was recording, then as well as stopping the recording in the onPause() method,
+    // we also change the ic_stop icon back to ic_record, and set isRecording = false.
     private void releaseMediaRecorder(){
+
+        if (isRecording) {
+            try {
+                mMediaRecorder.stop();  // stop the recording
+
+                // Tell the media scanner about the new file so that it is
+                // immediately available to the user.
+                MediaScannerConnection.scanFile(this, new String[] {
+                                mOutputFile.getPath() },
+                        new String[] { "video/mp4" }, null);
+            } catch (RuntimeException e) {
+                // RuntimeException is thrown when stop() is called immediately after start().
+                // In this case the output file is not properly constructed ans should be deleted.
+                Log.d(TAG, "RuntimeException: stop() is called immediately after start()");
+                //noinspection ResultOfMethodCallIgnored
+                mOutputFile.delete();
+            }
+
+            ImageView recordButton = (ImageView) findViewById(R.id.record_button);
+            recordButton.setImageResource(R.drawable.ic_record);
+            isRecording = false;
+        }
+
         if (mMediaRecorder != null) {
             // clear recorder configuration
             mMediaRecorder.reset();
@@ -260,6 +255,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
         }
     }
 
+    // Called only when activity is paused, so that other applications can access the camera.
     private void releaseCamera(){
         if (mCamera != null){
             // release the camera for other applications
@@ -274,12 +270,9 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
 
         mMediaRecorder = new MediaRecorder();
 
-
-
-        // Step 1: Unlock and set camera to MediaRecorder
+        // Step 1: Unlock and set camera for MediaRecorder
         mCamera.unlock();
         mMediaRecorder.setCamera(mCamera);
-
 
         // Step 2: Set sources
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
@@ -288,7 +281,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
         mMediaRecorder.setProfile(profile);
 
-        // Step 4: Set output file
+        // Step 4: Set output file (handled in CameraHelper)
         mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
         if (mOutputFile == null) {
             return false;
@@ -361,6 +354,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
      */
     class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
 
+        // The return value states whether the MediaRecorder was successfully started or not.
+        // This value is passed into the onPostExecute method.
         @Override
         protected Boolean doInBackground(Void... voids) {
             // initialize video camera
@@ -370,7 +365,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
 
                 mMediaRecorder.start();
                 Log.i(TAG, "Successfully started.");
-                isRecording = true;
+
+
 
             } else {
                 // prepare didn't work, release the camera
@@ -380,10 +376,18 @@ public class TrackingActivity extends Activity implements View.OnClickListener, 
             return true;
         }
 
+
         @Override
         protected void onPostExecute(Boolean result) {
             if (!result) {
                 TrackingActivity.this.finish();
+
+            // If doInBackground() returns true, then recording was
+            // successful, so change record state and icons
+            } else {
+                ImageView recordButton = (ImageView) findViewById(R.id.record_button);
+                recordButton.setImageResource(R.drawable.ic_stop);
+                isRecording = true;
             }
 
 
