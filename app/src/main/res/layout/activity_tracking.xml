@@ -46,7 +46,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/freeze_camera"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"/>
 
     </RelativeLayout>
 
@@ -91,7 +91,9 @@
             android:layout_height="wrap_content"
             android:layout_toStartOf="@id/timestamp"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_record" />
+            android:src="@drawable/ic_record"
+            android:clickable="true"
+            android:onClick="onCaptureClick"/>
 
         <ImageView
             android:id="@+id/flashlight_button"
