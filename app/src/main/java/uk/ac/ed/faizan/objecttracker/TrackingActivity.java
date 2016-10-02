@@ -120,11 +120,15 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     // and stop the timestamp from updating (and reset to 0)
                     cameraPreview.releaseMediaRecorder();
                     CameraPreview.mCamera.lock();         // take camera access back from MediaRecorder
+                    Toast.makeText(this, "Saved in" +
+                            CameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
                 } else {
                     // Prepare the camera in a separate task (as it can take time)
                     // This method is also responsible for changing isRecording, icons, and
                     // configfuring timestamp
+                    Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
+                            Toast.LENGTH_LONG).show();
                     new MediaPrepareTask().execute(null, null, null);
 
                 }

@@ -2,7 +2,6 @@ package uk.ac.ed.faizan.objecttracker;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
@@ -43,7 +42,10 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
     static Camera mCamera;
     static MediaRecorder mMediaRecorder;
-    static File mOutputFile;
+    static File mMediaFile;
+    static File mDataFile;
+    static File mRootFolder;
+
     static CamcorderProfile mProfile;
     static Canvas canvas;
 
@@ -124,14 +126,14 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
                 // Tell the media scanner about the new file so that it is
                 // immediately available to the user.
                 MediaScannerConnection.scanFile(mContext, new String[] {
-                                mOutputFile.getPath() },
+                                mMediaFile.getPath() },
                         new String[] { "video/mp4" }, null);
             } catch (RuntimeException e) {
                 // RuntimeException is thrown when stop() is called immediately after start().
                 // In this case the output file is not properly constructed ans should be deleted.
                 Log.d(TAG, "RuntimeException: stop() is called immediately after start()");
                 //noinspection ResultOfMethodCallIgnored
-                mOutputFile.delete();
+                mMediaFile.delete();
             }
 
             mTimestamp.setText(R.string.timestamp);
@@ -178,11 +180,21 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
         mMediaRecorder.setProfile(mProfile);
 
         // Step 4: Set output file (handled in CameraHelper)
-        mOutputFile = CameraHelper.getOutputMediaFile(CameraHelper.MEDIA_TYPE_VIDEO);
-        if (mOutputFile == null) {
+        String date = CreateFiles.getDate();
+        mRootFolder = CreateFiles.getOutputFolder(date);
+        Log.i(TAG, "Output folder is " + mRootFolder.toString());
+
+        mMediaFile = CreateFiles.getOutputMediaFile(
+                CreateFiles.MEDIA_TYPE_VIDEO, mRootFolder, date);
+        mDataFile = CreateFiles.getOutputDataFile(mRootFolder, date);
+
+
+        if (mMediaFile == null) {
+            Log.i(TAG, "Output file was not created successfully!");
             return false;
         }
-        mMediaRecorder.setOutputFile(mOutputFile.getPath());
+
+        mMediaRecorder.setOutputFile(mMediaFile.getPath());
         mMediaRecorder.setPreviewDisplay(mHolder.getSurface());
 
         // Step 5: Prepare configured MediaRecorder
@@ -279,6 +291,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
             canvas.drawCircle(mX, mY, 60, paint);
             mOverlayHolder.unlockCanvasAndPost(canvas);
+            CreateFiles.appendToFile(mDataFile, mTimestamp.getText().toString(), mX, mY);
         }
     }
 
