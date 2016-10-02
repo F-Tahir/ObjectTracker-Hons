@@ -1,13 +1,20 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.hardware.Camera;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,40 +28,55 @@ import java.util.List;
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
  */
 
-public class CameraPreview implements SurfaceHolder.Callback {
+public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListener {
 
-    static SurfaceView mPreview;
+    private final String TAG = "object:tracker";
+
+    static SurfaceView mCameraView;
+    static SurfaceView mOverlayView;
+    static SurfaceHolder mHolder;
+    static SurfaceHolder mOverlayHolder;
+
     static TextView mTimestamp;
     static ImageView mRecordButton;
     static Context mContext;
 
-    static SurfaceHolder mHolder;
     static Camera mCamera;
     static MediaRecorder mMediaRecorder;
     static File mOutputFile;
     static CamcorderProfile mProfile;
+    static Canvas canvas;
 
     static boolean isRecording = false;
-    private final String TAG = "object:tracker";
 
-    public static long startTime = 0L;
-    public static long timeInMilliseconds = 0L;
-    public static long timeSwapBuff = 0L;
-    public static long updatedTime = 0L;
     static Timer mTimer;
 
-    public CameraPreview(Context context, SurfaceView preview, TextView timestamp, ImageView recordButton) {
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Coordinates of touched position;
+    float mX;
+    float mY;
+
+    public CameraPreview(Context context, SurfaceView preview, SurfaceView overlay,
+                         TextView timestamp, ImageView recordButton) {
         mContext = context;
-        mPreview = preview;
+        mCameraView = preview;
+        mHolder = mCameraView.getHolder();
+        mHolder.addCallback(this);
+
+        mOverlayView = overlay;
+        mOverlayHolder = mOverlayView.getHolder();
+        mOverlayHolder.setFormat(PixelFormat.TRANSPARENT);
+        mOverlayView.setZOrderOnTop(true);
+
         mTimestamp = timestamp;
         mRecordButton = recordButton;
 
         mCamera = CameraHelper.getDefaultCameraInstance();
-        mHolder = mPreview.getHolder();
-        mHolder.addCallback(this);
         mMediaRecorder = new MediaRecorder();
 
         mTimer = new Timer(timestamp);
+        mCameraView.setOnTouchListener(this);
     }
 
 
@@ -64,7 +86,6 @@ public class CameraPreview implements SurfaceHolder.Callback {
     public boolean setupCameraView() {
 
         if (mHolder == null) {
-            Log.i(TAG, "mHolder is null");
             return false;
         }
         try {
@@ -75,7 +96,6 @@ public class CameraPreview implements SurfaceHolder.Callback {
         }
 
         mCamera.startPreview();
-        Log.i(TAG, "Live camera preview started");
         return true;
     }
 
@@ -85,6 +105,17 @@ public class CameraPreview implements SurfaceHolder.Callback {
      * we also change the ic_stop icon back to ic_record, and set isRecording = false.
      */
     public void releaseMediaRecorder(){
+
+        // If recording is stopped, clear the canvas so that no circles are present
+        // after recording
+        if (canvas != null) {
+            canvas = mOverlayHolder.lockCanvas();
+            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+            mOverlayHolder.unlockCanvasAndPost(canvas);
+            Log.i(TAG, "Canvas cleared");
+        } else {
+            Log.i(TAG, "Canvas is null");
+        }
 
         if (isRecording) {
             try {
@@ -131,9 +162,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
         }
     }
 
-
     public boolean prepareVideoRecorder(){
-
 
         mMediaRecorder = new MediaRecorder();
 
@@ -172,10 +201,10 @@ public class CameraPreview implements SurfaceHolder.Callback {
     }
 
 
-
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
+        Log.i(TAG, "Surface created for the first time");
         if (mCamera != null) {
 
             // We need to make sure that our preview and recording video size are supported by the
@@ -185,7 +214,7 @@ public class CameraPreview implements SurfaceHolder.Callback {
             List<Camera.Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
             List<Camera.Size> mSupportedVideoSizes = parameters.getSupportedVideoSizes();
             Camera.Size optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
-                    mSupportedPreviewSizes, mPreview.getWidth(), mPreview.getHeight());
+                    mSupportedPreviewSizes, mCameraView.getWidth(), mCameraView.getHeight());
 
             // Use the same size for recording profile.
             mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
@@ -198,7 +227,6 @@ public class CameraPreview implements SurfaceHolder.Callback {
             mCamera.setParameters(parameters);
 
             try {
-                //mCamera.setDisplayOrientation(90);
                 mCamera.setPreviewDisplay(surfaceHolder);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -209,12 +237,49 @@ public class CameraPreview implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-    }
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {}
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {}
 
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+
+        switch(event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                mX = event.getX();
+                mY = event.getY();
+                Log.i(TAG, "In here");
+                Log.i(TAG, "mX is " + Float.toString(mX));
+                Log.i(TAG, "mY is " + Float.toString(mY));
+                if (mOverlayHolder.getSurface().isValid()) {
+                    Log.i(TAG, "Surface is valid");
+                    drawCircle();
+                }
+                break;
+        }
+        return true;
     }
+
+    private void drawCircle() {
+
+        // Draw only if an active recording is taking place
+        if (isRecording) {
+
+            // Lock the canvas so that it can be drawn on
+            canvas = mOverlayHolder.lockCanvas();
+            paint.setStyle(Paint.Style.FILL);
+
+            // Choose fill color to be the one selected by user, or red by default.
+            paint.setColor(TrackingActivity.overlayColor);
+
+            // Clear any previous circles
+            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
+            canvas.drawCircle(mX, mY, 60, paint);
+            mOverlayHolder.unlockCanvasAndPost(canvas);
+        }
+    }
+
 }

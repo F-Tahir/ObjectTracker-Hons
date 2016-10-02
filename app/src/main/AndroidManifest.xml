@@ -30,7 +30,8 @@
         </activity>
 
         <activity
-            android:name=".TrackingActivity" />
+            android:name=".TrackingActivity"
+            android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

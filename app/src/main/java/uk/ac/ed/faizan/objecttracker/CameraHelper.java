@@ -186,5 +186,5 @@ public class CameraHelper {
 
         return mediaFile;
     }
-
+    
 }

@@ -5,16 +5,15 @@
 
 ### Manual Tracking (to be done by 3rd October 2pm latest)
 
-- [ ] Add full functionality to record button
+- [X] Add full functionality to record button
     - [X] When Record button is pressed, the button changes to Stop button
     - [X] The surface view is recorded until the user presses Stop
-    - [ ] The surface view is recorded, and when the user presses Pause, the recording temporarily stops.
-    - [ ] The record time changes during recording
+    - [X] The record time changes during recording
 - [X] Add full functionality to stop button
     - [X] When Stop button is pressed, recording ends
     - [X] Recording is saved to file system with default name "VID_DATETIME.mp4"
-- [ ] Add full touch functionality to surface view **only** when user is recording
-    - [ ] When user touches screen during recording, the touched location is overlayed with a circle
+- [X] Add full touch functionality to surface view **only** when user is recording
+    - [X] When user touches screen during recording, the touched location is overlayed with a circle
     - [ ] The touch coordinates as well as timestamp of touch is saved in a YML format, shown below.
 - [ ] Add full functionality to flash button
     - [ ] Listen to users changes and store users preference

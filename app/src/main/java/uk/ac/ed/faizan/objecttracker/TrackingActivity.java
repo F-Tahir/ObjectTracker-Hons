@@ -27,7 +27,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     private final static String TAG = "object:tracker"; // For debugging purposes
 
     // Default color for overlay color when tracking objects (Red)
-    private int overlayColor = 0xffff0000;
+    static int overlayColor = 0xffff0000;
 
     // Inflate the layout and set the camera view when activity is created
     @Override
@@ -70,10 +70,11 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         Log.i(TAG, "In resume");
         super.onResume();
 
-        // Pass in the timestampp widget and surfaceview into the cameraPreview construct.
+        // Pass in the timestamp widget and surfaceview into the cameraPreview construct.
         cameraPreview = new CameraPreview(
                 this,
                 (SurfaceView) findViewById(R.id.camera_preview),
+                (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
                 (ImageView) findViewById(R.id.record_button));
 
