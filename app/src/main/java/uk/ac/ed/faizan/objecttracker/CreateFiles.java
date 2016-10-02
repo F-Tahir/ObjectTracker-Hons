@@ -70,7 +70,7 @@ public class CreateFiles {
         if (createRootDirSuccessful) {
             Log.i(TAG, "Root directory has been created successfully.");
 
-            File secondaryDir = new File(dir.toString() + "/" + timeStamp);
+            File secondaryDir = new File(dir.toString() + "/" + "RECORDING_" + timeStamp);
             createSecondaryDirSuccessful = secondaryDir.mkdirs();
 
             if (createSecondaryDirSuccessful) {
