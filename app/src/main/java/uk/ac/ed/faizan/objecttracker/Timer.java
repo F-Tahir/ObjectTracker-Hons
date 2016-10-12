@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.widget.TextView;
 
+import org.opencv.android.FpsMeter;
+
 
 /* Helper methods to start and stop the timer that is displayed when user is recording a video */
 public class Timer {
@@ -45,6 +47,7 @@ public class Timer {
             ymlTimestamp = timerValue.getText().toString() + String.format(":%03d", milliseconds);
 
             customHandler.postDelayed(this, 0);
+
         }
 
     };

@@ -16,10 +16,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+
+import org.opencv.android.FpsMeter;
+
 
 public class TrackingActivity extends Activity implements View.OnClickListener {
 
@@ -124,13 +126,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                             CameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
                 } else {
+
+                    Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
+                            Toast.LENGTH_LONG).show();
+
                     // Prepare the camera in a separate task (as it can take time)
                     // This method is also responsible for changing isRecording, icons, and
                     // configfuring timestamp
-                    Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
-                            Toast.LENGTH_LONG).show();
                     new MediaPrepareTask().execute(null, null, null);
-
                 }
                 break;
         }
@@ -228,6 +231,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 // Start updating the timestamp for recording if preparation is successful.
                 Timer.startTime = SystemClock.uptimeMillis();
                 Timer.customHandler.postDelayed(CameraPreview.mTimer.updateTimerThread, 0);
+
+                // This runnable is stopped in CameraPreview.releaseMediaRecorder();
             }
 
         }
