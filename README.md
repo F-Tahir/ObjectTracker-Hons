@@ -24,9 +24,11 @@
 - [ ] Add full functionality to flash button
     - [ ] Listen to users changes and store users preference
     - [ ] Embed the actual flashlight into the application
-- [ ] Add framestamp (frame #) to YML document (format below)
+- [ ] Add framestamp functionality
+    - [ ] Add frame number to YML file when user clicks to track object
     - [ ] Add current frame number to corner of surface view when user has tapped screen. Research some API's to find frame information
     - [ ] Add the frame number to the final recording for testing (this is used to ensure the frame/timestamp correspondence is accurate). Look into AndroidFFMpeg for this.
+    - [ ] Store milliseconds in the YML timestamp for more accuracy
 - [ ] Make the UI layout for camera full screen 
     - [ ] Make the toolbars transparent (i.e. no black frame), so that the optimal resolution isn't wonky.
  
@@ -110,16 +112,21 @@ Currently only hosting one drawable folder, but likely in future will also split
 ## Misc
 
 ### YAML Format
-The YAML format should follow something along the lines of:
+The YAML format should follow something along the lines of (assuming 30 FPS):
 
 ```
-timestamp: 00:00:03
+framenumber: 90
+    timestamp: 00:00:03
     x: 256
     y: 181
-timestamp: 00:00:06
+framenumber: 180    
+    timestamp: 00:00:06
     x: 280 
     y: 193
 ...
+...
+...
+
 ```
     
     

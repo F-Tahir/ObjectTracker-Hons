@@ -5,13 +5,60 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private String TAG = "object:tracker";
+
+    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch(status) {
+                case LoaderCallbackInterface.SUCCESS:
+                    Log.i(TAG,"OpenCV Manager Connected");
+                    // Can make OpenCV API calls from now on
+                    break;
+                case LoaderCallbackInterface.INIT_FAILED:
+                    Log.i(TAG,"Init Failed");
+                    break;
+                case LoaderCallbackInterface.INSTALL_CANCELED:
+                    Log.i(TAG,"Install Cancelled");
+                    break;
+                case LoaderCallbackInterface.INCOMPATIBLE_MANAGER_VERSION:
+                    Log.i(TAG,"Incompatible Version");
+                    break;
+                case LoaderCallbackInterface.MARKET_ERROR:
+                    Log.i(TAG,"Market Error");
+                    break;
+                default:
+                    Log.i(TAG,"OpenCV Manager Install");
+                    super.onManagerConnected(status);
+                    break;
+            }
+        }
+    };
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //initialize OpenCV manager
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, this, mLoaderCallback);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,9 +76,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startTrackingButton.setOnClickListener(this);
         viewRecordingsButton.setOnClickListener(this);
         preferencesButton.setOnClickListener(this);
-
-
     }
+
 
 
     @Override

@@ -23,9 +23,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.1'
-    compile files('libs/TangoSDK_Vega_Java.jar')
-    compile(name: 'TangoUX_Vega_Java', ext: 'aar')
-    compile(name: 'TangoSupport_Vega_Java', ext: 'aar')
     compile(name: 'color-picker', ext: 'aar')
     compile project(':openCVLibrary')
 }
