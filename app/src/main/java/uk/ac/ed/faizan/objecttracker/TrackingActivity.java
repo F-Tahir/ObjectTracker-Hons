@@ -20,13 +20,15 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
-import org.opencv.android.FpsMeter;
+import org.opencv.android.CameraBridgeViewBase;
+
 
 
 public class TrackingActivity extends Activity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
     private final static String TAG = "object:tracker"; // For debugging purposes
+    CameraBridgeViewBase mCameraPreview;
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -35,6 +37,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
 
         // Set up UI to make full screen, low profile soft-keys, etc.
         setupScreen();
@@ -48,6 +51,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         ImageView flashButton = (ImageView) findViewById(R.id.flashlight_button);
         ImageView recordButton = (ImageView) findViewById(R.id.record_button);
 
+        mCameraPreview = (CameraBridgeViewBase) findViewById(R.id.camera_preview);
+
         freezeButton.setOnClickListener(this);
         colorButton.setOnClickListener(this);
         flashButton.setOnClickListener(this);
@@ -60,8 +65,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         // If the camera is connected, then disconnect the camera and unbind the Tango service
         super.onPause();
 
-        // If user presses home buttoh whilst recording, the recording will save and state set to normal.
+        // If user presses home button whilst recording, the recording will save and state set to normal.
         // All of this is handled in releaseMediaRecorder();
+
+        if (mCameraPreview != null) {
+            mCameraPreview.disableView();
+        }
         cameraPreview.releaseMediaRecorder(); // release resources such as preview
         cameraPreview.releaseCamera(); // release the camera so that other applications can use it
     }
@@ -75,7 +84,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         // Pass in the timestamp widget and surfaceview into the cameraPreview construct.
         cameraPreview = new CameraPreview(
                 this,
-                (SurfaceView) findViewById(R.id.camera_preview),
+                (CameraBridgeViewBase) findViewById(R.id.camera_preview),
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
                 (ImageView) findViewById(R.id.record_button));
@@ -189,6 +198,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     }
 
 
+
     /**
      * Asynchronous task for preparing the {@link android.media.MediaRecorder} since it's a long blocking
      * operation.
@@ -221,8 +231,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             if (!result) {
                 TrackingActivity.this.finish();
 
-            // If doInBackground() returns true, then recording was
-            // successful, so change record state and icons
+                // If doInBackground() returns true, then recording was
+                // successful, so change record state and icons
             } else {
                 ImageView recordButton = (ImageView) findViewById(R.id.record_button);
                 recordButton.setImageResource(R.drawable.ic_stop);
@@ -240,7 +250,3 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     }
 
 }
-
-
-
-

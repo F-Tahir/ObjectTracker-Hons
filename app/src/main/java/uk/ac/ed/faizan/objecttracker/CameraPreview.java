@@ -16,6 +16,10 @@ import android.hardware.Camera;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +31,11 @@ import java.util.List;
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
  */
 
-public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListener {
+public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListener, CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
 
-    static SurfaceView mCameraView;
+    static CameraBridgeViewBase mCameraView;
     static SurfaceView mOverlayView;
     static SurfaceHolder mHolder;
     static SurfaceHolder mOverlayHolder;
@@ -58,11 +62,17 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
     // Coordinates of touched position;
     float mX;
     float mY;
+    int frameCount = 0;
 
-    public CameraPreview(Context context, SurfaceView preview, SurfaceView overlay,
+    public CameraPreview(Context context, CameraBridgeViewBase preview, SurfaceView overlay,
                          TextView timestamp, ImageView recordButton) {
         mContext = context;
         mCameraView = preview;
+        
+        mCameraView.setVisibility(SurfaceView.VISIBLE);
+        mCameraView.setCvCameraViewListener(this);
+
+
         mHolder = mCameraView.getHolder();
         mHolder.addCallback(this);
 
@@ -75,7 +85,6 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
         mRecordButton = recordButton;
 
         mCamera = CameraHelper.getDefaultCameraInstance();
-        mMediaRecorder = new MediaRecorder();
 
         mTimer = new Timer(timestamp);
         mCameraView.setOnTouchListener(this);
@@ -254,6 +263,18 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {}
 
+    @Override
+    public void onCameraViewStarted(int width, int height) {}
+
+    @Override
+    public void onCameraViewStopped() {}
+
+    @Override
+    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        Log.i(TAG, "Framecount is " + frameCount);
+        frameCount++;
+        return null;
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -265,6 +286,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
                 Log.i(TAG, "In here");
                 Log.i(TAG, "mX is " + Float.toString(mX));
                 Log.i(TAG, "mY is " + Float.toString(mY));
+                Log.i(TAG, "Framecount is " + Integer.toString(frameCount));
 
                 // Check to see if the current holder actually exists and is active
                 if (mOverlayHolder.getSurface().isValid()) {
