@@ -39,6 +39,7 @@
 - [ ] Add runtime permissions for devices >= Lollipop (https://developer.android.com/training/permissions/requesting.html)
     - [ ] Request permissions at runtime for Camera
     - [ ] Request permissions at runtime for Storage
+- [ ] Create own filepicker for app (http://stackoverflow.com/questions/18097763/how-to-open-the-my-files-folder-in-android-programatically-using-intent)
 
 ## Project Summary
 
