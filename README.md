@@ -19,19 +19,26 @@
     - [x] Allow user to change colour of circle
     - [ ] Allow user to change radius of circle (*possibly*)
 
-### Additions to manual tracking (to be done by 10th October) 
+### Additions to manual tracking (to be done by 17th October) 
 
-- [ ] Add full functionality to flash button
-    - [ ] Listen to users changes and store users preference
-    - [ ] Embed the actual flashlight into the application
+
 - [ ] Add framestamp functionality
     - [ ] Add frame number to YML file when user clicks to track object
     - [ ] Add current frame number to corner of surface view when user has tapped screen. Research some API's to find frame information
     - [ ] Add the frame number to the final recording for testing (this is used to ensure the frame/timestamp correspondence is accurate). Look into AndroidFFMpeg for this.
-    - [ ] Store milliseconds in the YML timestamp for more accuracy
+    - [X] Store milliseconds in the YML timestamp for more accuracy
 - [ ] Make the UI layout for camera full screen 
     - [ ] Make the toolbars transparent (i.e. no black frame), so that the optimal resolution isn't wonky.
  
+
+### Changes/implementations to be made but are currently not prioritized
+
+- [ ] Add full functionality to flash button
+    - [ ] Listen to users changes and store users preference
+    - [ ] Embed the actual flashlight into the application
+- [ ] Add runtime permissions for devices >= Lollipop (https://developer.android.com/training/permissions/requesting.html)
+    - [ ] Request permissions at runtime for Camera
+    - [ ] Request permissions at runtime for Storage
 
 ## Project Summary
 

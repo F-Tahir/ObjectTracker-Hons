@@ -265,8 +265,9 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
                 Log.i(TAG, "In here");
                 Log.i(TAG, "mX is " + Float.toString(mX));
                 Log.i(TAG, "mY is " + Float.toString(mY));
+
+                // Check to see if the current holder actually exists and is active
                 if (mOverlayHolder.getSurface().isValid()) {
-                    Log.i(TAG, "Surface is valid");
                     drawCircle();
                 }
                 break;
@@ -291,7 +292,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
             canvas.drawCircle(mX, mY, 60, paint);
             mOverlayHolder.unlockCanvasAndPost(canvas);
-            CreateFiles.appendToFile(mDataFile, mTimestamp.getText().toString(), mX, mY);
+            CreateFiles.appendToFile(mDataFile, Timer.ymlTimestamp, mX, mY);
         }
     }
 
