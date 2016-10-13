@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private String TAG = "object:tracker";
 
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -51,10 +52,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-
     @Override
     protected void onResume() {
         super.onResume();
+
         //initialize OpenCV manager
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, this, mLoaderCallback);
     }

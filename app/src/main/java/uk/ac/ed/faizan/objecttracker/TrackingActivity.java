@@ -20,8 +20,10 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
 
 
 public class TrackingActivity extends Activity implements View.OnClickListener {
@@ -32,6 +34,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
+
 
     // Inflate the layout and set the camera view when activity is created
     @Override
@@ -51,9 +54,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         ImageView flashButton = (ImageView) findViewById(R.id.flashlight_button);
         ImageView recordButton = (ImageView) findViewById(R.id.record_button);
 
-        mCameraPreview = (CameraBridgeViewBase) findViewById(R.id.camera_preview);
-
-        freezeButton.setOnClickListener(this);
         colorButton.setOnClickListener(this);
         flashButton.setOnClickListener(this);
         recordButton.setOnClickListener(this);
@@ -88,11 +88,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
                 (ImageView) findViewById(R.id.record_button));
-
-
-        // Set up camera and surface view to show camera preview
-        cameraPreview.setupCameraView();
-
     }
 
     /* Called when activity is created, to make activity full screen, hide status bars, and ensure
@@ -163,11 +158,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         popup.show();
     }
 
-
-    /*
-     * Create a dialog to select the color for tracking overlay (e.g. a bounding box).
-     * Default color is red (#FF0000) as defined in global variable selectedColor above.
-     */
+        /*
+         * Create a dialog to select the color for tracking overlay (e.g. a bounding box).
+         * Default color is red (#FF0000) as defined in global variable selectedColor above.
+         */
     public void getColor(Button button) {
         ColorPickerDialogBuilder
                 .with(this)
@@ -220,6 +214,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             } else {
                 // prepare didn't work, release the camera
                 cameraPreview.releaseMediaRecorder();
+                cameraPreview.releaseCamera();
                 return false;
             }
             return true;

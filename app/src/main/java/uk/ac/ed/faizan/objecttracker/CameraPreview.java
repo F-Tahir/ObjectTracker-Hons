@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.JavaCameraView;
 import org.opencv.core.Mat;
 
 import java.io.File;
@@ -31,7 +32,8 @@ import java.util.List;
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
  */
 
-public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListener, CameraBridgeViewBase.CvCameraViewListener2 {
+public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListener,
+        CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
 
@@ -64,14 +66,14 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
     float mY;
     int frameCount = 0;
 
+
     public CameraPreview(Context context, CameraBridgeViewBase preview, SurfaceView overlay,
                          TextView timestamp, ImageView recordButton) {
         mContext = context;
         mCameraView = preview;
-        
-        mCameraView.setVisibility(SurfaceView.VISIBLE);
-        mCameraView.setCvCameraViewListener(this);
 
+        mCameraView.enableView();
+        mCameraView.setCvCameraViewListener(this);
 
         mHolder = mCameraView.getHolder();
         mHolder.addCallback(this);
@@ -84,7 +86,14 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
         mTimestamp = timestamp;
         mRecordButton = recordButton;
 
-        mCamera = CameraHelper.getDefaultCameraInstance();
+        // Causes errors on the Google Tango device
+//        try {
+//            releaseCamera();
+//            mCamera = CameraHelper.getDefaultCameraInstance();
+//        } catch (Exception e) {
+//            Log.i(TAG, "Camera failed to open successfully");
+//        }
+
 
         mTimer = new Timer(timestamp);
         mCameraView.setOnTouchListener(this);
@@ -93,6 +102,8 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
     /* Called in onResume() to set up the camera and the surfaceView associated with it. The surface
      * view is used to preview the camera buffer before recording initializes.
+     *
+     * CURRENTLY NOT USED - mCameraPreview.enableView(); does this for us.
      */
     public boolean setupCameraView() {
 
@@ -183,7 +194,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
         // Step 2: Set sources
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
         // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
         mMediaRecorder.setProfile(mProfile);
@@ -271,9 +282,9 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Log.i(TAG, "Framecount is " + frameCount);
-        frameCount++;
-        return null;
+
+        if (isRecording) frameCount++;
+        return inputFrame.rgba();
     }
 
     @Override
