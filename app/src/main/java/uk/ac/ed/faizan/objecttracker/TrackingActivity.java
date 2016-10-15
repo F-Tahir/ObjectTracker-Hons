@@ -2,6 +2,7 @@ package uk.ac.ed.faizan.objecttracker;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -26,7 +27,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 
-public class TrackingActivity extends Activity implements View.OnClickListener {
+public class  TrackingActivity extends Activity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
     private final static String TAG = "object:tracker"; // For debugging purposes
@@ -34,6 +35,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
+
+    // Colours to be passed into OpenCV constructs
+    static int a = 255;
+    static int r = 255;
+    static int g = 0;
+    static int b = 0;
 
 
     // Inflate the layout and set the camera view when activity is created
@@ -49,13 +56,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_tracking);
 
         // Register and set onClickListeners for various views
-        Button freezeButton =  (Button) findViewById(R.id.freeze_button);
         Button colorButton =  (Button) findViewById(R.id.select_color_button);
-        ImageView flashButton = (ImageView) findViewById(R.id.flashlight_button);
         ImageView recordButton = (ImageView) findViewById(R.id.record_button);
 
         colorButton.setOnClickListener(this);
-        flashButton.setOnClickListener(this);
         recordButton.setOnClickListener(this);
     }
 
@@ -112,10 +116,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.flashlight_button:
-                ImageView flashButton = (ImageView) v;
-                showFlashPopupMenu(flashButton);
-                break;
             case R.id.select_color_button:
                 Button colorButton = (Button) v;
                 getColor(colorButton);
@@ -125,7 +125,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     // release the MediaRecorder object, change icons, set isRecording = false;,
                     // and stop the timestamp from updating (and reset to 0)
                     cameraPreview.releaseMediaRecorder();
-                    CameraPreview.mCamera.lock();         // take camera access back from MediaRecorder
+                    //CameraPreview.mCamera.lock();         // take camera access back from MediaRecorder
                     Toast.makeText(this, "Saved in" +
                             CameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
@@ -175,6 +175,16 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
                         if (overlayColor != selectedColor) {
                             overlayColor = selectedColor;
+                            a = Color.alpha(overlayColor);
+                            r = Color.red(overlayColor);
+                            g = Color.green(overlayColor);
+                            b = Color.blue(overlayColor);
+
+                            Log.i(TAG, "overlayColor is " + Integer.toHexString(overlayColor));
+                            Log.i(TAG, "a is " + a);
+                            Log.i(TAG, "r is " + r);
+                            Log.i(TAG, "g is " + g);
+                            Log.i(TAG, "b is " + b);
                             Toast.makeText(TrackingActivity.this,
                                     "Color selection saved.", Toast.LENGTH_SHORT).show();
                         }
@@ -208,8 +218,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 // Camera is available and unlocked, MediaRecorder is prepared,
                 // now you can start recording
 
-                CameraPreview.mMediaRecorder.start();
-                Log.i(TAG, "Successfully started.");
+                return true;
 
             } else {
                 // prepare didn't work, release the camera
@@ -217,7 +226,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 cameraPreview.releaseCamera();
                 return false;
             }
-            return true;
         }
 
 
@@ -229,6 +237,15 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 // If doInBackground() returns true, then recording was
                 // successful, so change record state and icons
             } else {
+
+                Log.i(TAG, "Prepare was successful, now attempting to start");
+                try {
+                    CameraPreview.mMediaRecorder.start();
+                    Log.i(TAG, "MediaRecorder started properly");
+                } catch (RuntimeException e) {
+                    Log.i(TAG, "MediaRecorder did not start properly.");
+                }
+
                 ImageView recordButton = (ImageView) findViewById(R.id.record_button);
                 recordButton.setImageResource(R.drawable.ic_stop);
                 CameraPreview.isRecording = true;

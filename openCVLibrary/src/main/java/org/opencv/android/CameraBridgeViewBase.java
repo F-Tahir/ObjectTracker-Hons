@@ -6,6 +6,7 @@ import org.opencv.R;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,8 +15,10 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.media.MediaRecorder;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -29,6 +32,7 @@ import android.view.SurfaceView;
 public abstract class CameraBridgeViewBase extends SurfaceView implements SurfaceHolder.Callback {
 
     private static final String TAG = "CameraBridge";
+    private static final String TAG1 = "object:tracker";
     private static final int MAX_UNSPECIFIED = -1;
     private static final int STOPPED = 0;
     private static final int STARTED = 1;
@@ -54,6 +58,32 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
     public static final int CAMERA_ID_FRONT = 98;
     public static final int RGBA = 1;
     public static final int GRAY = 2;
+
+    protected MediaRecorder mRecorder;
+    protected Surface mSurface = null;
+
+    @TargetApi(21)
+    public void setRecorder(MediaRecorder rec) {
+        mRecorder = rec;
+        if (mRecorder != null) {
+            mSurface = mRecorder.getSurface();
+        }
+    }
+    public void releaseRecording(){
+
+        if (mSurface != null) {
+            mSurface.release();
+            mSurface = null;
+        }
+    }
+
+    public int getmFrameWidth() {
+        return mFrameWidth;
+    }
+
+    public int getmFrameHeight() {
+        return mFrameHeight;
+    }
 
     public CameraBridgeViewBase(Context context, int cameraId) {
         super(context);
@@ -407,22 +437,24 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
 
         if (bmpValid && mCacheBitmap != null) {
             Canvas canvas = getHolder().lockCanvas();
+            Canvas canvas1;
+
             if (canvas != null) {
                 canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
                 Log.d(TAG, "mStretch value: " + mScale);
 
                 if (mScale != 0) {
                     canvas.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
-                         new Rect((int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2),
-                         (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2),
-                         (int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2 + mScale*mCacheBitmap.getWidth()),
-                         (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2 + mScale*mCacheBitmap.getHeight())), null);
+                            new Rect((int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2),
+                                    (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2),
+                                    (int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2 + mScale*mCacheBitmap.getWidth()),
+                                    (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2 + mScale*mCacheBitmap.getHeight())), null);
                 } else {
-                     canvas.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
-                         new Rect((canvas.getWidth() - mCacheBitmap.getWidth()) / 2,
-                         (canvas.getHeight() - mCacheBitmap.getHeight()) / 2,
-                         (canvas.getWidth() - mCacheBitmap.getWidth()) / 2 + mCacheBitmap.getWidth(),
-                         (canvas.getHeight() - mCacheBitmap.getHeight()) / 2 + mCacheBitmap.getHeight()), null);
+                    canvas.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
+                            new Rect((canvas.getWidth() - mCacheBitmap.getWidth()) / 2,
+                                    (canvas.getHeight() - mCacheBitmap.getHeight()) / 2,
+                                    (canvas.getWidth() - mCacheBitmap.getWidth()) / 2 + mCacheBitmap.getWidth(),
+                                    (canvas.getHeight() - mCacheBitmap.getHeight()) / 2 + mCacheBitmap.getHeight()), null);
                 }
 
                 if (mFpsMeter != null) {
@@ -431,6 +463,37 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
                 }
                 getHolder().unlockCanvasAndPost(canvas);
             }
+
+            if (mSurface != null) {
+                canvas1 = mSurface.lockCanvas(null);
+                canvas1.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
+                Log.d(TAG, "mStretch value: " + mScale);
+
+                if (mScale != 0) {
+                    canvas1.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
+                            new Rect((int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2),
+                                    (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2),
+                                    (int)((canvas.getWidth() - mScale*mCacheBitmap.getWidth()) / 2 + mScale*mCacheBitmap.getWidth()),
+                                    (int)((canvas.getHeight() - mScale*mCacheBitmap.getHeight()) / 2 + mScale*mCacheBitmap.getHeight())), null);
+                } else {
+                    canvas1.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
+                            new Rect((canvas.getWidth() - mCacheBitmap.getWidth()) / 2,
+                                    (canvas.getHeight() - mCacheBitmap.getHeight()) / 2,
+                                    (canvas.getWidth() - mCacheBitmap.getWidth()) / 2 + mCacheBitmap.getWidth(),
+                                    (canvas.getHeight() - mCacheBitmap.getHeight()) / 2 + mCacheBitmap.getHeight()), null);
+                }
+
+                if (mFpsMeter != null) {
+                    mFpsMeter.measure();
+                    mFpsMeter.draw(canvas1, 20, 30);
+                }
+                mSurface.unlockCanvasAndPost(canvas1);
+            }
+
+
+
+
+
         }
     }
 

@@ -1,5 +1,6 @@
 package uk.ac.ed.faizan.objecttracker;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -10,29 +11,30 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.hardware.Camera;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCameraView;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
+import org.opencv.core.Point;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
 
 /*
  * This class is responsible for setting up the SurfacePreview, getting the Camera instance,
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
  */
 
-public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListener,
+public class CameraPreview implements View.OnTouchListener,
         CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
@@ -51,8 +53,8 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
     static File mMediaFile;
     static File mDataFile;
     static File mRootFolder;
+    static Surface mRecordingSurface;
 
-    static CamcorderProfile mProfile;
     static Canvas canvas;
 
     static boolean isRecording = false;
@@ -60,6 +62,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
     static Timer mTimer;
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    Mat newMat;
 
     // Coordinates of touched position;
     float mX;
@@ -76,7 +79,6 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
         mCameraView.setCvCameraViewListener(this);
 
         mHolder = mCameraView.getHolder();
-        mHolder.addCallback(this);
 
         mOverlayView = overlay;
         mOverlayHolder = mOverlayView.getHolder();
@@ -86,39 +88,9 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
         mTimestamp = timestamp;
         mRecordButton = recordButton;
 
-        // Causes errors on the Google Tango device
-//        try {
-//            releaseCamera();
-//            mCamera = CameraHelper.getDefaultCameraInstance();
-//        } catch (Exception e) {
-//            Log.i(TAG, "Camera failed to open successfully");
-//        }
-
 
         mTimer = new Timer(timestamp);
         mCameraView.setOnTouchListener(this);
-    }
-
-
-    /* Called in onResume() to set up the camera and the surfaceView associated with it. The surface
-     * view is used to preview the camera buffer before recording initializes.
-     *
-     * CURRENTLY NOT USED - mCameraPreview.enableView(); does this for us.
-     */
-    public boolean setupCameraView() {
-
-        if (mHolder == null) {
-            return false;
-        }
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        mCamera.startPreview();
-        return true;
     }
 
 
@@ -126,7 +98,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
      * if the user was recording, then as well as stopping the recording in the onPause() method,
      * we also change the ic_stop icon back to ic_record, and set isRecording = false.
      */
-    public void releaseMediaRecorder(){
+    public synchronized void releaseMediaRecorder(){
 
         // If recording is stopped, clear the canvas so that no circles are present
         // after recording
@@ -139,8 +111,10 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
             Log.i(TAG, "Canvas is null");
         }
 
+
         if (isRecording) {
             try {
+                mCameraView.releaseRecording();
                 mMediaRecorder.stop();  // stop the recording
 
                 // Tell the media scanner about the new file so that it is
@@ -151,9 +125,7 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
             } catch (RuntimeException e) {
                 // RuntimeException is thrown when stop() is called immediately after start().
                 // In this case the output file is not properly constructed ans should be deleted.
-                Log.d(TAG, "RuntimeException: stop() is called immediately after start()");
-                //noinspection ResultOfMethodCallIgnored
-                mMediaFile.delete();
+                throw new AssertionError(e);
             }
 
             mTimestamp.setText(R.string.timestamp);
@@ -169,9 +141,9 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
             // release the recorder object
             mMediaRecorder.release();
             mMediaRecorder = null;
+
             // Lock camera for later use i.e taking it back from MediaRecorder.
             // MediaRecorder doesn't need it anymore and we will release it if the activity pauses.
-            mCamera.lock();
         }
     }
 
@@ -184,20 +156,17 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
         }
     }
 
-    public boolean prepareVideoRecorder(){
+    @TargetApi(23)
+    public boolean prepareVideoRecorder() {
 
         mMediaRecorder = new MediaRecorder();
 
-        // Step 1: Unlock and set camera for MediaRecorder
-        mCamera.unlock();
-        mMediaRecorder.setCamera(mCamera);
+
 
         // Step 2: Set sources
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
 
-        // Step 3: Set a CamcorderProfile (requires API Level 8 or higher)
-        mMediaRecorder.setProfile(mProfile);
 
         // Step 4: Set output file (handled in CameraHelper)
         String date = CreateFiles.getDate();
@@ -214,12 +183,26 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
             return false;
         }
 
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mMediaRecorder.setVideoSize(320, 240);
+        mMediaRecorder.setVideoFrameRate(30);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+
+
         mMediaRecorder.setOutputFile(mMediaFile.getPath());
-        mMediaRecorder.setPreviewDisplay(mHolder.getSurface());
 
         // Step 5: Prepare configured MediaRecorder
         try {
             mMediaRecorder.prepare();
+            Log.i(TAG, "Prepare was successful");
+
+            mCameraView.setRecorder(mMediaRecorder);
+            if (mRecordingSurface == null) {
+                Log.i(TAG, "Recording surface is null");
+            } else {
+                Log.i(TAG, "Recording surface is not null");
+            }
         } catch (IllegalStateException e) {
             Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
             releaseMediaRecorder();
@@ -234,57 +217,27 @@ public class CameraPreview implements SurfaceHolder.Callback, View.OnTouchListen
 
 
     @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
-        Log.i(TAG, "Surface created for the first time");
-        if (mCamera != null) {
-
-            // We need to make sure that our preview and recording video size are supported by the
-            // camera. Query camera to find all the sizes and choose the optimal size given the
-            // dimensions of our preview surface.
-            Camera.Parameters parameters = mCamera.getParameters();
-            List<Camera.Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
-            List<Camera.Size> mSupportedVideoSizes = parameters.getSupportedVideoSizes();
-            Camera.Size optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
-                    mSupportedPreviewSizes, mCameraView.getWidth(), mCameraView.getHeight());
-
-            // Use the same size for recording profile.
-            mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-            mProfile.videoFrameWidth = optimalSize.width;
-            mProfile.videoFrameHeight = optimalSize.height;
-
-
-            // likewise for the camera object itself.
-            parameters.setPreviewSize(mProfile.videoFrameWidth, mProfile.videoFrameHeight);
-            mCamera.setParameters(parameters);
-
-            try {
-                mCamera.setPreviewDisplay(surfaceHolder);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mCamera.startPreview();
-        }
-
+    public void onCameraViewStarted(int width, int height) {
+        newMat = new Mat();
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {}
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {}
-
-    @Override
-    public void onCameraViewStarted(int width, int height) {}
-
-    @Override
-    public void onCameraViewStopped() {}
+    public void onCameraViewStopped() {
+        newMat.release();
+    }
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        if (isRecording) frameCount++;
-        return inputFrame.rgba();
+        newMat = inputFrame.rgba();
+        if (isRecording) {
+            frameCount++;
+
+            // RGBA order as opposed to ARGB.
+            Imgproc.putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 100,
+                    new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 10);
+        }
+        return newMat;
     }
 
     @Override

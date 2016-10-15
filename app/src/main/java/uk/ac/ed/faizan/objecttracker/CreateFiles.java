@@ -57,6 +57,7 @@ public class CreateFiles {
 
         if (!isExternalStorageWritable()) {
             Log.i(TAG, "External storage is not writeable");
+
             return null;
         }
         // Create an "ObjectTracker" folder in SDCard root
@@ -70,7 +71,7 @@ public class CreateFiles {
         if (createRootDirSuccessful) {
             Log.i(TAG, "Root directory has been created successfully.");
 
-            File secondaryDir = new File(dir.toString() + "/" + "RECORDING_" + timeStamp);
+            File secondaryDir = new File(dir.toString() + "/" + "REC_" + timeStamp);
             createSecondaryDirSuccessful = secondaryDir.mkdirs();
 
             if (createSecondaryDirSuccessful) {
