@@ -28,6 +28,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /*
  * This class is responsible for setting up the SurfacePreview, getting the Camera instance,
@@ -39,11 +40,10 @@ public class CameraPreview implements View.OnTouchListener,
 
     private final String TAG = "object:tracker";
 
-    static CameraBridgeViewBase mCameraView;
+    static CameraView mCameraView;
     static SurfaceView mOverlayView;
     static SurfaceHolder mHolder;
     static SurfaceHolder mOverlayHolder;
-
     static TextView mTimestamp;
     static ImageView mRecordButton;
     static Context mContext;
@@ -58,6 +58,7 @@ public class CameraPreview implements View.OnTouchListener,
     static Canvas canvas;
 
     static boolean isRecording = false;
+    static boolean isFlashOn = false;
 
     static Timer mTimer;
 
@@ -67,15 +68,14 @@ public class CameraPreview implements View.OnTouchListener,
     // Coordinates of touched position;
     float mX;
     float mY;
-    int frameCount = 0;
+    static int frameCount = 0;
 
 
-    public CameraPreview(Context context, CameraBridgeViewBase preview, SurfaceView overlay,
+    public CameraPreview(Context context, CameraView preview, SurfaceView overlay,
                          TextView timestamp, ImageView recordButton) {
         mContext = context;
         mCameraView = preview;
 
-        mCameraView.enableView();
         mCameraView.setCvCameraViewListener(this);
 
         mHolder = mCameraView.getHolder();
@@ -162,7 +162,6 @@ public class CameraPreview implements View.OnTouchListener,
         mMediaRecorder = new MediaRecorder();
 
 
-
         // Step 2: Set sources
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
@@ -183,11 +182,10 @@ public class CameraPreview implements View.OnTouchListener,
             return false;
         }
 
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setVideoSize(320, 240);
-        mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        CamcorderProfile mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+        mMediaRecorder.setCaptureRate(30.0);
+        mMediaRecorder.setProfile(mProfile);
+
 
 
         mMediaRecorder.setOutputFile(mMediaFile.getPath());
@@ -229,13 +227,17 @@ public class CameraPreview implements View.OnTouchListener,
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
+        Log.i(TAG, "Framecount is " + frameCount);
+
+        frameCount++;
         newMat = inputFrame.rgba();
         if (isRecording) {
-            frameCount++;
+
+
 
             // RGBA order as opposed to ARGB.
-            Imgproc.putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 100,
-                    new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 10);
+            //Imgproc.putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 100,
+                    //new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 10);
         }
         return newMat;
     }
@@ -260,6 +262,7 @@ public class CameraPreview implements View.OnTouchListener,
         }
         return true;
     }
+
 
     private void drawCircle() {
 

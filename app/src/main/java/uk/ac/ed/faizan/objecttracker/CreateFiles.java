@@ -154,8 +154,8 @@ public class CreateFiles {
 
         try {
             fos = new FileOutputStream(dataFile.toString(), true);
-            byte[] buffer = String.format(Locale.UK, "timestamp: %s\n\tx: %d\n\ty: %d\n",
-                    timeStamp, (int) xCoord, (int) yCoord).getBytes();
+            byte[] buffer = String.format(Locale.UK, "framestamp: %d\n\ttimestamp: %s\n\tx: %d\n\ty: %d\n",
+                    CameraPreview.frameCount, timeStamp, (int) xCoord, (int) yCoord).getBytes();
             fos.write(buffer);
             Log.i(TAG, "Wrote to " + dataFile);
             fos.close();

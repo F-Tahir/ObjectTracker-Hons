@@ -26,12 +26,14 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
+import java.util.List;
+
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
     private final static String TAG = "object:tracker"; // For debugging purposes
-    CameraBridgeViewBase mCameraPreview;
+    CameraView mCameraPreview;
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -58,9 +60,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         // Register and set onClickListeners for various views
         Button colorButton =  (Button) findViewById(R.id.select_color_button);
         ImageView recordButton = (ImageView) findViewById(R.id.record_button);
+        Button flashButton = (Button) findViewById(R.id.flash_button);
 
         colorButton.setOnClickListener(this);
         recordButton.setOnClickListener(this);
+        flashButton.setOnClickListener(this);
     }
 
     // Called when activity becomes obscured.
@@ -84,11 +88,12 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     protected void onResume() {
         Log.i(TAG, "In resume");
         super.onResume();
-
+        mCameraPreview = (CameraView) findViewById(R.id.camera_preview);
+        mCameraPreview.enableView();
         // Pass in the timestamp widget and surfaceview into the cameraPreview construct.
         cameraPreview = new CameraPreview(
                 this,
-                (CameraBridgeViewBase) findViewById(R.id.camera_preview),
+                mCameraPreview,
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
                 (ImageView) findViewById(R.id.record_button));
@@ -140,6 +145,22 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     new MediaPrepareTask().execute(null, null, null);
                 }
                 break;
+            case R.id.flash_button:
+                List<String> flashModes = mCameraPreview.getFlashModes();
+                if (CameraPreview.isFlashOn) {
+                    if (mCameraPreview.hasCameraFlash()) {
+                        mCameraPreview.disableFlash(flashModes);
+                    }
+                    CameraPreview.isFlashOn = false;
+                } else {
+                    CameraPreview.isFlashOn = true;
+                    if (mCameraPreview.hasCameraFlash()) {
+                        mCameraPreview.enableFlash(flashModes);
+                        Log.i(TAG, "Camera has flash");
+                    } else {
+                        Toast.makeText(this, "Flash not available on this device", Toast.LENGTH_LONG).show();
+                    }
+                }
         }
     }
 

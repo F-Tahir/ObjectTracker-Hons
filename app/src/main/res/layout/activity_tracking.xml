@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <org.opencv.android.JavaCameraView
+        <uk.ac.ed.faizan.objecttracker.CameraView
             android:id="@+id/camera_preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,20 +27,34 @@
     </FrameLayout>
 
     <RelativeLayout
-    android:id="@+id/toolbar_top"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:layout_alignParentTop="true"
-    android:layout_centerHorizontal="true">
+        android:id="@+id/toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/camera_ui_horizontal_margin"
+        android:layout_marginEnd="@dimen/camera_ui_horizontal_margin">
 
-    <Button
-        android:id="@+id/select_color_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:background="?android:attr/selectableItemBackground"
-        android:text="@string/set_color"
-        android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/flash_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/enable_flash"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/select_color_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/set_color"
+            android:textColor="@android:color/white" />
 
     </RelativeLayout>
 

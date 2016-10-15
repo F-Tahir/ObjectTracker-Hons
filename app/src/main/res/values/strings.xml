@@ -21,5 +21,6 @@
     <string name="flash_popup_off">Off</string>
     <string name="flash_popup_auto">Auto</string>
     <string name="set_color">Set Color</string>
+    <string name="enable_flash">Enable Flash</string>
 
 </resources>
