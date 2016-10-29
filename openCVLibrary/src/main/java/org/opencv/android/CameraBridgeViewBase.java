@@ -492,7 +492,9 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
                     mFpsMeter.measure();
                     mFpsMeter.draw(canvas, 20, 30);
                 }
-                mSurface.unlockCanvasAndPost(canvas);
+                // Bugfix to avoid app crashing when recording is stopped
+                if (mSurface != null)
+                    mSurface.unlockCanvasAndPost(canvas);
             }
 
         }

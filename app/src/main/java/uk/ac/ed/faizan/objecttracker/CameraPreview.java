@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.util.Log;
@@ -15,27 +14,31 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Core;
 import org.opencv.core.Scalar;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 
+
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+
+import static org.opencv.imgproc.Imgproc.putText;
 
 /*
  * This class is responsible for setting up the SurfacePreview, getting the Camera instance,
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
  */
 
-public class CameraPreview implements View.OnTouchListener,
+public class
+CameraPreview implements View.OnTouchListener,
         CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
@@ -165,6 +168,19 @@ public class CameraPreview implements View.OnTouchListener,
         // Step 2: Set sources
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+
+        Size preferredSize = mCameraView.getPreferredSize();
+
+        Log.i(TAG, "Preferred width: " + preferredSize.width);
+        Log.i(TAG, "Preferred height: " + preferredSize.height);
+        mMediaRecorder.setVideoSize(preferredSize.width, preferredSize.height);
+        mMediaRecorder.setVideoFrameRate(30);
+        mMediaRecorder.setVideoEncodingBitRate(8 * 1000 * 1000);
+
+		mCameraView.setPreviewSize(preferredSize.width, preferredSize.height);
 
 
         // Step 4: Set output file (handled in CameraHelper)
@@ -181,10 +197,6 @@ public class CameraPreview implements View.OnTouchListener,
             Log.i(TAG, "Output file was not created successfully!");
             return false;
         }
-
-        CamcorderProfile mProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
-        mMediaRecorder.setCaptureRate(30.0);
-        mMediaRecorder.setProfile(mProfile);
 
 
 
@@ -236,8 +248,8 @@ public class CameraPreview implements View.OnTouchListener,
 
 
             // RGBA order as opposed to ARGB.
-            //Imgproc.putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 100,
-                    //new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 10);
+            putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
+                    new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 2);
         }
         return newMat;
     }

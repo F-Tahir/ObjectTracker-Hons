@@ -2,6 +2,7 @@ package uk.ac.ed.faizan.objecttracker;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 
 import android.util.Log;
@@ -26,6 +27,16 @@ public class CameraView extends JavaCameraView {
         return p.getFlashMode() != null;
     }
 
+    public Size getPreferredSize() {
+        return mCamera.getParameters().getPreferredPreviewSizeForVideo();
+    }
+
+
+	public void setPreviewSize(int width, int height) {
+		Camera.Parameters params = mCamera.getParameters();
+		params.setPreviewSize(width, height);
+		mCamera.setParameters(params);
+	}
     /*
      * This method returns all the supported flash modes. It does not check if the device actually
      * supports flash, so could return null. Because of this, it is recommended to call hasCameraFlash()
@@ -55,6 +66,8 @@ public class CameraView extends JavaCameraView {
         parameters2.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
         mCamera.setParameters(parameters2);
     }
+
+
 
 
 
