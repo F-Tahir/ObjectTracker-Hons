@@ -55,7 +55,6 @@ CameraPreview implements View.OnTouchListener,
     static MediaRecorder mMediaRecorder;
     static File mMediaFile;
     static File mDataFile;
-    static File mRootFolder;
     static Surface mRecordingSurface;
 
     static Canvas canvas;
@@ -97,11 +96,14 @@ CameraPreview implements View.OnTouchListener,
     }
 
 
-    /* Called when the recording is stopped, or if the activity was paused, so we should make sure that
+
+    /** Called when the recording is stopped, or if the activity was paused, so we should make sure that
      * if the user was recording, then as well as stopping the recording in the onPause() method,
      * we also change the ic_stop icon back to ic_record, and set isRecording = false.
      */
     public synchronized void releaseMediaRecorder(){
+
+        frameCount = 0;
 
         // If recording is stopped, clear the canvas so that no circles are present
         // after recording
@@ -150,18 +152,18 @@ CameraPreview implements View.OnTouchListener,
         }
     }
 
-    // Called only when activity is paused, so that other applications can access the camera.
-    public void releaseCamera(){
-        if (mCamera != null){
-            // release the camera for other applications
-            mCamera.release();
-            mCamera = null;
-        }
-    }
-
-    @TargetApi(23)
+	/**
+     * This function is called when the user hits the record button. This function will set up the
+     * audio and video source, video framerate, encoding bitrate, create the video and data files,
+     * and finally start recording if everything is successful. <br><br>
+     * <b>Importantly</b>, this function sets the video (output resolution) size to the device's
+     * preferred size by calling the built in getPreferredSize() method. The returned value of this
+     * method differs over different devices.
+     * @return boolean States whether or not the MediaRecorder preview was successful.
+     */
     public boolean prepareVideoRecorder() {
 
+        frameCount = 0;
         mMediaRecorder = new MediaRecorder();
 
 
@@ -172,37 +174,31 @@ CameraPreview implements View.OnTouchListener,
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
+        // Set video size to preferred width and height, which is specific for each device.
         Size preferredSize = mCameraView.getPreferredSize();
-
-        Log.i(TAG, "Preferred width: " + preferredSize.width);
-        Log.i(TAG, "Preferred height: " + preferredSize.height);
         mMediaRecorder.setVideoSize(preferredSize.width, preferredSize.height);
-        mMediaRecorder.setVideoFrameRate(30);
-        mMediaRecorder.setVideoEncodingBitRate(8 * 1000 * 1000);
+        mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
 
-		mCameraView.setPreviewSize(preferredSize.width, preferredSize.height);
+        // Sets to 30 but does not check if phone supports 30, so need to add this
+        mCameraView.setFps();
+
+        // Lock exposure to increase fps
+        mCameraView.lockAutoExposure();
 
 
-        // Step 4: Set output file (handled in CameraHelper)
-        String date = CreateFiles.getDate();
-        mRootFolder = CreateFiles.getOutputFolder(date);
-        Log.i(TAG, "Output folder is " + mRootFolder.toString());
-
-        mMediaFile = CreateFiles.getOutputMediaFile(
-                CreateFiles.MEDIA_TYPE_VIDEO, mRootFolder, date);
-        mDataFile = CreateFiles.getOutputDataFile(mRootFolder, date);
-
+        // Create the data and video file output
+        long now = System.currentTimeMillis();
+        mMediaFile = Utils.getVideoFile(now);
+        mDataFile = Utils.getDataFile(now);
 
         if (mMediaFile == null) {
             Log.i(TAG, "Output file was not created successfully!");
             return false;
         }
 
-
-
         mMediaRecorder.setOutputFile(mMediaFile.getPath());
 
-        // Step 5: Prepare configured MediaRecorder
+        // Try to prepare/start themedia recorder
         try {
             mMediaRecorder.prepare();
             Log.i(TAG, "Prepare was successful");
@@ -239,17 +235,15 @@ CameraPreview implements View.OnTouchListener,
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        Log.i(TAG, "Framecount is " + frameCount);
-
-        frameCount++;
         newMat = inputFrame.rgba();
         if (isRecording) {
 
-
+            frameCount++;
+            Log.i(TAG, "Frame count is " + frameCount);
 
             // RGBA order as opposed to ARGB.
-            putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
-                    new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 2);
+            /*putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
+                  new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 2);*/
         }
         return newMat;
     }
@@ -261,10 +255,6 @@ CameraPreview implements View.OnTouchListener,
             case MotionEvent.ACTION_DOWN:
                 mX = event.getX();
                 mY = event.getY();
-                Log.i(TAG, "In here");
-                Log.i(TAG, "mX is " + Float.toString(mX));
-                Log.i(TAG, "mY is " + Float.toString(mY));
-                Log.i(TAG, "Framecount is " + Integer.toString(frameCount));
 
                 // Check to see if the current holder actually exists and is active
                 if (mOverlayHolder.getSurface().isValid()) {
@@ -276,6 +266,18 @@ CameraPreview implements View.OnTouchListener,
     }
 
 
+	/**
+     * A method used for Manual tracking mode only. This method reacts to a users touch when recording.
+     * The touch location's x and y coordinates are parsed, and stored into the corresponding .yml
+     * file for the recording. A circle is then drawn on the screen to mark the touch location.
+     * This circle's colour can be changed using the interface.<br><br>
+     *
+     * <b>Note</b> that the x and y coordinates are stored in terms of the camera resolution, <i>not</i> the
+     * screen resolution.If this is not done, then for example, a 2560x1440 screen recording at 1920x1080
+     * will pose issueswhen storing coordinates. If the user touches the bottom right corner, 2560x1440~
+     * will be stored,as opposed to 1920x1080, which is the video resolution. It is obvious that this
+     * poses issues.
+     */
     private void drawCircle() {
 
         // Draw only if an active recording is taking place
@@ -293,7 +295,11 @@ CameraPreview implements View.OnTouchListener,
 
             canvas.drawCircle(mX, mY, 60, paint);
             mOverlayHolder.unlockCanvasAndPost(canvas);
-            CreateFiles.appendToFile(mDataFile, Timer.ymlTimestamp, mX, mY);
+
+            Utils.appendToFile(mDataFile, frameCount, Timer.ymlTimestamp,
+                (mX * mCameraView.getFrameWidth())/mCameraView.getWidth(),
+                (mY * mCameraView.getFrameHeight())/mCameraView.getHeight());
+
         }
     }
 

@@ -21,18 +21,13 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
-
 import java.util.List;
 
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
 
     private CameraPreview cameraPreview;
-    private final static String TAG = "object:tracker"; // For debugging purposes
+    private final String TAG = getClass().getSimpleName();
     CameraView mCameraPreview;
 
     // Default color for overlay color when tracking objects (Red)
@@ -70,17 +65,14 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // Called when activity becomes obscured.
     @Override
     protected void onPause() {
-        // If the camera is connected, then disconnect the camera and unbind the Tango service
         super.onPause();
 
-        // If user presses home button whilst recording, the recording will save and state set to normal.
-        // All of this is handled in releaseMediaRecorder();
-
+        // This releases the camera
         if (mCameraPreview != null) {
             mCameraPreview.disableView();
         }
         cameraPreview.releaseMediaRecorder(); // release resources such as preview
-        cameraPreview.releaseCamera(); // release the camera so that other applications can use it
+
     }
 
     // Called after onCreate() in an Android activity lifecycle.
@@ -99,8 +91,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 (ImageView) findViewById(R.id.record_button));
     }
 
-    /* Called when activity is created, to make activity full screen, hide status bars, and ensure
-    that screen never times out whilst recording.
+    /**
+     * Called at the start of activity creation to configure the screen. Sets the screen to full-size,
+     * turns on immersive-screen mode, and ensures that the screen never times out.
      */
     public void setupScreen() {
         // Hide title and status bar
@@ -130,12 +123,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 Button colorButton = (Button) v;
                 getColor(colorButton);
                 break;
+
             case R.id.record_button:
                 if (CameraPreview.isRecording) {
-                    // release the MediaRecorder object, change icons, set isRecording = false;,
-                    // and stop the timestamp from updating (and reset to 0)
+                    // release the MediaRecorder object.
                     cameraPreview.releaseMediaRecorder();
-                    //CameraPreview.mCamera.lock();         // take camera access back from MediaRecorder
                     Toast.makeText(this, "Saved in" +
                             CameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
@@ -145,11 +137,10 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                             Toast.LENGTH_LONG).show();
 
                     // Prepare the camera in a separate task (as it can take time)
-                    // This method is also responsible for changing isRecording, icons, and
-                    // configfuring timestamp
                     new MediaPrepareTask().execute(null, null, null);
                 }
                 break;
+
             case R.id.flash_button:
                 List<String> flashModes = mCameraPreview.getFlashModes();
                 if (CameraPreview.isFlashOn) {
@@ -169,25 +160,12 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         }
     }
 
-
-    /* This method is called when the flash icon is clicked.
-     * A popup menu is presented to select On, Off, or Auto.
+    /**
+     * Create a dialog to select the color for tracking overlay. This tracking overlay includes
+     * text, bounding boxes, circles (for manual tracking, etc).
+     *
+     * @param button The view that has to be clicked to bring up the color selection pane.
      */
-    public void showFlashPopupMenu(ImageView image) {
-        PopupMenu popup = new PopupMenu(this, image);
-        popup.inflate(R.menu.flash_menu);
-
-
-        // Set "Auto" as the selected item as this is default
-        popup.getMenu().getItem(0).setChecked(true);
-
-        popup.show();
-    }
-
-        /*
-         * Create a dialog to select the color for tracking overlay (e.g. a bounding box).
-         * Default color is red (#FF0000) as defined in global variable selectedColor above.
-         */
     public void getColor(Button button) {
         ColorPickerDialogBuilder
                 .with(this)
@@ -231,12 +209,18 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
     /**
      * Asynchronous task for preparing the {@link android.media.MediaRecorder} since it's a long blocking
-     * operation.
+     * operation.<br><br>
+     * <b>Important:</b> This ASyncTask's onPostExecute method is responsible for setting the timer,
+     * changing the drawable resource to a stop button, and setting the isRecording boolean to true.
      */
     class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
 
-        // The return value states whether the MediaRecorder was successfully started or not.
-        // This value is passed into the onPostExecute method.
+		/**
+         * Calls the prepareVideoRecorder() method in an AsyncTask so it does not slow down the UI
+         * thread.
+         *
+         * @return boolean returns whether or not the MediaRecorder preparation was successful
+         */
         @Override
         protected Boolean doInBackground(Void... voids) {
             // initialize video camera
@@ -247,14 +231,19 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 return true;
 
             } else {
-                // prepare didn't work, release the camera
+                // prepare didn't work, release the recorder
                 cameraPreview.releaseMediaRecorder();
-                cameraPreview.releaseCamera();
                 return false;
             }
         }
 
 
+		/**
+         * If the MediaRecorder preparations were a success, this method starts the MediaRecorder,
+         * starts the timer, and changes the drawable resource and isRecording boolean.
+         *
+         * @param result Whether or not the essential MediaRecorder preparations were a success.
+         */
         @Override
         protected void onPostExecute(Boolean result) {
             if (!result) {
@@ -267,18 +256,19 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 Log.i(TAG, "Prepare was successful, now attempting to start");
                 try {
                     CameraPreview.mMediaRecorder.start();
+                    ImageView recordButton = (ImageView) findViewById(R.id.record_button);
+                    recordButton.setImageResource(R.drawable.ic_stop);
+                    CameraPreview.isRecording = true;
+
+                    // Start updating the timestamp for recording if preparation is successful.
+                    Timer.startTime = SystemClock.uptimeMillis();
+                    Timer.customHandler.postDelayed(CameraPreview.mTimer.updateTimerThread, 0);
                     Log.i(TAG, "MediaRecorder started properly");
                 } catch (RuntimeException e) {
                     Log.i(TAG, "MediaRecorder did not start properly.");
                 }
 
-                ImageView recordButton = (ImageView) findViewById(R.id.record_button);
-                recordButton.setImageResource(R.drawable.ic_stop);
-                CameraPreview.isRecording = true;
 
-                // Start updating the timestamp for recording if preparation is successful.
-                Timer.startTime = SystemClock.uptimeMillis();
-                Timer.customHandler.postDelayed(CameraPreview.mTimer.updateTimerThread, 0);
 
                 // This runnable is stopped in CameraPreview.releaseMediaRecorder();
             }
