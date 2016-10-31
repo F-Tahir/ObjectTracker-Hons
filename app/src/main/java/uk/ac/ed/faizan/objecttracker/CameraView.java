@@ -3,7 +3,6 @@ package uk.ac.ed.faizan.objecttracker;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
-import android.telecom.Call;
 import android.util.AttributeSet;
 
 import android.util.Log;
@@ -11,6 +10,8 @@ import android.util.Log;
 import org.opencv.android.JavaCameraView;
 
 import java.util.List;
+
+import static android.R.attr.width;
 
 public class CameraView extends JavaCameraView {
 

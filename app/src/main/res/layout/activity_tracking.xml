@@ -80,13 +80,14 @@
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="@android:color/white" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/record_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_toStartOf="@id/timestamp"
-            android:src="@drawable/ic_record" />
+            android:clickable="true"
+            android:src="@drawable/ic_record"/>
 
 
         </RelativeLayout>

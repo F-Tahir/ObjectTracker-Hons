@@ -180,6 +180,8 @@ CameraPreview implements View.OnTouchListener,
         mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
 
         // Sets to 30 but does not check if phone supports 30, so need to add this
+        // Will think about using a CamcorderProfile instead.
+        mMediaRecorder.setVideoFrameRate(30);
         mCameraView.setFps();
 
         // Lock exposure to increase fps
@@ -190,13 +192,12 @@ CameraPreview implements View.OnTouchListener,
         long now = System.currentTimeMillis();
         mMediaFile = Utils.getVideoFile(now);
         mDataFile = Utils.getDataFile(now);
-
         if (mMediaFile == null) {
             Log.i(TAG, "Output file was not created successfully!");
             return false;
         }
-
         mMediaRecorder.setOutputFile(mMediaFile.getPath());
+
 
         // Try to prepare/start themedia recorder
         try {
@@ -204,11 +205,7 @@ CameraPreview implements View.OnTouchListener,
             Log.i(TAG, "Prepare was successful");
 
             mCameraView.setRecorder(mMediaRecorder);
-            if (mRecordingSurface == null) {
-                Log.i(TAG, "Recording surface is null");
-            } else {
-                Log.i(TAG, "Recording surface is not null");
-            }
+
         } catch (IllegalStateException e) {
             Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
             releaseMediaRecorder();
