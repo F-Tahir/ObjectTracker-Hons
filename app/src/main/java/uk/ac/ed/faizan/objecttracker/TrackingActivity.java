@@ -13,7 +13,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,13 +25,12 @@ import java.util.List;
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
 
-    private CameraPreview cameraPreview;
     private final String TAG = getClass().getSimpleName();
-    CameraView mCameraPreview;
+    private CameraPreview mCameraPreview;
+    CameraControl mCameraControl;
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
-
     // Colours to be passed into OpenCV constructs
     static int a = 255;
     static int r = 255;
@@ -68,10 +66,10 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         super.onPause();
 
         // This releases the camera
-        if (mCameraPreview != null) {
-            mCameraPreview.disableView();
+        if (mCameraControl != null) {
+            mCameraControl.disableView();
         }
-        cameraPreview.releaseMediaRecorder(); // release resources such as preview
+        mCameraPreview.releaseMediaRecorder(); // release resources such as preview
 
     }
 
@@ -80,12 +78,12 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     protected void onResume() {
         Log.i(TAG, "In resume");
         super.onResume();
-        mCameraPreview = (CameraView) findViewById(R.id.camera_preview);
-        mCameraPreview.enableView();
-        // Pass in the timestamp widget and surfaceview into the cameraPreview construct.
-        cameraPreview = new CameraPreview(
+        mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
+        mCameraControl.enableView();
+        // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
+        mCameraPreview = new CameraPreview(
                 this,
-                mCameraPreview,
+            mCameraControl,
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
                 (ImageView) findViewById(R.id.record_button));
@@ -125,11 +123,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 break;
 
             case R.id.record_button:
-                if (CameraPreview.isRecording) {
+                if (mCameraPreview.isRecording) {
                     // release the MediaRecorder object.
-                    cameraPreview.releaseMediaRecorder();
+                    mCameraPreview.releaseMediaRecorder();
                     Toast.makeText(this, "Saved in" +
-                            CameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
+                            mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
                 } else {
 
@@ -142,21 +140,21 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 break;
 
             case R.id.flash_button:
-                List<String> flashModes = mCameraPreview.getFlashModes();
-                if (CameraPreview.isFlashOn) {
-                    if (mCameraPreview.hasCameraFlash()) {
-                        mCameraPreview.disableFlash(flashModes);
-                    }
-                    CameraPreview.isFlashOn = false;
-                } else {
-                    CameraPreview.isFlashOn = true;
-                    if (mCameraPreview.hasCameraFlash()) {
-                        mCameraPreview.enableFlash(flashModes);
-                        Log.i(TAG, "Camera has flash");
+                List<String> flashModes = mCameraControl.getFlashModes();
+
+                if (mCameraControl.hasCameraFlash()) {
+                    if (!mCameraPreview.isFlashOn) {
+                        mCameraControl.enableFlash(flashModes);
+                        mCameraPreview.isFlashOn = true;
                     } else {
-                        Toast.makeText(this, "Flash not available on this device", Toast.LENGTH_LONG).show();
+                        mCameraControl.disableFlash(flashModes);
+                        mCameraPreview.isFlashOn = false;
                     }
+                } else {
+                    Toast.makeText(this, "Camera does not support flash!", Toast.LENGTH_LONG).show();
                 }
+
+
         }
     }
 
@@ -224,15 +222,15 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         @Override
         protected Boolean doInBackground(Void... voids) {
             // initialize video camera
-            if (cameraPreview.prepareVideoRecorder()) {
-                // Camera is available and unlocked, MediaRecorder is prepared,
-                // now you can start recording
-
+            if (mCameraPreview.prepareVideoRecorder()) {
+                // Camera is available, MediaRecorder is prepared,
+                // now you can start recording. Goes to onPostExecute() with true as
+                // a parameter.
                 return true;
 
             } else {
-                // prepare didn't work, release the recorder
-                cameraPreview.releaseMediaRecorder();
+                // Prepare didn't work, release the recorder
+                mCameraPreview.releaseMediaRecorder();
                 return false;
             }
         }
@@ -255,20 +253,19 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
                 Log.i(TAG, "Prepare was successful, now attempting to start");
                 try {
-                    CameraPreview.mMediaRecorder.start();
+                    mCameraPreview.mMediaRecorder.start();
                     ImageView recordButton = (ImageView) findViewById(R.id.record_button);
                     recordButton.setImageResource(R.drawable.ic_stop);
-                    CameraPreview.isRecording = true;
+                    mCameraPreview.isRecording = true;
 
                     // Start updating the timestamp for recording if preparation is successful.
-                    Timer.startTime = SystemClock.uptimeMillis();
-                    Timer.customHandler.postDelayed(CameraPreview.mTimer.updateTimerThread, 0);
+                    mCameraPreview.mTimer.startTime = SystemClock.uptimeMillis();
+                    mCameraPreview.mTimer.customHandler.postDelayed(mCameraPreview.mTimer.updateTimerThread, 0);
                     Log.i(TAG, "MediaRecorder started properly");
+
                 } catch (RuntimeException e) {
                     Log.i(TAG, "MediaRecorder did not start properly.");
                 }
-
-
 
                 // This runnable is stopped in CameraPreview.releaseMediaRecorder();
             }

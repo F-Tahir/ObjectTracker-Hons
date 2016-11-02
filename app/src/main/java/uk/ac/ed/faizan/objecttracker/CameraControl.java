@@ -13,10 +13,10 @@ import java.util.List;
 
 import static android.R.attr.width;
 
-public class CameraView extends JavaCameraView {
+public class CameraControl extends JavaCameraView {
 
     public final String TAG = "object:tracker";
-    public CameraView(Context context, AttributeSet attrs) {
+    public CameraControl(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

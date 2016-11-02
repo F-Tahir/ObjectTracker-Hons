@@ -1,6 +1,5 @@
 package uk.ac.ed.faizan.objecttracker;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -10,10 +9,8 @@ import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,16 +18,12 @@ import android.widget.TextView;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
-import org.opencv.core.Core;
-import org.opencv.core.Scalar;
-import org.opencv.core.Point;
-import org.opencv.imgproc.Imgproc;
 
 
 import java.io.File;
 import java.io.IOException;
 
-import static org.opencv.imgproc.Imgproc.putText;
+
 
 /*
  * This class is responsible for setting up the SurfacePreview, getting the Camera instance,
@@ -43,44 +36,41 @@ CameraPreview implements View.OnTouchListener,
 
     private final String TAG = "object:tracker";
 
-    static CameraView mCameraView;
-    static SurfaceView mOverlayView;
-    static SurfaceHolder mHolder;
-    static SurfaceHolder mOverlayHolder;
-    static TextView mTimestamp;
-    static ImageView mRecordButton;
-    static Context mContext;
+    private CameraControl mCameraControl;
+    private SurfaceView mOverlayView;
+    private SurfaceHolder mHolder;
+    private SurfaceHolder mOverlayHolder;
+    private TextView mTimestamp;
+    private ImageView mRecordButton;
+    private Context mContext;
 
-    static Camera mCamera;
-    static MediaRecorder mMediaRecorder;
-    static File mMediaFile;
-    static File mDataFile;
-    static Surface mRecordingSurface;
+    MediaRecorder mMediaRecorder;
+    public Timer mTimer;
 
+    private File mDataFile;
+    File mMediaFile;
+
+    boolean isRecording = false;
+    boolean isFlashOn = false;
+
+    private Mat newMat;
+
+    // Booleans used for touch positions during manual tracking
+    private float mX;
+    private float mY;
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     static Canvas canvas;
 
-    static boolean isRecording = false;
-    static boolean isFlashOn = false;
-
-    static Timer mTimer;
-
-    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    Mat newMat;
-
-    // Coordinates of touched position;
-    float mX;
-    float mY;
     static int frameCount = 0;
 
 
-    public CameraPreview(Context context, CameraView preview, SurfaceView overlay,
+    public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
                          TextView timestamp, ImageView recordButton) {
         mContext = context;
-        mCameraView = preview;
+        mCameraControl = preview;
+        mHolder = mCameraControl.getHolder();
+        mCameraControl.setCvCameraViewListener(this);
 
-        mCameraView.setCvCameraViewListener(this);
-
-        mHolder = mCameraView.getHolder();
 
         mOverlayView = overlay;
         mOverlayHolder = mOverlayView.getHolder();
@@ -92,9 +82,76 @@ CameraPreview implements View.OnTouchListener,
 
 
         mTimer = new Timer(timestamp);
-        mCameraView.setOnTouchListener(this);
+
+        mCameraControl.setOnTouchListener(this);
+
+        mMediaRecorder = new MediaRecorder();
     }
 
+
+    /**
+     * This function is called when the user hits the record button. This function will set up the
+     * audio and video source, video framerate, encoding bitrate, create the video and data files,
+     * and finally start recording if everything is successful. <br><br>
+     * <b>Importantly</b>, this function sets the video (output resolution) size to the device's
+     * preferred size by calling the built in getPreferredSize() method. The returned value of this
+     * method differs over different devices.
+     * @return boolean States whether or not the MediaRecorder preview was successful.
+     */
+    public boolean prepareVideoRecorder() {
+
+        frameCount = 0;
+
+        // Step 2: Set sources
+        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
+        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+
+        // Set video size to preferred width and height, which is specific for each device.
+        Size preferredSize = mCameraControl.getPreferredSize();
+        // mMediaRecorder.setVideoSize(preferredSize.width, preferreSize.height);
+        mMediaRecorder.setVideoSize(1280, 720);
+        mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
+
+        // Sets to 30 but does not check if phone supports 30, so need to add this
+        // Will think about using a CamcorderProfile instead.
+        mMediaRecorder.setVideoFrameRate(30);
+
+        // Lock exposure to increase fps
+        mCameraControl.lockAutoExposure();
+
+
+        // Create the data and video file output
+        long now = System.currentTimeMillis();
+        mMediaFile = Utils.getVideoFile(now);
+        mDataFile = Utils.getDataFile(now);
+        if (mMediaFile == null) {
+            Log.i(TAG, "Output file was not created successfully!");
+            return false;
+        }
+        mMediaRecorder.setOutputFile(mMediaFile.getPath());
+
+
+        // Try to prepare/start themedia recorder
+        try {
+            mMediaRecorder.prepare();
+            Log.i(TAG, "Prepare was successful");
+
+            mCameraControl.setRecorder(mMediaRecorder);
+
+        } catch (IllegalStateException e) {
+            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        } catch (IOException e) {
+            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
+            releaseMediaRecorder();
+            return false;
+        }
+        return true;
+    }
 
 
     /** Called when the recording is stopped, or if the activity was paused, so we should make sure that
@@ -119,7 +176,7 @@ CameraPreview implements View.OnTouchListener,
 
         if (isRecording) {
             try {
-                mCameraView.releaseRecording();
+                mCameraControl.releaseRecording();
                 mMediaRecorder.stop();  // stop the recording
 
                 // Tell the media scanner about the new file so that it is
@@ -134,7 +191,7 @@ CameraPreview implements View.OnTouchListener,
             }
 
             mTimestamp.setText(R.string.timestamp);
-            Timer.customHandler.removeCallbacks(mTimer.updateTimerThread);
+            mTimer.customHandler.removeCallbacks(mTimer.updateTimerThread);
 
             mRecordButton.setImageResource(R.drawable.ic_record);
             isRecording = false;
@@ -152,73 +209,7 @@ CameraPreview implements View.OnTouchListener,
         }
     }
 
-	/**
-     * This function is called when the user hits the record button. This function will set up the
-     * audio and video source, video framerate, encoding bitrate, create the video and data files,
-     * and finally start recording if everything is successful. <br><br>
-     * <b>Importantly</b>, this function sets the video (output resolution) size to the device's
-     * preferred size by calling the built in getPreferredSize() method. The returned value of this
-     * method differs over different devices.
-     * @return boolean States whether or not the MediaRecorder preview was successful.
-     */
-    public boolean prepareVideoRecorder() {
-
-        frameCount = 0;
-        mMediaRecorder = new MediaRecorder();
-
-
-        // Step 2: Set sources
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
-        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
-
-        // Set video size to preferred width and height, which is specific for each device.
-        Size preferredSize = mCameraView.getPreferredSize();
-        mMediaRecorder.setVideoSize(preferredSize.width, preferredSize.height);
-        mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
-
-        // Sets to 30 but does not check if phone supports 30, so need to add this
-        // Will think about using a CamcorderProfile instead.
-        mMediaRecorder.setVideoFrameRate(30);
-        mCameraView.setFps();
-
-        // Lock exposure to increase fps
-        mCameraView.lockAutoExposure();
-
-
-        // Create the data and video file output
-        long now = System.currentTimeMillis();
-        mMediaFile = Utils.getVideoFile(now);
-        mDataFile = Utils.getDataFile(now);
-        if (mMediaFile == null) {
-            Log.i(TAG, "Output file was not created successfully!");
-            return false;
-        }
-        mMediaRecorder.setOutputFile(mMediaFile.getPath());
-
-
-        // Try to prepare/start themedia recorder
-        try {
-            mMediaRecorder.prepare();
-            Log.i(TAG, "Prepare was successful");
-
-            mCameraView.setRecorder(mMediaRecorder);
-
-        } catch (IllegalStateException e) {
-            Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
-            releaseMediaRecorder();
-            return false;
-        } catch (IOException e) {
-            Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
-            releaseMediaRecorder();
-            return false;
-        }
-        return true;
-    }
-
-
+    /* Functions implemented from setCvCameraListener*/
     @Override
     public void onCameraViewStarted(int width, int height) {
         newMat = new Mat();
@@ -229,6 +220,7 @@ CameraPreview implements View.OnTouchListener,
         newMat.release();
     }
 
+    /* We do our OpenCV frame processing here.*/
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
@@ -236,7 +228,6 @@ CameraPreview implements View.OnTouchListener,
         if (isRecording) {
 
             frameCount++;
-            Log.i(TAG, "Frame count is " + frameCount);
 
             // RGBA order as opposed to ARGB.
             /*putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
@@ -244,6 +235,7 @@ CameraPreview implements View.OnTouchListener,
         }
         return newMat;
     }
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -293,9 +285,9 @@ CameraPreview implements View.OnTouchListener,
             canvas.drawCircle(mX, mY, 60, paint);
             mOverlayHolder.unlockCanvasAndPost(canvas);
 
-            Utils.appendToFile(mDataFile, frameCount, Timer.ymlTimestamp,
-                (mX * mCameraView.getFrameWidth())/mCameraView.getWidth(),
-                (mY * mCameraView.getFrameHeight())/mCameraView.getHeight());
+            Utils.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp,
+                (mX * mCameraControl.getFrameWidth())/ mCameraControl.getWidth(),
+                (mY * mCameraControl.getFrameHeight())/ mCameraControl.getHeight());
 
         }
     }

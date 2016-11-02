@@ -61,6 +61,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
 
     protected MediaRecorder mRecorder;
     protected Surface mSurface = null;
+    Canvas canvas;
 
 
     /**
@@ -454,7 +455,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
         }
 
         if (bmpValid && mCacheBitmap != null) {
-            Canvas canvas = getHolder().lockCanvas();
+            canvas = getHolder().lockCanvas();
 
             if (canvas != null) {
                 canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
@@ -483,7 +484,6 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
         }
 
         if (bmpValid && mCacheBitmap != null) {
-            Canvas canvas;
 
             if (mRecorder != null && mSurface != null) {
 

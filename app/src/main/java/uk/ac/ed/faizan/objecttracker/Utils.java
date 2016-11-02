@@ -13,9 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 /**
- * Application Utilities
+ * Application Utilities. Consists of functions used to create the media and data files used during
+ * recording.
  *
- * Created by Faizan on 16/10/2016.
  */
 public final class Utils
 {
