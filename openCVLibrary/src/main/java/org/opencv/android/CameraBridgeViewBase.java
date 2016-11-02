@@ -62,6 +62,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
     protected MediaRecorder mRecorder;
     protected Surface mSurface = null;
     Canvas canvas;
+    private final Object mLock = new Object();
 
 
     /**
@@ -79,11 +80,13 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
             mSurface = mRecorder.getSurface();
         }
     }
-    public void releaseRecording(){
 
-        if (mSurface != null) {
-            mSurface.release();
-            mSurface = null;
+    public void releaseRecording(){
+        synchronized(mLock) {
+            if (mSurface != null) {
+                mSurface.release();
+                mSurface = null;
+            }
         }
     }
 
@@ -485,33 +488,36 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
 
         if (bmpValid && mCacheBitmap != null) {
 
-            if (mRecorder != null && mSurface != null) {
-
-                canvas = mSurface.lockCanvas(null);
-
-                canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
-                Log.d(TAG, "mStretch value: " + mScale);
+            synchronized (mLock) {
+                if (mRecorder != null && mSurface != null) {
 
 
-                // This section is used to draw the bitmap to the surface used for recording.
-                // I don't scale here because if I do scale, the result video will be clipped on some devices.
-                // Scaling is only needed for the preview, not the final video.
-                canvas.drawBitmap(mCacheBitmap, new Rect(0,0,mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
-                    new Rect((canvas.getWidth() - mCacheBitmap.getWidth()) / 2,
-                        (canvas.getHeight() - mCacheBitmap.getHeight()) / 2,
-                        (canvas.getWidth() - mCacheBitmap.getWidth()) / 2 + mCacheBitmap.getWidth(),
-                        (canvas.getHeight() - mCacheBitmap.getHeight()) / 2 + mCacheBitmap.getHeight()), null);
+                    canvas = mSurface.lockCanvas(null);
+
+                    canvas.drawColor(0, android.graphics.PorterDuff.Mode.CLEAR);
+                    Log.d(TAG, "mStretch value: " + mScale);
 
 
-                if (mFpsMeter != null) {
-                    mFpsMeter.measure();
-                    mFpsMeter.draw(canvas, 20, 30);
+                    // This section is used to draw the bitmap to the surface used for recording.
+                    // I don't scale here because if I do scale, the result video will be clipped on some devices.
+                    // Scaling is only needed for the preview, not the final video.
+                    canvas.drawBitmap(mCacheBitmap, new Rect(0, 0, mCacheBitmap.getWidth(), mCacheBitmap.getHeight()),
+                        new Rect((canvas.getWidth() - mCacheBitmap.getWidth()) / 2,
+                            (canvas.getHeight() - mCacheBitmap.getHeight()) / 2,
+                            (canvas.getWidth() - mCacheBitmap.getWidth()) / 2 + mCacheBitmap.getWidth(),
+                            (canvas.getHeight() - mCacheBitmap.getHeight()) / 2 + mCacheBitmap.getHeight()), null);
+
+
+                    if (mFpsMeter != null) {
+                        mFpsMeter.measure();
+                        mFpsMeter.draw(canvas, 20, 30);
+                    }
+                    // Bugfix to avoid app crashing when recording is stopped
+                    if (mSurface != null)
+                        mSurface.unlockCanvasAndPost(canvas);
                 }
-                // Bugfix to avoid app crashing when recording is stopped
-                if (mSurface != null)
-                    mSurface.unlockCanvasAndPost(canvas);
-            }
 
+            }
         }
 
     }

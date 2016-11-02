@@ -84,8 +84,6 @@ CameraPreview implements View.OnTouchListener,
         mTimer = new Timer(timestamp);
 
         mCameraControl.setOnTouchListener(this);
-
-        mMediaRecorder = new MediaRecorder();
     }
 
 
@@ -102,6 +100,8 @@ CameraPreview implements View.OnTouchListener,
 
         frameCount = 0;
 
+        mMediaRecorder = new MediaRecorder();
+
         // Step 2: Set sources
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
@@ -111,7 +111,7 @@ CameraPreview implements View.OnTouchListener,
 
         // Set video size to preferred width and height, which is specific for each device.
         Size preferredSize = mCameraControl.getPreferredSize();
-        // mMediaRecorder.setVideoSize(preferredSize.width, preferreSize.height);
+        // mMediaRecorder.setVideoSize(preferredSize.width, preferredSize.height);
         mMediaRecorder.setVideoSize(1280, 720);
         mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
 
@@ -198,6 +198,7 @@ CameraPreview implements View.OnTouchListener,
         }
 
         if (mMediaRecorder != null) {
+
             // clear recorder configuration
             mMediaRecorder.reset();
             // release the recorder object
