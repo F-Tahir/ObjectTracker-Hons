@@ -434,6 +434,9 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
      * This method shall be called by the subclasses when they have valid
      * object and want it to be delivered to external client (via callback) and
      * then displayed on the screen.
+     *
+     * A block is synchronized with a lock object so that it is not executed at the same time
+     * as the surface is released. If it were not synchronized, the app would occasionally crash.
      * @param frame - the current frame to be delivered
      */
     protected void deliverAndDrawFrame(CvCameraViewFrame frame) {

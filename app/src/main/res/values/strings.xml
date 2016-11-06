@@ -10,17 +10,16 @@
     <string name="view_recordings">View Recordings</string>
 
     <!-- Camera UI Text -->
-    <string name="manual_mode">Manual Mode</string>
-    <string name="freeze_camera">Freeze Camera</string>
-    <string name="unfreeze_camera">Unfreeze Camera</string>
     <string name="timestamp">0:00:00</string>
-    <string name="flashlight_auto">Auto</string>
 
     <!-- Flash popup menu -->
-    <string name="flash_popup_on">On</string>
-    <string name="flash_popup_off">Off</string>
-    <string name="flash_popup_auto">Auto</string>
-    <string name="set_color">Set Color</string>
-    <string name="enable_flash">Enable Flash</string>
+    <string name="flash_state_off">Off</string>
+    <string name="flash_state_on">On</string>
 
+    <!-- Freeze button -->
+    <string name="freeze_enabled">Frozen</string>
+    <string name="freeze_disabled">Live</string>
+
+    <string name="set_color">Color</string>
+    <string name="manual_tracking">Manual Tracking</string>
 </resources>

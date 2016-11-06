@@ -27,7 +27,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
     private final String TAG = getClass().getSimpleName();
     private CameraPreview mCameraPreview;
-    CameraControl mCameraControl;
+    private CameraControl mCameraControl;
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -50,14 +50,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         // Inflate layout
         setContentView(R.layout.activity_tracking);
 
-        // Register and set onClickListeners for various views
-        Button colorButton =  (Button) findViewById(R.id.select_color_button);
-        ImageView recordButton = (ImageView) findViewById(R.id.record_button);
-        Button flashButton = (Button) findViewById(R.id.flash_button);
-
-        colorButton.setOnClickListener(this);
-        recordButton.setOnClickListener(this);
-        flashButton.setOnClickListener(this);
+        // Register onClickListeners for various views
+        findViewById(R.id.select_color_button).setOnClickListener(this);
+        findViewById(R.id.record_button).setOnClickListener(this);
+        findViewById(R.id.flash_button).setOnClickListener(this);
+        findViewById(R.id.freeze_button).setOnClickListener(this);
     }
 
     // Called when activity becomes obscured.
@@ -141,19 +138,43 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
             case R.id.flash_button:
                 List<String> flashModes = mCameraControl.getFlashModes();
+                Button flashButton = (Button) v;
 
                 if (mCameraControl.hasCameraFlash()) {
                     if (!mCameraPreview.isFlashOn) {
                         mCameraControl.enableFlash(flashModes);
                         mCameraPreview.isFlashOn = true;
+                        flashButton.setText(getResources().getString(R.string.flash_state_on));
+                        flashButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_flash_on, 0, 0);
+
                     } else {
                         mCameraControl.disableFlash(flashModes);
                         mCameraPreview.isFlashOn = false;
+                        flashButton.setText(getResources().getString(R.string.flash_state_off));
+                        flashButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_flash_off, 0, 0);
                     }
                 } else {
                     Toast.makeText(this, "Camera does not support flash!", Toast.LENGTH_LONG).show();
                 }
+                break;
 
+            case R.id.freeze_button:
+                Button freezeButton = (Button) v;
+                if (!mCameraPreview.isRecording) {
+
+                    if (!mCameraPreview.isPreviewFrozen) {
+                        freezeButton.setText(getResources().getString(R.string.freeze_enabled));
+                        mCameraPreview.isPreviewFrozen = true;
+                        mCameraControl.disableView();
+                    } else {
+                        mCameraPreview.isPreviewFrozen = false;
+                        freezeButton.setText(getResources().getString(R.string.freeze_disabled));
+                        mCameraControl.enableView();
+                    }
+                } else {
+                    Toast.makeText(this, "Cannot freeze whilst recording!", Toast.LENGTH_SHORT).show();
+                }
+                break;
 
         }
     }

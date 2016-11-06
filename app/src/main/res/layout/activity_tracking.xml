@@ -19,21 +19,15 @@
             opencv:camera_id="back"
             opencv:show_fps="false" />
 
-        <SurfaceView
-            android:id="@+id/transparent_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
     </FrameLayout>
 
     <RelativeLayout
+        android:paddingTop="8dp"
         android:id="@+id/toolbar_top"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="@dimen/camera_ui_horizontal_margin"
-        android:layout_marginEnd="@dimen/camera_ui_horizontal_margin">
+        android:layout_alignParentStart="true">
 
 
         <Button
@@ -42,32 +36,64 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
+            android:drawableTop="@drawable/ic_flash_off"
             android:background="?android:attr/selectableItemBackground"
-            android:text="@string/enable_flash"
+            android:text="@string/flash_state_off"
+            android:textAllCaps="false"
             android:textColor="@android:color/white" />
+
+        <Switch
+            android:id="@+id/tracking_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/manual_tracking"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:checked="true"/>
 
         <Button
             android:id="@+id/select_color_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
+            android:drawableTop="@drawable/ic_color_picker"
             android:background="?android:attr/selectableItemBackground"
             android:text="@string/set_color"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+
+        <Button
+            android:id="@+id/freeze_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_flash_off"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/freeze_disabled"
+            android:textAllCaps="false"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
             android:textColor="@android:color/white" />
 
-    </RelativeLayout>
+        <SurfaceView
+            android:id="@+id/transparent_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"/>
 
+    </RelativeLayout>
 
 
     <RelativeLayout
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginBottom="@dimen/camera_ui_vertical_margin"
-        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/timestamp"
@@ -87,10 +113,10 @@
             android:layout_centerInParent="true"
             android:layout_toStartOf="@id/timestamp"
             android:clickable="true"
-            android:src="@drawable/ic_record"/>
+            android:src="@drawable/ic_record1"/>
 
+    </RelativeLayout>
 
-        </RelativeLayout>
 
 
 </RelativeLayout>

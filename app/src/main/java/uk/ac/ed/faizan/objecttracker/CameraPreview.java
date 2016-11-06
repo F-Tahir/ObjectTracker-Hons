@@ -18,10 +18,13 @@ import android.widget.TextView;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 
 
 import java.io.File;
 import java.io.IOException;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 
 
@@ -52,6 +55,7 @@ CameraPreview implements View.OnTouchListener,
 
     boolean isRecording = false;
     boolean isFlashOn = false;
+    boolean isPreviewFrozen = false;
 
     private Mat newMat;
 
@@ -59,9 +63,9 @@ CameraPreview implements View.OnTouchListener,
     private float mX;
     private float mY;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    static Canvas canvas;
 
-    static int frameCount = 0;
+    private static Canvas canvas;
+    private static int frameCount = 0;
 
 
     public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
@@ -221,18 +225,23 @@ CameraPreview implements View.OnTouchListener,
         newMat.release();
     }
 
-    /* We do our OpenCV frame processing here.*/
+    /* We do our OpenCV frame processing here.
+    * When the camera preview is frozen (i.e. user hits freeze button), then disableView() is
+    * called, and consequently, this callback will no longer be executed.
+    *
+    * Note: Preview can only be frozen whilst user is not recording.
+    */
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
+        Log.i(TAG, "New frame");
         newMat = inputFrame.rgba();
         if (isRecording) {
 
             frameCount++;
-
             // RGBA order as opposed to ARGB.
-            /*putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
-                  new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 2);*/
+            // /*putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
+            //new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 2);*/
         }
         return newMat;
     }
