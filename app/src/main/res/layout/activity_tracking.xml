@@ -42,16 +42,6 @@
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
 
-        <Switch
-            android:id="@+id/tracking_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:text="@string/manual_tracking"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"
-            android:checked="true"/>
 
         <Button
             android:id="@+id/select_color_button"
@@ -69,7 +59,7 @@
             android:id="@+id/freeze_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableTop="@drawable/ic_flash_off"
+            android:drawableTop="@drawable/ic_freeze_disabled"
             android:background="?android:attr/selectableItemBackground"
             android:text="@string/freeze_disabled"
             android:textAllCaps="false"
@@ -88,12 +78,14 @@
 
 
     <RelativeLayout
+
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:gravity="center_vertical"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="@dimen/activity_vertical_margin">
 
         <TextView
             android:id="@+id/timestamp"
@@ -113,10 +105,24 @@
             android:layout_centerInParent="true"
             android:layout_toStartOf="@id/timestamp"
             android:clickable="true"
-            android:src="@drawable/ic_record1"/>
+            android:src="@drawable/ic_record"/>
+
+
+
+        <Button
+            android:id="@+id/tracking_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/camera_ui_horizontal_margin"
+            android:layout_alignParentEnd="true"
+            android:text="@string/manual_tracking"
+            android:textAllCaps="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:textColor="@android:color/white"
+            android:layout_centerVertical="true"/>
+
 
     </RelativeLayout>
-
 
 
 </RelativeLayout>

@@ -158,17 +158,20 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 }
                 break;
 
+            // Deals with changing drawables and other resources when freeze is enabled/disabled.
             case R.id.freeze_button:
                 Button freezeButton = (Button) v;
                 if (!mCameraPreview.isRecording) {
 
                     if (!mCameraPreview.isPreviewFrozen) {
-                        freezeButton.setText(getResources().getString(R.string.freeze_enabled));
                         mCameraPreview.isPreviewFrozen = true;
+                        freezeButton.setText(getResources().getString(R.string.freeze_enabled));
+                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_enabled, 0, 0);
                         mCameraControl.disableView();
                     } else {
                         mCameraPreview.isPreviewFrozen = false;
                         freezeButton.setText(getResources().getString(R.string.freeze_disabled));
+                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
                         mCameraControl.enableView();
                     }
                 } else {

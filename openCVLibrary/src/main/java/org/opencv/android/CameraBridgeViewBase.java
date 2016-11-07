@@ -492,7 +492,7 @@ public abstract class CameraBridgeViewBase extends SurfaceView implements Surfac
         if (bmpValid && mCacheBitmap != null) {
 
             synchronized (mLock) {
-                if (mRecorder != null && mSurface != null) {
+                if (mRecorder != null && mSurface != null && mSurface.isValid()) {
 
 
                     canvas = mSurface.lockCanvas(null);
