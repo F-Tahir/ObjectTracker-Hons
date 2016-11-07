@@ -23,25 +23,24 @@
 
     <RelativeLayout
         android:paddingTop="8dp"
+        android:paddingLeft="-12dp"
         android:id="@+id/toolbar_top"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
 
-
         <Button
-            android:id="@+id/flash_button"
+            android:id="@+id/tracking_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:drawableTop="@drawable/ic_flash_off"
+            android:text="@string/tracking_mode"
+            android:textAllCaps="true"
+            android:textSize="12sp"
             android:background="?android:attr/selectableItemBackground"
-            android:text="@string/flash_state_off"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white" />
-
+            android:textColor="@android:color/white"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"/>
 
         <Button
             android:id="@+id/select_color_button"
@@ -51,9 +50,30 @@
             android:background="?android:attr/selectableItemBackground"
             android:text="@string/set_color"
             android:textAllCaps="false"
+            android:textSize="10sp"
             android:textColor="@android:color/white"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"/>
+            android:drawablePadding="-12dp"
+            android:layout_marginBottom="-4dp"
+            android:layout_below="@id/tracking_mode"
+            />
+
+
+
+        <Button
+            android:id="@+id/flash_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_flash_off"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/flash_state_off"
+            android:textSize="10sp"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            android:drawablePadding="-16dp"
+            android:layout_marginBottom="-4dp"
+            android:layout_below="@id/select_color_button"/>
+
+
 
         <Button
             android:id="@+id/freeze_button"
@@ -62,10 +82,13 @@
             android:drawableTop="@drawable/ic_freeze_disabled"
             android:background="?android:attr/selectableItemBackground"
             android:text="@string/freeze_disabled"
+            android:textSize="10sp"
             android:textAllCaps="false"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:drawablePadding="-12dp"
+            android:layout_marginBottom="-4dp"
+            android:layout_below="@id/flash_button"/>
+
 
         <SurfaceView
             android:id="@+id/transparent_view"
@@ -106,21 +129,6 @@
             android:layout_toStartOf="@id/timestamp"
             android:clickable="true"
             android:src="@drawable/ic_record"/>
-
-
-
-        <Button
-            android:id="@+id/tracking_state"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/camera_ui_horizontal_margin"
-            android:layout_alignParentEnd="true"
-            android:text="@string/manual_tracking"
-            android:textAllCaps="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:textColor="@android:color/white"
-            android:layout_centerVertical="true"/>
-
 
     </RelativeLayout>
 
