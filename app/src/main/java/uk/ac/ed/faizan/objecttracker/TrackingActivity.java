@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.PopupMenu;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -22,12 +24,17 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.util.List;
 
+import static android.R.attr.button;
+
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
 
     private final String TAG = getClass().getSimpleName();
     private CameraPreview mCameraPreview;
     private CameraControl mCameraControl;
+
+    // trackingMode 0 states manual mode, 1 states automatic mode
+    int trackingMode = 0;
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -55,6 +62,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         findViewById(R.id.record_button).setOnClickListener(this);
         findViewById(R.id.flash_button).setOnClickListener(this);
         findViewById(R.id.freeze_button).setOnClickListener(this);
+        findViewById(R.id.tracking_mode_button).setOnClickListener(this);
     }
 
     // Called when activity becomes obscured.
@@ -111,9 +119,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // View v refers to the widget that was clicked. A second method is then called depending on the
     // type of view clicked. For instance, if the "Freeze Camera" button was clicked, then
     // case R.id.freeze_button would be executed
+    // TODO: Clean up this click listener code
     public void onClick(View v) {
 
         switch (v.getId()) {
+
             case R.id.select_color_button:
                 Button colorButton = (Button) v;
                 getColor(colorButton);
@@ -135,6 +145,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     new MediaPrepareTask().execute(null, null, null);
                 }
                 break;
+
 
             case R.id.flash_button:
                 List<String> flashModes = mCameraControl.getFlashModes();
@@ -158,6 +169,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 }
                 break;
 
+
             // Deals with changing drawables and other resources when freeze is enabled/disabled.
             case R.id.freeze_button:
                 Button freezeButton = (Button) v;
@@ -179,8 +191,47 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 }
                 break;
 
+
+            // TODO: Add functionality to "Help" button, which displays info of each mode
+            // TODO: Clean up this code a little
+            case R.id.tracking_mode_button:
+                PopupMenu popup = new PopupMenu(this, v);
+                popup.inflate(R.menu.tracking_type_menu);
+
+                // Set the menu item according to whatever is saved in trackingMode field.
+                popup.getMenu().getItem(trackingMode).setChecked(true);
+
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item)
+                    {
+                        switch (item.getItemId()) {
+                            case R.id.manual:
+                                item.setChecked(true);
+                                trackingMode = 0;
+                                Toast.makeText(TrackingActivity.this, "Tracking mode set to manual.",
+                                    Toast.LENGTH_SHORT).show();
+                                return true;
+
+                            case R.id.automatic:
+                                item.setChecked(true);
+                                trackingMode = 1;
+                                Toast.makeText(TrackingActivity.this, "Tracking mode set to automatic.",
+                                    Toast.LENGTH_SHORT).show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+
+                });
+
+                popup.show();
+
         }
     }
+
 
     /**
      * Create a dialog to select the color for tracking overlay. This tracking overlay includes

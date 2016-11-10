@@ -21,5 +21,8 @@
     <string name="freeze_disabled">Live</string>
 
     <string name="set_color">Color</string>
-    <string name="tracking_mode">Mode</string>
+    <string name="mode">Mode</string>
+    <string name="manual_tracking">Manual Tracking</string>
+    <string name="automatic_tracking">Automatic Tracking</string>
+    <string name="help">Help</string>
 </resources>

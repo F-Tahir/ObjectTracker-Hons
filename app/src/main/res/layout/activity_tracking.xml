@@ -31,11 +31,10 @@
         android:layout_alignParentStart="true">
 
         <Button
-            android:id="@+id/tracking_mode"
+            android:id="@+id/tracking_mode_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="
-            "
+            android:text="@string/mode"
             android:textAllCaps="true"
             android:textSize="12sp"
             android:background="?android:attr/selectableItemBackground"
@@ -55,7 +54,7 @@
             android:textColor="@android:color/white"
             android:drawablePadding="-12dp"
             android:layout_marginBottom="-4dp"
-            android:layout_below="@id/tracking_mode"
+            android:layout_below="@id/tracking_mode_button"
             />
 
 

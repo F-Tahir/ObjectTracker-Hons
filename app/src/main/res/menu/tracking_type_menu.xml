@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:checkableBehavior="single"
+        android:id="@+id/test">
+        <item
+            android:id="@+id/manual"
+            android:title="@string/manual_tracking"/>
+
+        <item
+            android:id="@+id/automatic"
+            android:title="@string/automatic_tracking" />
+    </group>
+
+        <item android:id="@+id/help"
+              android:title="@string/help"/>
+</menu>
