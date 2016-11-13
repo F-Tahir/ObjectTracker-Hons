@@ -4,14 +4,12 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
-
 import android.util.Log;
 
 import org.opencv.android.JavaCameraView;
 
 import java.util.List;
 
-import static android.R.attr.width;
 
 public class CameraControl extends JavaCameraView {
 
@@ -78,13 +76,6 @@ public class CameraControl extends JavaCameraView {
         }
     }
 
-
-    public void setFps() {
-        // Should check to see if camera supports this range, and if not, select next closest range.
-        Camera.Parameters p = mCamera.getParameters();
-        p.setPreviewFpsRange( 30000, 30000 ); // 30 fps
-        mCamera.setParameters(p);
-    }
 
     public void lockAutoExposure() {
         Camera.Parameters p = mCamera.getParameters();

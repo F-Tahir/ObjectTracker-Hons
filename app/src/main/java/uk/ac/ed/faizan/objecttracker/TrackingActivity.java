@@ -147,6 +147,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                         // Prepare the camera in a separate task (as it can take time)
                         new MediaPrepareTask().execute(null, null, null);
                     }
+
                     // Automatic tracking
                 } else {
 
@@ -158,6 +159,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                         Toast.makeText(this, "Now recording using automatic tracking. " +
                             "Template file is template.jpg.",
                             Toast.LENGTH_LONG).show();
+
                         // Prepare the camera in a separate task (as it can take time)
                         new MediaPrepareTask().execute(null, null, null);
                     }
