@@ -73,6 +73,22 @@ public final class Utils
 
 
 	/**
+	 * // TODO: Remove this function once I create a method to select template in realtime.
+	 *
+	 * Retrieves the template matching file for automatic tracking. The template file
+	 * is stored in the root "ObjectTracker" folder as a .jpg or .png, and is always named
+	 * template.jpg (for now)
+	 *
+	 * @return Path to the template file
+	 */
+	public static File getTemplateFile() {
+		File root = new File(Environment.getExternalStorageDirectory(), "ObjectTracker");
+
+		return new File(root, "template.jpg");
+	}
+
+
+	/**
 	 * Creates the root ObjectTracker directory if it does not exist. Within that directory, creates
 	 * a folder with the naming format yyyyMMdd (i.e. a new folder for each day), so that the folders
 	 * are not cluttered. Within this folder, creates a furhter file depending on the <i>ext</i> parameter.

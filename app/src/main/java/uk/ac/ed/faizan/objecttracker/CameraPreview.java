@@ -18,13 +18,11 @@ import android.widget.TextView;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-
+import org.opencv.highgui.Highgui;
 
 import java.io.File;
 import java.io.IOException;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 
 
@@ -38,7 +36,6 @@ CameraPreview implements View.OnTouchListener,
         CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
-
     private CameraControl mCameraControl;
     private SurfaceView mOverlayView;
     private SurfaceHolder mHolder;
@@ -46,6 +43,9 @@ CameraPreview implements View.OnTouchListener,
     private TextView mTimestamp;
     private ImageView mRecordButton;
     private Context mContext;
+    private int mTrackingMode; // 0 for manual tracking, 1 for automatic
+    private Mat mCameraMat;
+    private Mat mTemplateMat;
 
     MediaRecorder mMediaRecorder;
     public Timer mTimer;
@@ -53,11 +53,15 @@ CameraPreview implements View.OnTouchListener,
     private File mDataFile;
     File mMediaFile;
 
+    // Used only in automatic tracking for template matching.
+
+
     boolean isRecording = false;
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
 
-    private Mat newMat;
+
+
 
     // Booleans used for touch positions during manual tracking
     private float mX;
@@ -69,7 +73,7 @@ CameraPreview implements View.OnTouchListener,
 
 
     public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
-                         TextView timestamp, ImageView recordButton) {
+                         TextView timestamp, ImageView recordButton, int trackingMode) {
         mContext = context;
         mCameraControl = preview;
         mHolder = mCameraControl.getHolder();
@@ -83,7 +87,6 @@ CameraPreview implements View.OnTouchListener,
 
         mTimestamp = timestamp;
         mRecordButton = recordButton;
-
 
         mTimer = new Timer(timestamp);
 
@@ -100,7 +103,15 @@ CameraPreview implements View.OnTouchListener,
      * method differs over different devices.
      * @return boolean States whether or not the MediaRecorder preview was successful.
      */
-    public boolean prepareVideoRecorder() {
+    public boolean prepareVideoRecorder(int trackingMode) {
+
+        mTrackingMode = trackingMode;
+
+        // Get the template from root if tracking mode is 1 (automatic tracking)
+        // TODO: Possibly remove once I implement template matching in realtime
+        if (mTrackingMode == 1) {
+            mTemplateMat = Highgui.imread(Utils.getTemplateFile().toString());
+        }
 
         frameCount = 0;
 
@@ -217,12 +228,16 @@ CameraPreview implements View.OnTouchListener,
     /* Functions implemented from setCvCameraListener*/
     @Override
     public void onCameraViewStarted(int width, int height) {
-        newMat = new Mat();
+        mCameraMat = new Mat();
     }
 
     @Override
     public void onCameraViewStopped() {
-        newMat.release();
+        mCameraMat.release();
+
+        // Used in automatic tracking only.
+        // TODO: Remove once I implement a way to select template in realtime
+        if (mTemplateMat != null) mTemplateMat.release();
     }
 
     /* We do our OpenCV frame processing here.
@@ -234,16 +249,15 @@ CameraPreview implements View.OnTouchListener,
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
-        Log.i(TAG, "New frame");
-        newMat = inputFrame.rgba();
+        mCameraMat = inputFrame.rgba();
         if (isRecording) {
 
             frameCount++;
             // RGBA order as opposed to ARGB.
-            // /*putText(newMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
+            // /*putText(mCameraMat, Integer.toString(frameCount), new Point(100, 500), 3, 1,
             //new Scalar(TrackingActivity.r, TrackingActivity.g, TrackingActivity.b, TrackingActivity.a), 2);*/
         }
-        return newMat;
+        return mCameraMat;
     }
 
 
@@ -279,8 +293,9 @@ CameraPreview implements View.OnTouchListener,
      */
     private void drawCircle() {
 
-        // Draw only if an active recording is taking place
-        if (isRecording) {
+        // Draw only if an active recording is taking place, and tracking mode is manual.
+        Log.i(TAG, "tracking mode is " + mTrackingMode);
+        if (isRecording && mTrackingMode == 0) {
 
             // Lock the canvas so that it can be drawn on
             canvas = mOverlayHolder.lockCanvas();

@@ -24,7 +24,6 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.util.List;
 
-import static android.R.attr.button;
 
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
@@ -35,6 +34,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
+
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -88,10 +88,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
         mCameraPreview = new CameraPreview(
                 this,
-            mCameraControl,
+                mCameraControl,
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
-                (ImageView) findViewById(R.id.record_button));
+                (ImageView) findViewById(R.id.record_button),
+                trackingMode);
     }
 
     /**
@@ -130,19 +131,37 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 break;
 
             case R.id.record_button:
-                if (mCameraPreview.isRecording) {
-                    // release the MediaRecorder object.
-                    mCameraPreview.releaseMediaRecorder();
-                    Toast.makeText(this, "Saved in" +
+                // Manual tracking
+                if (trackingMode == 0) {
+                    if (mCameraPreview.isRecording) {
+                        // release the MediaRecorder object.
+                        mCameraPreview.releaseMediaRecorder();
+                        Toast.makeText(this, "Saved in" +
                             mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
-                } else {
+                    } else {
 
-                    Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
+                        Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
                             Toast.LENGTH_LONG).show();
 
-                    // Prepare the camera in a separate task (as it can take time)
-                    new MediaPrepareTask().execute(null, null, null);
+                        // Prepare the camera in a separate task (as it can take time)
+                        new MediaPrepareTask().execute(null, null, null);
+                    }
+                    // Automatic tracking
+                } else {
+
+                    if (mCameraPreview.isRecording) {
+                        mCameraPreview.releaseMediaRecorder();
+                        Toast.makeText(this, "Saved in" +
+                            mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Now recording using automatic tracking. " +
+                            "Template file is template.jpg.",
+                            Toast.LENGTH_LONG).show();
+                        // Prepare the camera in a separate task (as it can take time)
+                        new MediaPrepareTask().execute(null, null, null);
+                    }
+
                 }
                 break;
 
@@ -297,7 +316,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         @Override
         protected Boolean doInBackground(Void... voids) {
             // initialize video camera
-            if (mCameraPreview.prepareVideoRecorder()) {
+            if (mCameraPreview.prepareVideoRecorder(trackingMode)) {
                 // Camera is available, MediaRecorder is prepared,
                 // now you can start recording. Goes to onPostExecute() with true as
                 // a parameter.
