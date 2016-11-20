@@ -25,4 +25,31 @@
     <string name="manual_tracking">Manual Tracking</string>
     <string name="automatic_tracking">Automatic Tracking</string>
     <string name="help">Help</string>
+
+
+    <!-- Help Dialog -->
+    <string name="help_dialog_manual_tracking">Manual Tracking</string>
+    <string name="help_dialog_automatic_tracking">Automatic Tracking</string>
+    <string name="help_dialog_manual_tracking_desc">
+        Manual tracking is the simplest type of tracking mode this app offers. Simply select the
+        "Manual Tracking" option by clicking on the MODE button. After pressing the record button, you
+        can then click on the object that you wish to track, every 3-5 seconds.
+        \n\nUpon each click, the coordinates of the touch will be appended to a .yml data file, along with the time and
+        frame number of the touch. A circle will be overlayed on the touch location*. Along with the recording file,
+        the data file allows for offline tracking using your favourite external tools.
+    </string>
+
+    <string name="help_dialog_automatic_tracking_desc">
+        Automatic tracking uses a more advanced technique called "template matching". When selecting
+        this method, the user will be presented with an option to select a template of the image
+        that they wish to track. Upon selecting the template and pressing record, template matching
+        uses a method that searches the entire image frame for the template specified by the user.
+        Upon finding a closest match, a bounding box will be drawn around the location of the detected
+        object*.
+        \n\n To select a template for template matching:
+        \n *Instructions on how to select template here*
+
+        \n\n\n\n\n*You can change the circle overlay color by tapping the icon labelled \"Color\".
+
+    </string>
 </resources>

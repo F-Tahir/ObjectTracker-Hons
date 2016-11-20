@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.hardware.Camera.Size;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -55,6 +54,8 @@ CameraPreview implements View.OnTouchListener,
     // Used only in automatic tracking for template matching.
     private Mat mTemplateMat;
     private Mat mResult;
+    private Mat mCameraMatResized;
+    private Mat mTemplateMatResized;
 
     private File mDataFile;
     File mMediaFile;
@@ -72,6 +73,9 @@ CameraPreview implements View.OnTouchListener,
 
     private static Canvas canvas;
     private static int frameCount = 0;
+
+    // Used to resize the input image to speed up template matching.
+    private static double resizeRatio = 0.25;
 
 
     public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
@@ -92,6 +96,10 @@ CameraPreview implements View.OnTouchListener,
         mTimer = new Timer(timestamp);
 
         mCameraControl.setOnTouchListener(this);
+
+        // Used only for template matching (automatic tracking), but initialize anyway.
+        mCameraMatResized = new Mat();
+        mTemplateMatResized = new Mat();
     }
 
 
@@ -102,6 +110,8 @@ CameraPreview implements View.OnTouchListener,
      * <b>Importantly</b>, this function sets the video (output resolution) size to the device's
      * preferred size by calling the built in getPreferredSize() method. The returned value of this
      * method differs over different devices.
+     *
+     * @params tracking mode is 0 if manual tracking is selected, 1 for automatic tracking.
      * @return boolean States whether or not the MediaRecorder preview was successful.
      */
     public boolean prepareVideoRecorder(int trackingMode) {
@@ -111,6 +121,8 @@ CameraPreview implements View.OnTouchListener,
         // Get the template from root if tracking mode is 1 (automatic tracking)
         // TODO: Possibly remove once I implement template matching in realtime
         if (mTrackingMode == 1) {
+
+            // Must convert image so that it is compatible with the input frame
             mTemplateMat = Imgcodecs.imread(Utils.getTemplateFile().toString());
             Imgproc.cvtColor(mTemplateMat, mTemplateMat, Imgproc.COLOR_BGR2RGBA);
 
@@ -120,22 +132,23 @@ CameraPreview implements View.OnTouchListener,
             double templateScaled_row = (mTemplateMat.rows()/1836.0)*720.0;
             org.opencv.core.Size size = new org.opencv.core.Size(templateScaled_col, templateScaled_row);
             Imgproc.resize(mTemplateMat, mTemplateMat, size);
+
+            // Resize the template image (as well as input image), so that template matching is faster.
+            Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
+                resizeRatio, resizeRatio, Imgproc.INTER_AREA);
         }
 
         frameCount = 0;
 
         mMediaRecorder = new MediaRecorder();
 
-        // Step 2: Set sources
+        // TODO: Possibly provide an option to disable audio source so no audio is recorded.
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
-        // Set video size to preferred width and height, which is specific for each device.
-        Size preferredSize = mCameraControl.getPreferredSize();
-        // mMediaRecorder.setVideoSize(preferredSize.width, preferredSize.height);
         mMediaRecorder.setVideoSize(1280, 720);
         mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
 
@@ -143,9 +156,7 @@ CameraPreview implements View.OnTouchListener,
         // Will think about using a CamcorderProfile instead.
         mMediaRecorder.setVideoFrameRate(30);
 
-        // Lock exposure to increase fps
         mCameraControl.lockAutoExposure();
-
 
         // Create the data and video file output
         long now = System.currentTimeMillis();
@@ -197,7 +208,6 @@ CameraPreview implements View.OnTouchListener,
             Log.i(TAG, "Canvas is null");
         }
 
-
         if (isRecording) {
             try {
                 mCameraControl.releaseRecording();
@@ -208,6 +218,7 @@ CameraPreview implements View.OnTouchListener,
                 MediaScannerConnection.scanFile(mContext, new String[] {
                                 mMediaFile.getPath() },
                         new String[] { "video/mp4" }, null);
+
             } catch (RuntimeException e) {
                 // RuntimeException is thrown when stop() is called immediately after start().
                 // In this case the output file is not properly constructed ans should be deleted.
@@ -223,14 +234,11 @@ CameraPreview implements View.OnTouchListener,
 
         if (mMediaRecorder != null) {
 
-            // clear recorder configuration
+            // clear recorder configuration and release the recorder object
             mMediaRecorder.reset();
-            // release the recorder object
             mMediaRecorder.release();
             mMediaRecorder = null;
 
-            // Lock camera for later use i.e taking it back from MediaRecorder.
-            // MediaRecorder doesn't need it anymore and we will release it if the activity pauses.
         }
     }
 
@@ -241,11 +249,12 @@ CameraPreview implements View.OnTouchListener,
     }
 
     @Override
+    // Free any resources here to avoid memory leaks.
     public void onCameraViewStopped() {
 
-        if (mCameraMat != null)
-            mCameraMat.release();
-
+        mCameraMat.release();
+        mTemplateMatResized.release();
+        mCameraMatResized.release();
 
         // TODO: Remove once I implement a way to select template in realtime
         if (mTemplateMat != null)
@@ -265,11 +274,17 @@ CameraPreview implements View.OnTouchListener,
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         mCameraMat = inputFrame.rgba();
+        Log.i(TAG, "New frame");
 
+        // TODO: Move as much out of here as possible
         if (isRecording) {
 
             // Automatic tracking
             if (mTrackingMode == 1) {
+
+                // Downscale the image to speed up template matching
+                Imgproc.resize(mCameraMat, mCameraMatResized, new org.opencv.core.Size(), resizeRatio,
+                    resizeRatio, Imgproc.INTER_AREA);
 
                 int matchMethod = Imgproc.TM_CCOEFF_NORMED;
 
@@ -278,11 +293,10 @@ CameraPreview implements View.OnTouchListener,
                 int result_cols = mCameraMat.cols() - mTemplateMat.cols() + 1;
                 int result_rows = mCameraMat.rows() - mTemplateMat.rows() + 1;
 
-
                 mResult = new Mat(result_rows, result_cols, CvType.CV_32F);
 
-                // Move this to a new thread.
-                Imgproc.matchTemplate(mCameraMat, mTemplateMat, mResult, matchMethod);
+                // TODO: Move this to a new thread (e.g. an Asynctask)
+                Imgproc.matchTemplate(mCameraMatResized, mTemplateMatResized, mResult, matchMethod);
                 Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
 
                 // Localizing the best match with minMaxLoc
@@ -295,21 +309,22 @@ CameraPreview implements View.OnTouchListener,
                     matchLoc = mmr.maxLoc;
                 }
 
+                // Need to scale coordinates back up as we are working with images that are scaled down.
+                matchLoc.x = matchLoc.x*4;
+                matchLoc.y = matchLoc.y*4;
+
 
                 // Draw a boundary around the detected object.
-                Imgproc.rectangle(mCameraMat, matchLoc, new Point(matchLoc.x + mTemplateMat.cols(),
-                    matchLoc.y + mTemplateMat.rows()), new Scalar(TrackingActivity.r, TrackingActivity.g,
+                Imgproc.rectangle(mCameraMat, matchLoc, new Point((matchLoc.x + mTemplateMat.cols()),
+                    (matchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
                     TrackingActivity.b, TrackingActivity.a), 2);
 
 
-                // Manual tracking - // Framecount only needed in manual tracking.
+                // Manual tracking, so implement the framecount, and do nothing else.
             } else {
-
                 frameCount++;
             }
         }
-
-
 
         return mCameraMat;
     }

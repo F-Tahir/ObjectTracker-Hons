@@ -1,6 +1,7 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -213,7 +214,6 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 break;
 
 
-            // TODO: Add functionality to "Help" button, which displays info of each mode
             // TODO: Clean up this code a little
             case R.id.tracking_mode_button:
                 PopupMenu popup = new PopupMenu(this, v);
@@ -228,6 +228,8 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     public boolean onMenuItemClick(MenuItem item)
                     {
                         switch (item.getItemId()) {
+
+                            // Manual option selected
                             case R.id.manual:
                                 item.setChecked(true);
                                 trackingMode = 0;
@@ -235,12 +237,23 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                                     Toast.LENGTH_SHORT).show();
                                 return true;
 
+                            // Automatic option selected
                             case R.id.automatic:
                                 item.setChecked(true);
                                 trackingMode = 1;
                                 Toast.makeText(TrackingActivity.this, "Tracking mode set to automatic.",
                                     Toast.LENGTH_SHORT).show();
                                 return true;
+
+                            // Help button selected
+                            case R.id.help:
+
+                                AlertDialog.Builder adb = new AlertDialog.Builder(TrackingActivity.this);
+                                adb.setView(R.layout.tracking_mode_help_layout);
+                                
+                                adb.show();
+
+
                             default:
                                 return false;
                         }
