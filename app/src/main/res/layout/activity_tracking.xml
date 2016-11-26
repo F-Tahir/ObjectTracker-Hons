@@ -97,6 +97,7 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"/>
 
+
     </RelativeLayout>
 
 
@@ -129,6 +130,7 @@
             android:layout_toStartOf="@id/timestamp"
             android:clickable="true"
             android:src="@drawable/ic_record"/>
+
 
     </RelativeLayout>
 

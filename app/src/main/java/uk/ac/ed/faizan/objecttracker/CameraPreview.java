@@ -149,6 +149,7 @@ CameraPreview implements View.OnTouchListener,
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 
+        // The aspect ratio should be identical to that in JavaCameraView, to avoid scaling issues.
         mMediaRecorder.setVideoSize(1280, 720);
         mMediaRecorder.setVideoEncodingBitRate(4 * 1000 * 1000);
 

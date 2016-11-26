@@ -250,7 +250,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
                                 AlertDialog.Builder adb = new AlertDialog.Builder(TrackingActivity.this);
                                 adb.setView(R.layout.tracking_mode_help_layout);
-                                
+
                                 adb.show();
 
 
