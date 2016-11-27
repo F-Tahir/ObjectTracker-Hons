@@ -3,6 +3,7 @@ package uk.ac.ed.faizan.objecttracker;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +24,13 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import org.opencv.core.Mat;
+import org.opencv.android.Utils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -32,9 +40,13 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     private final String TAG = getClass().getSimpleName();
     private CameraPreview mCameraPreview;
     private CameraControl mCameraControl;
+    private TemplateSelection mTemplateSelection;
 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
+    boolean templateSelectionInitialized = false;
+    Mat mTemplateFrameMat;
+
 
 
     // Default color for overlay color when tracking objects (Red)
@@ -85,7 +97,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         Log.i(TAG, "In resume");
         super.onResume();
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
+        mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
         mCameraControl.enableView();
+
         // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
         mCameraPreview = new CameraPreview(
                 this,
@@ -127,45 +141,51 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         switch (v.getId()) {
 
             case R.id.select_color_button:
-                Button colorButton = (Button) v;
-                getColor(colorButton);
+                getColor();
                 break;
 
+
             case R.id.record_button:
-                // Manual tracking
+
+                if (mCameraPreview.isRecording) {
+                    // release the MediaRecorder object.
+                    mCameraPreview.releaseMediaRecorder();
+                    Toast.makeText(this, "Saved in" +
+                        mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
+
+                    // Reconfigure UI to enable or disable MODE and freeze buttons, depending on
+                    // what the tracking mode is (the function takes care of this for us).
+                    Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
+                        findViewById(R.id.freeze_button), trackingMode, mCameraPreview.isRecording);
+                    break;
+                }
+
+                // Manual tracking and not recording.
                 if (trackingMode == 0) {
-                    if (mCameraPreview.isRecording) {
-                        // release the MediaRecorder object.
-                        mCameraPreview.releaseMediaRecorder();
-                        Toast.makeText(this, "Saved in" +
-                            mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
 
-                    } else {
+                    Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
+                        Toast.LENGTH_LONG).show();
 
-                        Toast.makeText(this, "Now recording. Tap an object every 2-5 seconds to manually track it.",
-                            Toast.LENGTH_LONG).show();
+                    // Prepare the camera in a separate task (as it can take time)
+                    new MediaPrepareTask().execute(null, null, null);
 
-                        // Prepare the camera in a separate task (as it can take time)
-                        new MediaPrepareTask().execute(null, null, null);
-                    }
 
-                    // Automatic tracking
+                    // Automatic tracking and not recording.
                 } else {
 
-                    if (mCameraPreview.isRecording) {
-                        mCameraPreview.releaseMediaRecorder();
-                        Toast.makeText(this, "Saved in" +
-                            mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this, "Now recording using automatic tracking. " +
-                            "Template file is template.jpg.",
-                            Toast.LENGTH_LONG).show();
+                    templateSelectionInitialized = true;
+                    mTemplateSelection.setClearCanvas(false);
 
-                        // Prepare the camera in a separate task (as it can take time)
-                        new MediaPrepareTask().execute(null, null, null);
-                    }
+                    Toast.makeText(this, "To select a template, focus the camera on the object," +
+                        " then press the \"Live\" button.", Toast.LENGTH_LONG).show();
+
+                    // Freeze button is disabled by default, so enable it.
+                    // Enable it only for template selection, and nowhere else.
+                    findViewById(R.id.freeze_button).setEnabled(true);
+                    findViewById(R.id.freeze_button).setAlpha(1.0f);
 
                 }
+
                 break;
 
 
@@ -201,15 +221,43 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                         mCameraPreview.isPreviewFrozen = true;
                         freezeButton.setText(getResources().getString(R.string.freeze_enabled));
                         freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_enabled, 0, 0);
+
+                        // disableView() releases mCameraMat, so save it first.
+                        mTemplateFrameMat = new Mat();
+                        mCameraPreview.getCameraMat().copyTo(mTemplateFrameMat);
                         mCameraControl.disableView();
+
+                        // User has initialized automatic tracking, so start template selection -
+                        // show instructions to user.
+                        if (templateSelectionInitialized) {
+                            findViewById(R.id.select_template).setVisibility(View.VISIBLE);
+                            Toast.makeText(this, "Now select the template. For instructions, click on " +
+                                "MODE > Help.", Toast.LENGTH_LONG).show();
+                        }
+
                     } else {
                         mCameraPreview.isPreviewFrozen = false;
                         freezeButton.setText(getResources().getString(R.string.freeze_disabled));
                         freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
                         mCameraControl.enableView();
+
+                        // User is done with template selection, so save the template and set variables
+                        if (templateSelectionInitialized) {
+                            initializeTemplate();
+
+                            // Set clearCanvas boolean to true so old rectangle can be overwritten
+                            // TODO: Figure out why this doesn't call onDraw()
+
+                            mTemplateSelection.setClearCanvas(true);
+                            mTemplateSelection.invalidate();
+                            findViewById(R.id.select_template).setVisibility(View.INVISIBLE);
+                            templateSelectionInitialized = false;
+
+                            Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Toast.makeText(this, "Cannot freeze whilst recording!", Toast.LENGTH_SHORT).show();
+
+
                 }
                 break;
 
@@ -235,6 +283,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                                 trackingMode = 0;
                                 Toast.makeText(TrackingActivity.this, "Tracking mode set to manual.",
                                     Toast.LENGTH_SHORT).show();
+
+                                findViewById(R.id.freeze_button).setEnabled(false);
+                                findViewById(R.id.freeze_button).setAlpha(0.5f);
                                 return true;
 
                             // Automatic option selected
@@ -253,27 +304,72 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
                                 adb.show();
 
-
                             default:
                                 return false;
                         }
                     }
-
                 });
-
                 popup.show();
 
         }
     }
 
 
+	/**
+     * This method is called once the user acquires the object within the camera frame, and has selected
+     * the rectangle region of the template. We then read the rectangle's coordinates in this function,
+     * and then cut the template from the source image accordingly. The template is then converted
+     * to a Mat object, and we set the mTemplateMat object in CameraPreview.java to this newly created
+     * template Mat. We are then ready to start recording.
+     */
+    public void initializeTemplate() {
+        TemplateSelection templateSelection = (TemplateSelection) findViewById(R.id.select_template);
+
+        // Create a new bitmap with dimensions that are the same as the camera frame.
+        Bitmap source = Bitmap.createBitmap(mTemplateFrameMat.width(),
+            mTemplateFrameMat.height(), Bitmap.Config.ARGB_8888);
+
+        // Copy the camera frame mat to the newly created bitmap
+        Utils.matToBitmap(mTemplateFrameMat, source);
+
+        // Scale the coordinates in terms of screen size
+        double frameWidthRatio = (double) mCameraControl.getFrameWidth()/mCameraControl.getWidth();
+        double frameHeightRatio = (double) mCameraControl.getFrameHeight()/mCameraControl.getHeight();
+
+        int templateWidth =
+            (int) (Math.abs(templateSelection.getLeftCoord() - templateSelection.getRightCoord())
+                * frameWidthRatio);
+
+        int templateHeight =
+            (int) (Math.abs(templateSelection.getTopCoord() - templateSelection.getBottomCoord())
+                * frameHeightRatio);
+
+        // getLeftCoord() returns first x coord of rectangle, getTopCoord() returns first y coord.
+        // Also want to scale these in terms of screen size.
+        Bitmap template = Bitmap.createBitmap(source, (int) (templateSelection.getLeftCoord()*frameWidthRatio),
+            (int) (templateSelection.getTopCoord()*frameHeightRatio), templateWidth, templateHeight);
+
+        // Create a new Mat object to store bitmap to
+        Mat mat = new Mat();
+
+        // Convert bitmap to mat
+        Utils.bitmapToMat(template, mat);
+
+        // Set the template to the newly created mat
+        mCameraPreview.setTemplateMat(mat);
+
+        // Now attempt to start recording
+        new MediaPrepareTask().execute(null, null, null);
+    }
+
+
+
     /**
      * Create a dialog to select the color for tracking overlay. This tracking overlay includes
      * text, bounding boxes, circles (for manual tracking, etc).
      *
-     * @param button The view that has to be clicked to bring up the color selection pane.
      */
-    public void getColor(Button button) {
+    public void getColor() {
         ColorPickerDialogBuilder
                 .with(this)
                 .setTitle("Choose Color")
@@ -347,7 +443,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
 		/**
          * If the MediaRecorder preparations were a success, this method starts the MediaRecorder,
-         * starts the timer, and changes the drawable resource and isRecording boolean.
+         * starts the timer, and changes the drawable resource and isRecording boolean. This method
+         * is also responsible for disabling/enabling UI buttons such as the "Mode" and freeze button,
+         * as they should not be enabled during recording, and should be enabled whilst not recording.
          *
          * @param result Whether or not the essential MediaRecorder preparations were a success.
          */
@@ -375,6 +473,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 } catch (RuntimeException e) {
                     Log.i(TAG, "MediaRecorder did not start properly.");
                 }
+
+                Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
+                    findViewById(R.id.freeze_button), trackingMode, mCameraPreview.isRecording);
 
                 // This runnable is stopped in CameraPreview.releaseMediaRecorder();
             }

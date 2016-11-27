@@ -36,8 +36,7 @@ import java.io.IOException;
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
  */
 
-public class
-CameraPreview implements View.OnTouchListener,
+public class CameraPreview implements View.OnTouchListener,
         CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
@@ -75,7 +74,7 @@ CameraPreview implements View.OnTouchListener,
     private static int frameCount = 0;
 
     // Used to resize the input image to speed up template matching.
-    private static double resizeRatio = 0.25;
+    private static double resizeRatio = 0.5;
 
 
     public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
@@ -102,6 +101,24 @@ CameraPreview implements View.OnTouchListener,
         mTemplateMatResized = new Mat();
     }
 
+	/**
+     * Retrieve the current frame from camera feed. We can then use this frame to select a template.
+     * @return Mat object that wraps the current camera frame.
+     */
+    public Mat getCameraMat() {
+        Log.i("object:tracker", "in CameraPreview - mCameraMat width is " + mCameraMat.width());
+        Log.i("object:tracker", "in CameraPreview - mCameraMat height is " + mCameraMat.height());
+        return mCameraMat;
+    }
+
+	/**
+     * Used to set the template after user has carried out the template selection process.
+     *
+     * @param templateMat A bitmap object converted to a Mat, used for template matching
+     */
+    public void setTemplateMat(Mat templateMat) {
+        mTemplateMat = templateMat;
+    }
 
     /**
      * This function is called when the user hits the record button. This function will set up the
@@ -119,19 +136,19 @@ CameraPreview implements View.OnTouchListener,
         mTrackingMode = trackingMode;
 
         // Get the template from root if tracking mode is 1 (automatic tracking)
-        // TODO: Possibly remove once I implement template matching in realtime
         if (mTrackingMode == 1) {
 
-            // Must convert image so that it is compatible with the input frame
-            mTemplateMat = Imgcodecs.imread(Utils.getTemplateFile().toString());
             Imgproc.cvtColor(mTemplateMat, mTemplateMat, Imgproc.COLOR_BGR2RGBA);
 
-            // Resize the image in terms of video size. 3264x1836 is image res using default camera app
-            // on samsung galaxy s6.
-            double templateScaled_col = (mTemplateMat.cols()/3264.0)*1280.0;
-            double templateScaled_row = (mTemplateMat.rows()/1836.0)*720.0;
-            org.opencv.core.Size size = new org.opencv.core.Size(templateScaled_col, templateScaled_row);
-            Imgproc.resize(mTemplateMat, mTemplateMat, size);
+
+            if (mTemplateMat == null) {
+
+                Log.i("object:tracker", "mTemplateMat is null!");
+
+            }
+
+            Log.i("object:tracker", "mTemplateMat width: " + mTemplateMat.cols());
+            Log.i("object:tracker", "mTemplateMat height: " + mTemplateMat.rows());
 
             // Resize the template image (as well as input image), so that template matching is faster.
             Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
@@ -161,8 +178,8 @@ CameraPreview implements View.OnTouchListener,
 
         // Create the data and video file output
         long now = System.currentTimeMillis();
-        mMediaFile = Utils.getVideoFile(now);
-        mDataFile = Utils.getDataFile(now);
+        mMediaFile = Utilities.getVideoFile(now);
+        mDataFile = Utilities.getDataFile(now);
         if (mMediaFile == null) {
             Log.i(TAG, "Output file was not created successfully!");
             return false;
@@ -253,11 +270,15 @@ CameraPreview implements View.OnTouchListener,
     // Free any resources here to avoid memory leaks.
     public void onCameraViewStopped() {
 
-        mCameraMat.release();
-        mTemplateMatResized.release();
+        if (mCameraMat != null)
+            mCameraMat.release();
+
+        if (mTemplateMat != null)
+            mTemplateMatResized.release();
+
+        if (mCameraMatResized != null)
         mCameraMatResized.release();
 
-        // TODO: Remove once I implement a way to select template in realtime
         if (mTemplateMat != null)
             mTemplateMat.release();
 
@@ -275,7 +296,6 @@ CameraPreview implements View.OnTouchListener,
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         mCameraMat = inputFrame.rgba();
-        Log.i(TAG, "New frame");
 
         // TODO: Move as much out of here as possible
         if (isRecording) {
@@ -311,8 +331,8 @@ CameraPreview implements View.OnTouchListener,
                 }
 
                 // Need to scale coordinates back up as we are working with images that are scaled down.
-                matchLoc.x = matchLoc.x*4;
-                matchLoc.y = matchLoc.y*4;
+                matchLoc.x = matchLoc.x*2;
+                matchLoc.y = matchLoc.y*2;
 
 
                 // Draw a boundary around the detected object.
@@ -379,7 +399,7 @@ CameraPreview implements View.OnTouchListener,
             canvas.drawCircle(mX, mY, 60, paint);
             mOverlayHolder.unlockCanvasAndPost(canvas);
 
-            Utils.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp,
+            Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp,
                 (mX * mCameraControl.getFrameWidth())/ mCameraControl.getWidth(),
                 (mY * mCameraControl.getFrameHeight())/ mCameraControl.getHeight());
 

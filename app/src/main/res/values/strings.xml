@@ -32,7 +32,7 @@
     <string name="help_dialog_automatic_tracking">Automatic Tracking</string>
     <string name="help_dialog_manual_tracking_desc">
         Manual tracking is the simplest type of tracking mode this app offers. Simply select the
-        "Manual Tracking" option by clicking on the MODE button. After pressing the record button, you
+        "Manual Tracking" option by clicking on the <i>MODE</i> button. After pressing the record button, you
         can then click on the object that you wish to track, every 3-5 seconds.
         \n\nUpon each click, the coordinates of the touch will be appended to a .yml data file, along with the time and
         frame number of the touch. A circle will be overlayed on the touch location*. Along with the recording file,
@@ -46,10 +46,23 @@
         uses a method that searches the entire image frame for the template specified by the user.
         Upon finding a closest match, a bounding box will be drawn around the location of the detected
         object*.
-        \n\n To select a template for template matching:
-        \n *Instructions on how to select template here*
+        \n\n <b>To select a template for template matching</b>:
+        \n\n 1) Click the <i>MODE</i> button and select <i>Automatic Tracking</i> (Manual Tracking is default).
+        \n 2) Ensure that the object you wish to track is clearly displayed on screen (with no blur).
+        \n 3) Press the <i>Live</i> <img src="@drawable/freeze_button"/> button to freeze the camera preview. This allows you to select the template
+        with ease, as the object will not move.
+        \n 4) Once the camera preview is frozen, hold your finger and drag a box around the object you wish to track.
+        \n 5) Once you are happy with the selection process, press the <i>Freeze</i> button to restart the camera preview.
+        \n 6) Upon pressing the freeze button, the template will be saved, and automatic tracking will start.
+        \n Note: if the template selection rectangle is difficult to see, press the <i>Freeze</i> button to change the
+        overlay colour.
 
         \n\n\n\n\n*You can change the circle overlay color by tapping the icon labelled \"Color\".
-
     </string>
+
+
+    <!-- Strings for custom toast that shows instructions on how to select for template matching -->
+    <string name="freeze_preview_toast_string1">To select a template, firstly focus the camera on the object,
+        and then press the</string>
+    <string name="freeze_preview_toast_string2"> button</string>
 </resources>

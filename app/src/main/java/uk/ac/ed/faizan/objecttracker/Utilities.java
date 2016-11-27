@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.View;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,9 +18,9 @@ import java.util.Locale;
  * recording.
  *
  */
-public final class Utils
+public final class Utilities
 {
-	private static final String TAG = Utils.class.getSimpleName();
+	private static final String TAG = Utilities.class.getSimpleName();
 
 	private static ThreadLocal<SimpleDateFormat> sFileDateFormat = new ThreadLocal<SimpleDateFormat>(){
 		@Override
@@ -69,22 +70,6 @@ public final class Utils
 	public static File getDataFile(long time)
 	{
 		return getExternalFile(time, "yml");
-	}
-
-
-	/**
-	 * // TODO: Remove this function once I create a method to select template in realtime.
-	 *
-	 * Retrieves the template matching file for automatic tracking. The template file
-	 * is stored in the root "ObjectTracker" folder as a .jpg or .png, and is always named
-	 * template.jpg (for now)
-	 *
-	 * @return Path to the template file
-	 */
-	public static File getTemplateFile() {
-		File root = new File(Environment.getExternalStorageDirectory(), "ObjectTracker");
-
-		return new File(root, "template.jpg");
 	}
 
 
@@ -163,5 +148,42 @@ public final class Utils
 		} catch (IOException e) {
 			Log.i(TAG, "IOException occured when trying to close FileOutputStream for data file.");
 		}
+	}
+
+
+
+	/**
+	 * This method is called ewery time the UI buttons need to be enabled or disabled. In the object
+	 * tracking scenario, it is called every time the record button is pressed.  UI buttons are disabled
+	 * during recording so that the user cannot select a different tracking mode whilst recording, for example.
+	 *
+	 * @param trackingModeButton The id of the button used to change the tracking mode.
+	 * @param freezeButton The id of the button used to freeze the camera preview.
+	 * @param trackingMode Either 0 or 1 - 0 if tracking mode is set to manual, 1 if automatic
+	 * @param isRecording Boolean to state whether the device is recording a current video or not.
+	 */
+	public static void reconfigureUIButtons(View trackingModeButton, View freezeButton,
+											int trackingMode, boolean isRecording) {
+
+		if (isRecording) {
+			trackingModeButton.setEnabled(false);
+			freezeButton.setEnabled(false);
+
+			trackingModeButton.setAlpha(0.5f);
+			freezeButton.setAlpha(0.5f);
+
+
+		} else if (!isRecording) {
+			trackingModeButton.setEnabled(true);
+			freezeButton.setEnabled(false);
+
+			trackingModeButton.setAlpha(1.0f);
+			freezeButton.setAlpha(0.5f);
+
+		}
+
+
+
+
 	}
 }
