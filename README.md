@@ -1,4 +1,4 @@
-# Object Tracking System using Google Tango Device - Honours Project 2016-2017
+# Object Tracking System using Android Device - Honours Project 2016-2017
 
 
 ## To-do
@@ -21,7 +21,6 @@
 
 ### Additions to manual tracking (to be done by 17th October) 
 
-
 - [x] Add framestamp functionality
     - [x] Add frame number to YML file when user clicks to track object
     - [x] Add current frame number to corner of surface view when user has tapped screen. Research some API's to find frame information
@@ -29,8 +28,19 @@
     - [X] Store milliseconds in the YML timestamp for more accuracy
 - [x] Make the UI layout for camera full screen 
     - [x] Make the toolbars transparent (i.e. no black frame), so that the optimal resolution isn't wonky.
- 
+    
+    
+### Additions for next few months - prioritise these(date TBA)
 
+- [ ] Improve template matching
+    - [ ] Possibly implement another object recognition method that is rotation/scale invariant
+- [ ] Fix small bugs with changing between tracking modes when initialising template
+- [ ] Fix bug where app crashes if a template is not selected but user unfreezes preview
+- [ ] Add code to clear the selected template each time automatic tracking is initialized again
+- [ ] Add code to access sensor (accelerometer and gyroscope for now) readings
+    - [ ] Append sensor data to some file (to be discussed)
+
+ 
 ### Changes/implementations to be made but are currently not prioritized
 
 - [x] Add full functionality to flash button
@@ -41,26 +51,26 @@
     - [ ] Request permissions at runtime for Camera
     - [ ] Request permissions at runtime for Storage
 - [ ] Create own filepicker for app (http://stackoverflow.com/questions/18097763/how-to-open-the-my-files-folder-in-android-programatically-using-intent)
+- [ ] Add a settings pane in main screen, allowing user to set default tracking mode and overlay color
+    - [ ] Read from the persistent settings to change to the user-set tracking mode/overlay color each time app is run
+- [ ] Generally clean up UI (especially main screen)
+    
 
 ## Project Summary
 
 ### Overall Goals
-The overall goal of this project is to evaluate the possibilites and limitations of a Google Tango tablet for imaging and tracking of small animals such as insects. The resulting analysis should consist of a program which camn be used to extract useful data for tracking.
+The overall goal of this project is to evaluate the possibilites and limitations of an Android device for imaging and tracking of small animals such as insects. The resulting analysis should consist of a program which camn be used to extract useful data for tracking.
 The final thesis will include:
-- A technical evaluation of the Tango for tracking purposes
+- A technical evaluation of the device for tracking purposes
 - A recording/tracking application prototype description (this will also be implemented)
 - An evaluation of this application.
 
 
 ### External Libraries
 This project will make use of a few external libraries:
-- Google Tango SDK
 - OpenCV4android SDK
 - Color Picker by QuadFlask on GitHub. Imported as "color-picker.aar"
 
-### Sources
-- Google Tango Docs: <https://developers.google.com/tango/>
-- OpenCV4android Docs: <http://opencv.org/platforms/android.html> 
 
 ## Code Documentation
 
@@ -118,10 +128,15 @@ As `layout-sw600dp`, but the difference is this folder stores landscape layouts 
 Currently only hosting one drawable folder, but likely in future will also split drawables. This section remains as a placeholder.
 
 
-## Misc
+## Tracking Modes
 
-### YAML Format
-The YAML format should follow something along the lines of (assuming 30 FPS):
+### Manual Tracking
+The manual tracking mode offered by this application makes use of external offline tracking software. The idea is to record a video, and whilst recording, we can tap on the location of an object. Tapping on an object stores information regarding the x and y coordinates, in a YML file. We can make use of this data file when offline tracking, in order to track accurately. This is known as manual correction.
+
+### Automatic Tracking
+The application also offers automatic tracking via template matching. Rather than using offline tracking software, we can select a template on an android device, and use openCV functions to search for the closest match to this template in each camera frame. We can then draw a bounding box around the closest match and include this annotation in our final video. This is known as online tracking.
+
+The data file is formatted in the following way:
 
 ```
 framenumber: 90
@@ -137,6 +152,37 @@ framenumber: 180
 ...
 
 ```
+
+## Automatic Tracking Methods
+Still to discuss with Ben, but ideally would like to implement matchTemplate and at least one other method such as CamShift or SURF descriptors with FLANN matching.
+An interesting idea is implementing FLANN matching but using both SURF and SIFT descriptors, and analysing which descriptor is faster (SURF is claimed to be faster).
+
+
+
+## Dissertation ideas
+1) Technical evaluation of the test devices (S6 and Google Nexus 5X)
+    1.1) Camera/CPU specs, fps, resolution, colour space
+2) Recording/tracking prototype description (for manual and automatic tracking?)
+    2.1) Matching methods for matchTemplate (e.g SQDIFF, CCOEFF, etc)
+    2.2) Talk about SURF vs SIFT dsscriptors if I use Features2D for online tracking
+3) Descriptions and evaluations of the different automatic tracking methods
+    3.1) Evaluate based on efficiency, reliability and simplicity
+    3.2) If using Features2D framework, can compare SURF vs SIFT descriptors (SURF claimed to be faster, is this claim true?)
+    3.3) Suggestions for optimisation (e.g. downscaling image, searching only part of image, etc)
+    3.4) Talk about each tracking method in detail, how it works, its advantages and disadvantages
+4) Evaluation of the overall program
+    4.1) Usability, are android devices suitable?
+    4.2) Advantages and disadvantages to current system
+    4.3) Is it a practical application?
+   
+   
+   
+### Sources
+- OpenCV4android Docs: <http://opencv.org/platforms/android.html> 
+- Writeup on different possible tracking methods (also includes sensor information): https://docs.google.com/document/d/1jP9_py3FzA-sxTt6PLTENPkShpYYiEQyr_QhVkRh49U/edit?usp=sharing
+
+
+
     
     
 
