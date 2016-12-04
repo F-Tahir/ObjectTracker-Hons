@@ -160,20 +160,20 @@ An interesting idea is implementing FLANN matching but using both SURF and SIFT 
 
 
 ## Dissertation ideas
-1. Technical evaluation of the test devices (S6 and Google Nexus 5X)
-  a) Camera/CPU specs, fps, resolution, colour space
-2. Recording/tracking prototype description (for manual and automatic tracking?)
-  a) Matching methods for matchTemplate (e.g SQDIFF, CCOEFF, etc)
-  b) Talk about SURF vs SIFT dsscriptors if I use Features2D for online tracking
-3. Descriptions and evaluations of the different automatic tracking methods
-  a) Evaluate based on efficiency, reliability and simplicity
-  b) If using Features2D framework, can compare SURF vs SIFT descriptors (SURF claimed to be faster, is this claim true?)
-  c) Suggestions for optimisation (e.g. downscaling image, searching only part of image, etc)
-  d) Talk about each tracking method in detail, how it works, its advantages and disadvantages
-4. Evaluation of the overall program
-  a) Usability, are android devices suitable?
-  b) Advantages and disadvantages to current system
-  c) Is it a practical application?
+1. Technical evaluation of the test devices (S6 and Google Nexus 5X)<br />
+  a) Camera/CPU specs, fps, resolution, colour space<br />
+2. Recording/tracking prototype description (for manual and automatic tracking?)<br />
+  a) Matching methods for matchTemplate (e.g SQDIFF, CCOEFF, etc)<br />
+  b) Talk about SURF vs SIFT dsscriptors if I use Features2D for online tracking<br />
+3. Descriptions and evaluations of the different automatic tracking methods<br />
+  a) Evaluate based on efficiency, reliability and simplicity<br />
+  b) If using Features2D framework, can compare SURF vs SIFT descriptors (SURF claimed to be faster, is this claim true?)<br />
+  c) Suggestions for optimisation (e.g. downscaling image, searching only part of image, etc)<br />
+  d) Talk about each tracking method in detail, how it works, its advantages and disadvantages<br />
+4. Evaluation of the overall program<br />
+  a) Usability, are android devices suitable?<br />
+  b) Advantages and disadvantages to current system<br />
+  c) Is it a practical application?<br />
    
    
    
