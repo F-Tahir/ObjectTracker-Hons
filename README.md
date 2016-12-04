@@ -160,20 +160,20 @@ An interesting idea is implementing FLANN matching but using both SURF and SIFT 
 
 
 ## Dissertation ideas
-1) Technical evaluation of the test devices (S6 and Google Nexus 5X)
-    1.1) Camera/CPU specs, fps, resolution, colour space
-2) Recording/tracking prototype description (for manual and automatic tracking?)
-    2.1) Matching methods for matchTemplate (e.g SQDIFF, CCOEFF, etc)
-    2.2) Talk about SURF vs SIFT dsscriptors if I use Features2D for online tracking
-3) Descriptions and evaluations of the different automatic tracking methods
-    3.1) Evaluate based on efficiency, reliability and simplicity
-    3.2) If using Features2D framework, can compare SURF vs SIFT descriptors (SURF claimed to be faster, is this claim true?)
-    3.3) Suggestions for optimisation (e.g. downscaling image, searching only part of image, etc)
-    3.4) Talk about each tracking method in detail, how it works, its advantages and disadvantages
-4) Evaluation of the overall program
-    4.1) Usability, are android devices suitable?
-    4.2) Advantages and disadvantages to current system
-    4.3) Is it a practical application?
+1. Technical evaluation of the test devices (S6 and Google Nexus 5X)<br />
+..1. Camera/CPU specs, fps, resolution, colour space<br />
+2. Recording/tracking prototype description (for manual and automatic tracking?)<br />
+..1. Matching methods for matchTemplate (e.g SQDIFF, CCOEFF, etc)<br />
+..2. Talk about SURF vs SIFT dsscriptors if I use Features2D for online tracking<br />
+3. Descriptions and evaluations of the different automatic tracking methods<br />
+..1. Evaluate based on efficiency, reliability and simplicity<br />
+..2. If using Features2D framework, can compare SURF vs SIFT descriptors (SURF claimed to be faster, is this claim true?)<br />
+..3. Suggestions for optimisation (e.g. downscaling image, searching only part of image, etc)<br />
+..4. Talk about each tracking method in detail, how it works, its advantages and disadvantages<br />
+4. Evaluation of the overall program<br />
+..1. Usability, are android devices suitable?<br />
+..2. Advantages and disadvantages to current system<br />
+..3. Is it a practical application?<br />
    
    
    
