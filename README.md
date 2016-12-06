@@ -34,6 +34,8 @@
 
 - [ ] Improve template matching
     - [ ] Possibly implement another object recognition method that is rotation/scale invariant
+    - [ ] Update template on each frame
+    - [ ] Allow for automatic correction of template by clicking on location
 - [ ] Fix small bugs with changing between tracking modes when initialising template
 - [ ] Fix bug where app crashes if a template is not selected but user unfreezes preview
 - [ ] Add code to clear the selected template each time automatic tracking is initialized again
@@ -54,6 +56,7 @@
 - [ ] Add a settings pane in main screen, allowing user to set default tracking mode and overlay color
     - [ ] Read from the persistent settings to change to the user-set tracking mode/overlay color each time app is run
 - [ ] Generally clean up UI (especially main screen)
+- [ ] Allow application to record in both landscape and portrait orientation
     
 
 ## Project Summary
