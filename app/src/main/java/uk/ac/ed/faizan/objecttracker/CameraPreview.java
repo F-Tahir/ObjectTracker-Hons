@@ -14,20 +14,23 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Core.MinMaxLocResult;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.IOException;
 
+import static org.opencv.ml.SVM.P;
+import static uk.ac.ed.faizan.objecttracker.TrackingActivity.a;
 
 
 
@@ -37,7 +40,7 @@ import java.io.IOException;
  */
 
 public class CameraPreview implements View.OnTouchListener,
-        CameraBridgeViewBase.CvCameraViewListener2 {
+    CameraBridgeViewBase.CvCameraViewListener2 {
 
     private final String TAG = "object:tracker";
     private CameraControl mCameraControl;
@@ -55,6 +58,7 @@ public class CameraPreview implements View.OnTouchListener,
     private Mat mResult;
     private Mat mCameraMatResized;
     private Mat mTemplateMatResized;
+    private Mat mCorrectedTemplateMat;
 
     private File mDataFile;
     File mMediaFile;
@@ -64,10 +68,9 @@ public class CameraPreview implements View.OnTouchListener,
     boolean isRecording = false;
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
+    boolean correctTemplate = false;
 
     // Values used for touch positions during manual tracking
-    private float mX;
-    private float mY;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private static Canvas canvas;
@@ -101,17 +104,15 @@ public class CameraPreview implements View.OnTouchListener,
         mTemplateMatResized = new Mat();
     }
 
-	/**
+    /**
      * Retrieve the current frame from camera feed. We can then use this frame to select a template.
      * @return Mat object that wraps the current camera frame.
      */
     public Mat getCameraMat() {
-        Log.i("object:tracker", "in CameraPreview - mCameraMat width is " + mCameraMat.width());
-        Log.i("object:tracker", "in CameraPreview - mCameraMat height is " + mCameraMat.height());
         return mCameraMat;
     }
 
-	/**
+    /**
      * Used to set the template after user has carried out the template selection process.
      *
      * @param templateMat A bitmap object converted to a Mat, used for template matching
@@ -140,15 +141,11 @@ public class CameraPreview implements View.OnTouchListener,
 
             Imgproc.cvtColor(mTemplateMat, mTemplateMat, Imgproc.COLOR_BGR2RGBA);
 
-
             if (mTemplateMat == null) {
 
                 Log.i("object:tracker", "mTemplateMat is null!");
 
             }
-
-            Log.i("object:tracker", "mTemplateMat width: " + mTemplateMat.cols());
-            Log.i("object:tracker", "mTemplateMat height: " + mTemplateMat.rows());
 
             // Resize the template image (as well as input image), so that template matching is faster.
             Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
@@ -234,8 +231,8 @@ public class CameraPreview implements View.OnTouchListener,
                 // Tell the media scanner about the new file so that it is
                 // immediately available to the user.
                 MediaScannerConnection.scanFile(mContext, new String[] {
-                                mMediaFile.getPath() },
-                        new String[] { "video/mp4" }, null);
+                        mMediaFile.getPath() },
+                    new String[] { "video/mp4" }, null);
 
             } catch (RuntimeException e) {
                 // RuntimeException is thrown when stop() is called immediately after start().
@@ -277,7 +274,7 @@ public class CameraPreview implements View.OnTouchListener,
             mTemplateMatResized.release();
 
         if (mCameraMatResized != null)
-        mCameraMatResized.release();
+            mCameraMatResized.release();
 
         if (mTemplateMat != null)
             mTemplateMat.release();
@@ -324,6 +321,7 @@ public class CameraPreview implements View.OnTouchListener,
                 MinMaxLocResult mmr = Core.minMaxLoc(mResult);
 
                 Point matchLoc;
+                // TODO: Allow option for different match methods
                 if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
                     matchLoc = mmr.minLoc;
                 } else {
@@ -334,12 +332,36 @@ public class CameraPreview implements View.OnTouchListener,
                 matchLoc.x = matchLoc.x*2;
                 matchLoc.y = matchLoc.y*2;
 
-
                 // Draw a boundary around the detected object.
                 Imgproc.rectangle(mCameraMat, matchLoc, new Point((matchLoc.x + mTemplateMat.cols()),
                     (matchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
-                    TrackingActivity.b, TrackingActivity.a), 2);
+                    TrackingActivity.b, a), 2);
 
+                // Update the template for next frame
+//                Log.i(TAG, "matchLoc.x ~ template width is " + matchLoc.x + ", " + mTemplateMat.width());
+//                Log.i(TAG, "matchLoc.y ~ template height is " + matchLoc.y + ", " + mTemplateMat.height());
+
+
+                // correctTemplate boolean is set in onTouch method. The new template is stored in
+                // mCorrectedTemplateMat. So resize that object, and store the result in mTemplateMatResized
+                if (correctTemplate) {
+                    Imgproc.resize(mCorrectedTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
+                        resizeRatio, resizeRatio, Imgproc.INTER_AREA);
+                    correctTemplate = false;
+
+                    // Otherwise just update the template to whatever is in the bounding box, but make
+                    // sure that the template is within bounds
+                } else {
+                    if (isNewTemplateInRange((int)matchLoc.x, (int)matchLoc.y)) {
+
+                        Rect roi = new Rect((int) matchLoc.x, (int) matchLoc.y, mTemplateMat.width(), mTemplateMat.height());
+                        mTemplateMat = new Mat(mCameraMat, roi);
+
+                        // Resize the template to make template matching faster
+                        Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
+                            resizeRatio, resizeRatio, Imgproc.INTER_AREA);
+                    }
+                }
 
                 // Manual tracking, so implement the framecount, and do nothing else.
             } else {
@@ -356,54 +378,143 @@ public class CameraPreview implements View.OnTouchListener,
 
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                mX = event.getX();
-                mY = event.getY();
+                float mX = event.getX();
+                float mY = event.getY();
 
                 // Check to see if the current holder actually exists and is active
                 if (mOverlayHolder.getSurface().isValid()) {
-                    drawCircle();
+
+                    // If recording and manual tracking is selected, this indicates to draw a circle
+                    // overlay to show touch position
+                    if (isRecording && mTrackingMode == 0) {
+
+                        drawCircle(mX, mY);
+                        Log.i(TAG, "Drawing circle for manual tracking.");
+
+                        // Otherwise if tracking mode is automatic, this means we need to carry out
+                        // manual template correction
+                    } else if (isRecording && mTrackingMode == 1) {
+
+                        templateCorrection(mX, mY);
+                    }
                 }
-                break;
         }
         return true;
     }
 
 
-	/**
+    /**
      * A method used for Manual tracking mode only. This method reacts to a users touch when recording.
      * The touch location's x and y coordinates are parsed, and stored into the corresponding .yml
      * file for the recording. A circle is then drawn on the screen to mark the touch location.
      * This circle's colour can be changed using the interface.<br><br>
      *
      * <b>Note</b> that the x and y coordinates are stored in terms of the camera resolution, <i>not</i> the
-     * screen resolution.If this is not done, then for example, a 2560x1440 screen recording at 1920x1080
-     * will pose issueswhen storing coordinates. If the user touches the bottom right corner, 2560x1440~
-     * will be stored,as opposed to 1920x1080, which is the video resolution. It is obvious that this
-     * poses issues.
+     * screen resolution. If this is not done, then for example, a 2560x1440 screen recording at 1920x1080
+     * will pose issues when storing coordinates. If the user touches the bottom right corner, 2560x1440~
+     * will be stored, as opposed to 1920x1080, which is the video resolution. It is obvious that this
+     * poses issues. Hence, this method also does the conversion for us. It is also worth nothing that
+     * this method is only called when user is recording, and manual tracking is selected. Checks
+     * are done in the onTouch method, so no checks are needed to be done here.
+     *
+     * @param mX The x-coordinate of the touched position
+     * @param mY The y-coordinate of the touched position
      */
-    private void drawCircle() {
+    private void drawCircle(float mX, float mY) {
 
-        // Draw only if an active recording is taking place, and tracking mode is manual.
-        if (isRecording && mTrackingMode == 0) {
+        // Lock the canvas so that it can be drawn on
+        canvas = mOverlayHolder.lockCanvas();
+        paint.setStyle(Paint.Style.FILL);
 
-            // Lock the canvas so that it can be drawn on
-            canvas = mOverlayHolder.lockCanvas();
-            paint.setStyle(Paint.Style.FILL);
+        // Choose fill color to be the one selected by user, or red by default.
+        paint.setColor(TrackingActivity.overlayColor);
 
-            // Choose fill color to be the one selected by user, or red by default.
-            paint.setColor(TrackingActivity.overlayColor);
+        // Clear any previous circles
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
-            // Clear any previous circles
-            canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        canvas.drawCircle(mX, mY, 60, paint);
+        mOverlayHolder.unlockCanvasAndPost(canvas);
 
-            canvas.drawCircle(mX, mY, 60, paint);
-            mOverlayHolder.unlockCanvasAndPost(canvas);
+        // Convert coordinates with respect to device resolution
+        int convertedX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
+            mCameraControl.getWidth());
+        int convertedY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
+            mCameraControl.getHeight());
 
-            Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp,
-                (mX * mCameraControl.getFrameWidth())/ mCameraControl.getWidth(),
-                (mY * mCameraControl.getFrameHeight())/ mCameraControl.getHeight());
+        // Finally append to file
+        Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY);
 
+
+    }
+
+    /**
+     * This method can only be called when the user is recording in automatic tracking mode. onTouch()
+     * checks for these conditions.
+     *
+     * This methods responsbility is to update the template manually, when a user clicks on a location
+     * within bounds of the screen. The touched position will be the center point of the new template,
+     * denoted by the mX and mY params. The new manually corrected template will be the same size as the
+     * original template.
+     *
+     * This method will throw an error and return correctly if the user tries to select a template
+     * region that is not within bounds of the screen.
+     * @param mX The x coordinate of the touched location on screen.
+     * @param mY The y coordinate of the touched location on screen.
+     */
+    private void templateCorrection(float mX, float mY) {
+
+        // Convert the touched coordinate in terms of the camera res (1280x720) - currently its in terms
+        // of screen resolution
+        int convertedX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
+            mCameraControl.getWidth());
+        int convertedY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
+            mCameraControl.getHeight());
+
+        int startingX = (int) (convertedX - (mTemplateMat.width()/2.0f));
+        int startingY = (int) (convertedY - (mTemplateMat.height()/2.0f));
+
+        Log.i(TAG, "(Starting x, startingY) = (" + startingX + ", " + startingY + ")");
+        Log.i(TAG, "(mTemplateWidth, mTemplateHeight) = (" + mTemplateMat.width() + ", " + mTemplateMat.height() + ")");
+
+
+        // Ensure the new template is within boundary of camera resolution, otherwise throw an error
+        if (!isNewTemplateInRange(startingX, startingY)) {
+            Toast.makeText(mContext, "New template will not be within range - template correction failed!",
+                Toast.LENGTH_LONG).show();
+
+        } else {
+            // This is used in onCameraFrame to retrieve the Mat and resize it.
+            // The corrected Mat is stored in mCorrectedTemplateMat.
+            correctTemplate = true;
+
+            // Create a region of interest and extract template from this region
+            Rect roi = new Rect(startingX, startingY, mTemplateMat.width(), mTemplateMat.height());
+            mCorrectedTemplateMat = new Mat(mCameraMat, roi);
+
+            // Note that resizing is done in onCameraFrame() - if correctTemplate is true, then onCameraFrame
+            // resizes the Mat stored in mCorrectedTemplateMat. The resizing is done in onCameraFrame() and not
+            // here, to avoid the automatic template updating from rewriting the new manually corrected template.
         }
+    }
+
+    /**
+     * This method is used to check that when manual template correction is carried out, the new template
+     * is within the correct range. Returns true if the range is valid, and false otherwise.
+     *
+     * @param x The starting(top-left) x coordinate of new template
+     * @param y The starting (top-left) y coordinate of new template
+     * @return True if new template is within range, false otherwise
+     */
+    private boolean isNewTemplateInRange(int x, int y) {
+        if (x + mTemplateMat.width() < 0 || x + mTemplateMat.width() > 1280 || x < 0) {
+            return false;
+        }
+
+        if (y + mTemplateMat.height() < 0 || y + mTemplateMat.height() > 720 || y < 0) {
+            return false;
+        }
+
+        return true;
     }
 
 }

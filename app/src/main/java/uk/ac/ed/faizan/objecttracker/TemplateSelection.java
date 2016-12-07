@@ -11,8 +11,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import static uk.ac.ed.faizan.objecttracker.TrackingActivity.b;
-
 public class TemplateSelection extends View {
 
 	private Paint mRectPaint;

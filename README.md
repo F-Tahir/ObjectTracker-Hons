@@ -33,14 +33,16 @@
 ### Additions for next few months - prioritise these(date TBA)
 
 - [ ] Improve template matching
-    - [ ] Possibly implement another object recognition method that is rotation/scale invariant
-    - [ ] Update template on each frame
-    - [ ] Allow for automatic correction of template by clicking on location
-- [ ] Fix small bugs with changing between tracking modes when initialising template
+    - [X] Update template on each frame
+    - [X] Allow for manual correction of template by clicking on location
+    - [ ] Speed up template matching (e.g. by adding concurrency)
+    - [ ] Possibly allow for template to be rotated?
+- [ ] Fix bugs with changing between tracking modes when initialising template
 - [ ] Fix bug where app crashes if a template is not selected but user unfreezes preview
 - [ ] Add code to clear the selected template each time automatic tracking is initialized again
-- [ ] Add code to access sensor (accelerometer and gyroscope for now) readings
-    - [ ] Append sensor data to some file (to be discussed)
+- [ ] Add code to access sensor (accelerometer and gyroscope for now) readings (more info to come)
+    - [ ] Figure out reasonable sensor polling time
+    - [ ] Append sensor data to some file
 
  
 ### Changes/implementations to be made but are currently not prioritized
@@ -49,8 +51,11 @@
     - [x] Listen to users changes and store users preference
     - [x] Embed the actual flashlight into the application
 - [x] Change setFps() function in CameraView so that it first checks to see if the fps is supported, if not, sets next closest.
+- [ ] Allow for the cmaera to record in both orientations
+- [ ] Add camera zoom to application.
 - [ ] Add runtime permissions for devices >= Lollipop (https://developer.android.com/training/permissions/requesting.html)
     - [ ] Request permissions at runtime for Camera
+    - [ ] Request runtime permissions for Audio (Microphone)
     - [ ] Request permissions at runtime for Storage
 - [ ] Create own filepicker for app (http://stackoverflow.com/questions/18097763/how-to-open-the-my-files-folder-in-android-programatically-using-intent)
 - [ ] Add a settings pane in main screen, allowing user to set default tracking mode and overlay color

@@ -27,10 +27,6 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import org.opencv.core.Mat;
 import org.opencv.android.Utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 
 

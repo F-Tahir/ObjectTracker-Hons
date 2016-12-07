@@ -181,9 +181,35 @@ public final class Utilities
 			freezeButton.setAlpha(0.5f);
 
 		}
+	}
 
 
+	/**
+	 * Given an x-coordinate in terms of the screen resolution (which can be higher or lower than the
+	 * image resolution), this function converts the coordinate in terms of the camera resolution, so that
+	 * overlays and templates are drawn/created in the right positions.
+	 *
+	 * @param mX The x-coordinate of the touched location, in terms of screen size
+	 * @param cameraWidth The width of the camera resolution (1280px currently)
+	 * @param screenWidth The width of the screen resolution
+	 * @return The converted x-coord in terms of camera resolution
+	 */
+	public static int convertDeviceXToCameraX(float mX, int cameraWidth, int screenWidth) {
+		return (int) (mX*cameraWidth)/screenWidth;
+	}
 
 
+	/**
+	 * Given an y-coordinate in terms of the screen resolution (which can be higher or lower than the
+	 * image resolution), this function converts the coordinate in terms of the camera resolution, so that
+	 * overlays and templates are drawn/created in the right positions.
+	 *
+	 * @param mY The y-coordinate of the touched location, in terms of screen size
+	 * @param cameraHeight The height of the camera resolution (1280px currently)
+	 * @param screenHeight The height of the screen resolution
+	 * @return The converted y-coord in terms of camera resolution
+	 */
+	public static int convertDeviceYToCameraY(float mY, int cameraHeight, int screenHeight) {
+		return (int) (mY*cameraHeight)/screenHeight;
 	}
 }
