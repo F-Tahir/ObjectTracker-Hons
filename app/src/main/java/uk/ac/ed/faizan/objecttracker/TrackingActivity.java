@@ -29,6 +29,8 @@ import org.opencv.android.Utils;
 
 import java.util.List;
 
+import static android.R.attr.x;
+import static android.R.attr.y;
 
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
@@ -169,9 +171,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     // Automatic tracking and not recording.
                 } else {
 
+                    // Set to true to state that we are in template selection phase
                     templateSelectionInitialized = true;
                     mTemplateSelection.setClearCanvas(false);
 
+                    // Next step is done when Freeze button is pressed
                     Toast.makeText(this, "To select a template, focus the camera on the object," +
                         " then press the \"Live\" button.", Toast.LENGTH_LONG).show();
 
@@ -179,9 +183,56 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     // Enable it only for template selection, and nowhere else.
                     findViewById(R.id.freeze_button).setEnabled(true);
                     findViewById(R.id.freeze_button).setAlpha(1.0f);
+                }
+                break;
+
+
+            // Deals with changing drawables and other resources when freeze is enabled/disabled.
+            case R.id.freeze_button:
+                Button freezeButton = (Button) v;
+
+                // Pressed before selecting template
+                if (!mCameraPreview.isRecording) {
+
+                    if (!mCameraPreview.isPreviewFrozen) {
+                        mCameraPreview.isPreviewFrozen = true;
+                        freezeButton.setText(getResources().getString(R.string.freeze_enabled));
+                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_enabled, 0, 0);
+
+
+                        // User has initialized automatic tracking, so start template selection -
+                        // show instructions to user.
+                        if (templateSelectionInitialized) {
+                            findViewById(R.id.select_template).setVisibility(View.VISIBLE);
+                            Toast.makeText(this, "Now select the template. For instructions, click on " +
+                                "MODE > Help.", Toast.LENGTH_LONG).show();
+                        }
+
+                        // Pressed after template is selected
+                    } else {
+                        mCameraPreview.isPreviewFrozen = false;
+                        freezeButton.setText(getResources().getString(R.string.freeze_disabled));
+                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
+
+                        // User is done with template selection, and has unfrozen the preview, so save
+                        // the selected template by calling initializeTemplate()
+                        if (templateSelectionInitialized) {
+                            initializeTemplate();
+
+                            // Set clearCanvas boolean to true so old rectangle can be overwritten
+                            // TODO: Figure out why this doesn't call onDraw()
+
+                            mTemplateSelection.setClearCanvas(true);
+                            mTemplateSelection.invalidate();
+                            findViewById(R.id.select_template).setVisibility(View.INVISIBLE);
+                            templateSelectionInitialized = false;
+
+                            Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
 
                 }
-
                 break;
 
 
@@ -204,56 +255,6 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     }
                 } else {
                     Toast.makeText(this, "Camera does not support flash!", Toast.LENGTH_LONG).show();
-                }
-                break;
-
-
-            // Deals with changing drawables and other resources when freeze is enabled/disabled.
-            case R.id.freeze_button:
-                Button freezeButton = (Button) v;
-                if (!mCameraPreview.isRecording) {
-
-                    if (!mCameraPreview.isPreviewFrozen) {
-                        mCameraPreview.isPreviewFrozen = true;
-                        freezeButton.setText(getResources().getString(R.string.freeze_enabled));
-                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_enabled, 0, 0);
-
-                        // disableView() releases mCameraMat, so save it first.
-                        mTemplateFrameMat = new Mat();
-                        mCameraPreview.getCameraMat().copyTo(mTemplateFrameMat);
-                        mCameraControl.disableView();
-
-                        // User has initialized automatic tracking, so start template selection -
-                        // show instructions to user.
-                        if (templateSelectionInitialized) {
-                            findViewById(R.id.select_template).setVisibility(View.VISIBLE);
-                            Toast.makeText(this, "Now select the template. For instructions, click on " +
-                                "MODE > Help.", Toast.LENGTH_LONG).show();
-                        }
-
-                    } else {
-                        mCameraPreview.isPreviewFrozen = false;
-                        freezeButton.setText(getResources().getString(R.string.freeze_disabled));
-                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
-                        mCameraControl.enableView();
-
-                        // User is done with template selection, so save the template and set variables
-                        if (templateSelectionInitialized) {
-                            initializeTemplate();
-
-                            // Set clearCanvas boolean to true so old rectangle can be overwritten
-                            // TODO: Figure out why this doesn't call onDraw()
-
-                            mTemplateSelection.setClearCanvas(true);
-                            mTemplateSelection.invalidate();
-                            findViewById(R.id.select_template).setVisibility(View.INVISIBLE);
-                            templateSelectionInitialized = false;
-
-                            Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-
                 }
                 break;
 
@@ -322,33 +323,31 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         TemplateSelection templateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
         // Create a new bitmap with dimensions that are the same as the camera frame.
-        Bitmap source = Bitmap.createBitmap(mTemplateFrameMat.width(),
-            mTemplateFrameMat.height(), Bitmap.Config.ARGB_8888);
+        Bitmap source = Bitmap.createBitmap(mCameraPreview.getCameraMat().width(),
+            mCameraPreview.getCameraMat().height(), Bitmap.Config.ARGB_8888);
 
         // Copy the camera frame mat to the newly created bitmap
-        Utils.matToBitmap(mTemplateFrameMat, source);
+        Utils.matToBitmap(mCameraPreview.getCameraMat(), source);
 
-        // Scale the coordinates in terms of screen size
+        // Scale the coordinates in terms of image size, not screen size.
         double frameWidthRatio = (double) mCameraControl.getFrameWidth()/mCameraControl.getWidth();
         double frameHeightRatio = (double) mCameraControl.getFrameHeight()/mCameraControl.getHeight();
 
         int templateWidth =
             (int) (Math.abs(templateSelection.getLeftCoord() - templateSelection.getRightCoord())
                 * frameWidthRatio);
-
         int templateHeight =
             (int) (Math.abs(templateSelection.getTopCoord() - templateSelection.getBottomCoord())
                 * frameHeightRatio);
 
-        // getLeftCoord() returns first x coord of rectangle, getTopCoord() returns first y coord.
-        // Also want to scale these in terms of screen size.
+        // Get the region of the template selection, and crop the camera frame using this info, to
+        // create a bitmap for the template. getLeftCoord() returns first x coord of template region,
+        // getTopCoord() returns first y coord.
         Bitmap template = Bitmap.createBitmap(source, (int) (templateSelection.getLeftCoord()*frameWidthRatio),
             (int) (templateSelection.getTopCoord()*frameHeightRatio), templateWidth, templateHeight);
 
-        // Create a new Mat object to store bitmap to
+        // Create a new Mat and store template bitmap to it.
         Mat mat = new Mat();
-
-        // Convert bitmap to mat
         Utils.bitmapToMat(template, mat);
 
         // Set the template to the newly created mat

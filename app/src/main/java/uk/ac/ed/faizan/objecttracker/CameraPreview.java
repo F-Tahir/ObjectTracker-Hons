@@ -292,6 +292,12 @@ public class CameraPreview implements View.OnTouchListener,
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
+        // Don't update the frame if camera preview is frozen - return early.
+        if (isPreviewFrozen) {
+            return null;
+        }
+
+        // Otherwise if preview is not frozen, update the frame.
         mCameraMat = inputFrame.rgba();
 
         // TODO: Move as much out of here as possible
