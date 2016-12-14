@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,8 +21,6 @@ public class TemplateSelection extends View {
 	private boolean mDrawRect = false;
 	private OnUpCallback mCallback = null;
 	private boolean mClearCanvas = false;
-
-
 
 	// mLeft is first x coordinate of rectangle, mTop is first y coordinate.
 	private int mLeft = 0;
@@ -98,7 +95,7 @@ public class TemplateSelection extends View {
 
 		mRectPaint.setStyle(Paint.Style.STROKE);
 		mRectPaint.setPathEffect(new DashPathEffect(new float[] {10,20}, 0));
-		mRectPaint.setStrokeWidth(5);
+		mRectPaint.setStrokeWidth(8);
 	}
 
 
@@ -154,11 +151,9 @@ public class TemplateSelection extends View {
 			mRight = Math.max(mEndX, mStartX);
 			mBottom = Math.max(mEndY, mStartY);
 			canvas.drawRect(mLeft, mTop, mRight, mBottom, mRectPaint);
-			Log.i("Test", "Canvas drawn");
 
 		} else if (mClearCanvas) {
 			canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-			Log.i("Test", "Canvas cleared");
 		}
 	}
 }

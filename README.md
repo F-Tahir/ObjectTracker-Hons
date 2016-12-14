@@ -35,11 +35,15 @@
 - [ ] Improve template matching
     - [X] Update template on each frame
     - [X] Allow for manual correction of template by clicking on location
+    - [ ] Implement 2D gaussian (or other ways) to improve accuracy
+    - [ ] Add logic that doesn't allow automatic tracking to jump more than a certain amount between frames
     - [ ] Speed up template matching (e.g. by adding concurrency)
-    - [ ] Possibly allow for template to be rotated?
+- [X] Create .yml data file for automatic tracking also
+- [X] Add alpha option to automatic tracking overlay color
 - [ ] Fix bugs with changing between tracking modes when initialising template
 - [ ] Fix bug where app crashes if a template is not selected but user unfreezes preview
 - [ ] Add code to clear the selected template each time automatic tracking is initialized again
+- [ ] Look into camera control (such as zoom, white balance) to potentially improve tracking
 - [ ] Add code to access sensor (accelerometer and gyroscope for now) readings (more info to come)
     - [ ] Figure out reasonable sensor polling time
     - [ ] Append sensor data to some file

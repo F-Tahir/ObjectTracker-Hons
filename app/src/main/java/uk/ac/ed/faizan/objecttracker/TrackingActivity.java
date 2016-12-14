@@ -29,9 +29,6 @@ import org.opencv.android.Utils;
 
 import java.util.List;
 
-import static android.R.attr.x;
-import static android.R.attr.y;
-
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
 
@@ -43,9 +40,6 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
     boolean templateSelectionInitialized = false;
-    Mat mTemplateFrameMat;
-
-
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -365,42 +359,50 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
      *
      */
     public void getColor() {
+
+        // Alpha cannot change if we are using automatic tracking (as OpenCV does not support
+        // alpha shapes on android YET), so disable the alpha slider if tracking mode is automatic.
+        boolean showAlphaSlider = true;
+
+        if (trackingMode == 1) {
+            showAlphaSlider = false;
+        }
+
         ColorPickerDialogBuilder
-                .with(this)
-                .setTitle("Choose Color")
-                .initialColor(overlayColor)
-                .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+            .with(this)
+            .setTitle("Choose Color")
+            .initialColor(overlayColor)
+            .showAlphaSlider(showAlphaSlider)
+            .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
+            .setPositiveButton("Ok", new ColorPickerClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                    if (overlayColor != selectedColor) {
+                        overlayColor = selectedColor;
+                        a = Color.alpha(overlayColor);
+                        r = Color.red(overlayColor);
+                        g = Color.green(overlayColor);
+                        b = Color.blue(overlayColor);
 
-                .setPositiveButton("Ok", new ColorPickerClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-
-                        if (overlayColor != selectedColor) {
-                            overlayColor = selectedColor;
-                            a = Color.alpha(overlayColor);
-                            r = Color.red(overlayColor);
-                            g = Color.green(overlayColor);
-                            b = Color.blue(overlayColor);
-
-                            Log.i(TAG, "overlayColor is " + Integer.toHexString(overlayColor));
-                            Log.i(TAG, "a is " + a);
-                            Log.i(TAG, "r is " + r);
-                            Log.i(TAG, "g is " + g);
-                            Log.i(TAG, "b is " + b);
-                            Toast.makeText(TrackingActivity.this,
-                                    "Color selection saved.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "overlayColor is " + Integer.toHexString(overlayColor));
+                        Log.i(TAG, "a is " + a);
+                        Log.i(TAG, "r is " + r);
+                        Log.i(TAG, "g is " + g);
+                        Log.i(TAG, "b is " + b);
                         Toast.makeText(TrackingActivity.this,
-                                "Color selection cancelled.", Toast.LENGTH_SHORT).show();
+                            "Color selection saved.", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .build()
-                .show();
+                }
+            })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(TrackingActivity.this,
+                        "Color selection cancelled.", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .build()
+            .show();
     }
 
 
@@ -455,6 +457,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
 
                 Log.i(TAG, "Prepare was successful, now attempting to start");
                 try {
+                    mCameraPreview.frameCount = 0;
                     mCameraPreview.mMediaRecorder.start();
                     ImageView recordButton = (ImageView) findViewById(R.id.record_button);
                     recordButton.setImageResource(R.drawable.ic_stop);

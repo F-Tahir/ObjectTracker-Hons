@@ -29,8 +29,6 @@ import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.io.IOException;
 
-import static org.opencv.ml.SVM.P;
-import static uk.ac.ed.faizan.objecttracker.TrackingActivity.a;
 
 
 
@@ -52,8 +50,6 @@ public class CameraPreview implements View.OnTouchListener,
     private int mTrackingMode; // 0 for manual tracking, 1 for automatic
 
     private Mat mCameraMat;
-
-    // Used only in automatic tracking for template matching.
     private Mat mTemplateMat;
     private Mat mResult;
     private Mat mCameraMatResized;
@@ -64,6 +60,7 @@ public class CameraPreview implements View.OnTouchListener,
     File mMediaFile;
     MediaRecorder mMediaRecorder;
     Timer mTimer;
+    int frameCount = 0;
 
     boolean isRecording = false;
     boolean isFlashOn = false;
@@ -74,7 +71,6 @@ public class CameraPreview implements View.OnTouchListener,
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private static Canvas canvas;
-    private static int frameCount = 0;
 
     // Used to resize the input image to speed up template matching.
     private static double resizeRatio = 0.5;
@@ -177,6 +173,7 @@ public class CameraPreview implements View.OnTouchListener,
         long now = System.currentTimeMillis();
         mMediaFile = Utilities.getVideoFile(now);
         mDataFile = Utilities.getDataFile(now);
+
         if (mMediaFile == null) {
             Log.i(TAG, "Output file was not created successfully!");
             return false;
@@ -297,6 +294,9 @@ public class CameraPreview implements View.OnTouchListener,
             return null;
         }
 
+        // Update frame counter for .yml file
+        frameCount++;
+
         // Otherwise if preview is not frozen, update the frame.
         mCameraMat = inputFrame.rgba();
 
@@ -313,7 +313,6 @@ public class CameraPreview implements View.OnTouchListener,
                 int matchMethod = Imgproc.TM_CCOEFF_NORMED;
 
                 // mTemplateMat resized in terms of video size in prepareMediaRecorder.
-                // Very hacky solution so need to fix it!
                 int result_cols = mCameraMat.cols() - mTemplateMat.cols() + 1;
                 int result_rows = mCameraMat.rows() - mTemplateMat.rows() + 1;
 
@@ -335,17 +334,19 @@ public class CameraPreview implements View.OnTouchListener,
                 }
 
                 // Need to scale coordinates back up as we are working with images that are scaled down.
-                matchLoc.x = matchLoc.x*2;
-                matchLoc.y = matchLoc.y*2;
+                matchLoc.x = matchLoc.x*(1.0/resizeRatio);
+                matchLoc.y = matchLoc.y*(1.0/resizeRatio);
 
                 // Draw a boundary around the detected object.
                 Imgproc.rectangle(mCameraMat, matchLoc, new Point((matchLoc.x + mTemplateMat.cols()),
                     (matchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
-                    TrackingActivity.b, a), 2);
+                    TrackingActivity.b, TrackingActivity.a), 2);
 
-                // Update the template for next frame
-//                Log.i(TAG, "matchLoc.x ~ template width is " + matchLoc.x + ", " + mTemplateMat.width());
-//                Log.i(TAG, "matchLoc.y ~ template height is " + matchLoc.y + ", " + mTemplateMat.height());
+
+                // Append center coord of rectangle, as well as time and frame number to .yml file
+                // Add mTemplate.cols()/2.0 because matchLoc.x/y returns top left coordinate, we want center
+                Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (matchLoc.x +
+                    (mTemplateMat.cols()/2.0f)), (int) (matchLoc.y + (mTemplateMat.cols()/2.0f)));
 
 
                 // correctTemplate boolean is set in onTouch method. The new template is stored in
@@ -355,8 +356,8 @@ public class CameraPreview implements View.OnTouchListener,
                         resizeRatio, resizeRatio, Imgproc.INTER_AREA);
                     correctTemplate = false;
 
-                    // Otherwise just update the template to whatever is in the bounding box, but make
-                    // sure that the template is within bounds
+                    // Otherwise, if correctTemplate is false, no correction is needed, just update
+                    // current template.
                 } else {
                     if (isNewTemplateInRange((int)matchLoc.x, (int)matchLoc.y)) {
 
@@ -368,13 +369,8 @@ public class CameraPreview implements View.OnTouchListener,
                             resizeRatio, resizeRatio, Imgproc.INTER_AREA);
                     }
                 }
-
-                // Manual tracking, so implement the framecount, and do nothing else.
-            } else {
-                frameCount++;
             }
         }
-
         return mCameraMat;
     }
 
@@ -390,7 +386,7 @@ public class CameraPreview implements View.OnTouchListener,
                 // Check to see if the current holder actually exists and is active
                 if (mOverlayHolder.getSurface().isValid()) {
 
-                    // If recording and manual tracking is selected, this indicates to draw a circle
+                    // If recording, and manual tracking is selected, this indicates to draw a circle
                     // overlay to show touch position
                     if (isRecording && mTrackingMode == 0) {
 
@@ -432,7 +428,6 @@ public class CameraPreview implements View.OnTouchListener,
         canvas = mOverlayHolder.lockCanvas();
         paint.setStyle(Paint.Style.FILL);
 
-        // Choose fill color to be the one selected by user, or red by default.
         paint.setColor(TrackingActivity.overlayColor);
 
         // Clear any previous circles
@@ -476,6 +471,7 @@ public class CameraPreview implements View.OnTouchListener,
         int convertedY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
             mCameraControl.getHeight());
 
+        // We have the center coordinate, but we want the top left coordinate, so do some maths
         int startingX = (int) (convertedX - (mTemplateMat.width()/2.0f));
         int startingY = (int) (convertedY - (mTemplateMat.height()/2.0f));
 
@@ -489,7 +485,7 @@ public class CameraPreview implements View.OnTouchListener,
                 Toast.LENGTH_LONG).show();
 
         } else {
-            // This is used in onCameraFrame to retrieve the Mat and resize it.
+            // This boolean is used in onCameraFrame to retrieve the Mat and resize it.
             // The corrected Mat is stored in mCorrectedTemplateMat.
             correctTemplate = true;
 

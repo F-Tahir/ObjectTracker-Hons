@@ -65,7 +65,9 @@
         you wish to track in the center of the screen, for optimal results.
 
 
-        \n\n\n\n\n*You can change the circle overlay color by tapping the icon labelled \"Color\".
+        \n\n\n\n\n*You can change the circle overlay color by tapping the icon labelled \"Color\". Note that
+        due to limitations of OpenCV4Android, the alpha value can only be changed for manual tracking, and is
+        thus disabled for automatic tracking.
     </string>
 
 
