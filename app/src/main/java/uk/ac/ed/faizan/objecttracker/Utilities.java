@@ -1,8 +1,12 @@
 package uk.ac.ed.faizan.objecttracker;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -211,5 +215,48 @@ public final class Utilities
 	 */
 	public static int convertDeviceYToCameraY(float mY, int cameraHeight, int screenHeight) {
 		return (int) (mY*cameraHeight)/screenHeight;
+	}
+
+
+	/**
+	 * Given a list of required permissions, this function checks whether all of the permissions required
+	 * have been granted, and returns true if so. If at least one function has <b>not</b> been granted,
+	 * this application will return false.
+	 *
+	 * @param context The activity that this function was called in
+	 * @param permissions The list of required permissions
+	 * @return True if all required permissions have been granted; false otherwise.
+	 */
+	public static boolean hasPermissions(Context context, String... permissions) {
+		if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+			for (String permission : permissions) {
+				if (ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_DENIED) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * This function checks that all the grant results for the required permissions are "PERMISSION
+	 * GRANTED". The return value is used to decide whether or not to start an intent that requires
+	 * the permissions. If at least one permission has been denied (grantResult[i] = PERMISSION_DENIED),
+	 * then this indicates we cannot start the intent.
+	 *
+	 * @param grantResults The results for each of the required permission - PERMISSION_GRANTED or
+	 *                     PERMISSION_DENIED, depending on users action
+	 * @return True if all required permissions have been granted, false otherwise.
+	 */
+	public static boolean allPermissionsGranted(int[] grantResults) {
+
+		if (grantResults.length > 0) {
+			for (int result : grantResults) {
+				if (result == PackageManager.PERMISSION_DENIED) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

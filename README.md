@@ -55,16 +55,14 @@
     - [x] Listen to users changes and store users preference
     - [x] Embed the actual flashlight into the application
 - [x] Change setFps() function in CameraView so that it first checks to see if the fps is supported, if not, sets next closest.
-- [ ] Allow for the cmaera to record in both orientations
-- [ ] Add camera zoom to application.
-- [ ] Add runtime permissions for devices >= Lollipop (https://developer.android.com/training/permissions/requesting.html)
-    - [ ] Request permissions at runtime for Camera
-    - [ ] Request runtime permissions for Audio (Microphone)
-    - [ ] Request permissions at runtime for Storage
+- [x] Add runtime permissions for devices >= Lollipop (https://developer.android.com/training/permissions/requesting.html)
+    - [x] Request permissions at runtime for Camera
+    - [x] Request runtime permissions for Audio (Microphone)
+    - [x] Request permissions at runtime for Storage
 - [ ] Create own filepicker for app (http://stackoverflow.com/questions/18097763/how-to-open-the-my-files-folder-in-android-programatically-using-intent)
 - [ ] Add a settings pane in main screen, allowing user to set default tracking mode and overlay color
     - [ ] Read from the persistent settings to change to the user-set tracking mode/overlay color each time app is run
-- [ ] Generally clean up UI (especially main screen)
+- [ ] Generally clean up main-screen UI
 - [ ] Allow application to record in both landscape and portrait orientation
     
 

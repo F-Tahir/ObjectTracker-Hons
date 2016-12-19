@@ -1,13 +1,17 @@
 package uk.ac.ed.faizan.objecttracker;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
@@ -33,6 +37,8 @@ import java.util.List;
 public class  TrackingActivity extends Activity implements View.OnClickListener {
 
     private final String TAG = getClass().getSimpleName();
+
+
     private CameraPreview mCameraPreview;
     private CameraControl mCameraControl;
     private TemplateSelection mTemplateSelection;
@@ -40,6 +46,12 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
     boolean templateSelectionInitialized = false;
+
+    private final int REQUEST_PERMISSIONS = 1;
+    private String[] permissionList = {
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.RECORD_AUDIO,
+        Manifest.permission.CAMERA};
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -68,6 +80,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         findViewById(R.id.flash_button).setOnClickListener(this);
         findViewById(R.id.freeze_button).setOnClickListener(this);
         findViewById(R.id.tracking_mode_button).setOnClickListener(this);
+
+        mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
+        mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
     }
 
     // Called when activity becomes obscured.
@@ -79,28 +94,82 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         if (mCameraControl != null) {
             mCameraControl.disableView();
         }
-        mCameraPreview.releaseMediaRecorder(); // release resources such as preview
 
+        // release resources such as preview
+        if (mCameraPreview != null) {
+            mCameraPreview.releaseMediaRecorder();
+        }
     }
 
     // Called after onCreate() in an Android activity lifecycle.
     @Override
     protected void onResume() {
-        Log.i(TAG, "In resume");
+        Log.i(TAG, "On resume");
         super.onResume();
-        mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
-        mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
-        mCameraControl.enableView();
 
-        // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
-        mCameraPreview = new CameraPreview(
+        // Request runtime permissions on devices >= API 23, before starting tracking activity
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            // At least one required permission not granted, request it.
+            // Dialog pauses activity, so when permissions are set, this check is done again, as
+            // the activity is resumed when dialog closes.
+            if(!Utilities.hasPermissions(this, permissionList)) {
+                ActivityCompat.requestPermissions(this, permissionList, REQUEST_PERMISSIONS);
+
+
+            // All required permissions granted, start the camera preview
+            } else {
+                mCameraControl.enableView();
+
+                // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
+                mCameraPreview = new CameraPreview(
+                    this,
+                    mCameraControl,
+                    (SurfaceView) findViewById(R.id.transparent_view),
+                    (TextView) findViewById(R.id.timestamp),
+                    (ImageView) findViewById(R.id.record_button),
+                    trackingMode);
+                Log.i(TAG, "Or Here");
+            }
+
+        } else {
+            // API < 23, so permissions were already set on installation. No need to check permissions.
+            mCameraControl.enableView();
+
+            // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
+            mCameraPreview = new CameraPreview(
                 this,
                 mCameraControl,
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
                 (ImageView) findViewById(R.id.record_button),
                 trackingMode);
+        }
+
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+    {
+        if (requestCode == REQUEST_PERMISSIONS) {
+
+
+            // At least one required permission not granted, show toast and don't start intent
+            if (!Utilities.allPermissionsGranted(grantResults)) {
+
+                Toast.makeText(this, "This app requires camera, audio and storage permissions to start tracking.",
+                    Toast.LENGTH_LONG).show();
+                finish();
+
+            }
+            /* The else part is taken care of onResume() - the permissions dialog pauses the activity,
+            and thus when permission setting is finished, the activity is resumed; onResume() is called.
+            So once the permissions are set, onResume() is called and if all permissions were granted,
+            onResume() enables the camera view and initializes variables.*/
+        }
+    }
+
 
     /**
      * Called at the start of activity creation to configure the screen. Sets the screen to full-size,
@@ -282,9 +351,15 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                             // Automatic option selected
                             case R.id.automatic:
                                 item.setChecked(true);
+
                                 trackingMode = 1;
                                 Toast.makeText(TrackingActivity.this, "Tracking mode set to automatic.",
                                     Toast.LENGTH_SHORT).show();
+
+                                // We don't use alpha for colors in automatic tracking, so reset to 255.
+                                overlayColor = overlayColor | 0xFF000000;
+
+                                a = 255;
                                 return true;
 
                             // Help button selected
