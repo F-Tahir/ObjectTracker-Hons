@@ -27,6 +27,40 @@
 
     </FrameLayout>
 
+
+    <RelativeLayout
+
+        android:id="@+id/toolbar_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+        <TextView
+            android:id="@+id/timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/camera_ui_horizontal_margin"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:text="@string/timestamp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/record_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_toStartOf="@id/timestamp"
+            android:clickable="true"
+            android:src="@drawable/ic_record"/>
+
+
+    </RelativeLayout>
+
     <RelativeLayout
         android:paddingTop="8dp"
         android:paddingLeft="-12dp"
@@ -106,40 +140,6 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"/>
-
-
-    </RelativeLayout>
-
-
-    <RelativeLayout
-
-        android:id="@+id/toolbar_bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="@dimen/activity_vertical_margin">
-
-        <TextView
-            android:id="@+id/timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/camera_ui_horizontal_margin"
-            android:layout_centerInParent="true"
-            android:layout_centerVertical="true"
-            android:text="@string/timestamp"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="@android:color/white" />
-
-        <ImageView
-            android:id="@+id/record_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_toStartOf="@id/timestamp"
-            android:clickable="true"
-            android:src="@drawable/ic_record"/>
 
 
     </RelativeLayout>

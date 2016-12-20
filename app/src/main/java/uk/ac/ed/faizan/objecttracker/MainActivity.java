@@ -1,9 +1,13 @@
 package uk.ac.ed.faizan.objecttracker;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -16,10 +20,18 @@ import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
 
+
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
 
 	private String TAG = "object:tracker";
+	private static final int REQUEST_PERMISSIONS = 1;
+	private String[] permissionList = {
+		Manifest.permission.WRITE_EXTERNAL_STORAGE,
+		Manifest.permission.RECORD_AUDIO,
+		Manifest.permission.CAMERA};
+
 
 
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this)
@@ -81,6 +93,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		preferencesButton.setOnClickListener(this);
 	}
 
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+	{
+		if (requestCode == REQUEST_PERMISSIONS) {
+
+
+			// At least one required permission not granted, show toast and don't start intent
+			if (!Utilities.allPermissionsGranted(grantResults)) {
+
+				Toast.makeText(this, "This app requires camera, audio and storage permissions to start tracking.",
+					Toast.LENGTH_LONG).show();
+
+				// All required permissions granted, start intent
+			} else {
+				Intent i = new Intent(this, TrackingActivity.class);
+				startActivity(i);
+			}
+		}
+	}
 
 
 	@Override
@@ -89,8 +120,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 		switch (view.getId()) {
 			case R.id.start_tracking_button:
-				Intent i = new Intent(this, TrackingActivity.class);
-				startActivity(i);
+
+				// Request runtime permissions on devices >= API 23, before starting tracking activity
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+					// At least one required permission not granted, request it.
+					if(!Utilities.hasPermissions(this, permissionList)){
+						ActivityCompat.requestPermissions(this, permissionList, REQUEST_PERMISSIONS);
+
+						// We have all required permissions
+					} else {
+						Intent i = new Intent(this, TrackingActivity.class);
+						startActivity(i);
+					}
+
+					// API < 23, no runtime permission check needed
+				} else {
+					Intent i = new Intent(this, TrackingActivity.class);
+					startActivity(i);
+				}
+
 				break;
 
 			case R.id.view_recordings_button:

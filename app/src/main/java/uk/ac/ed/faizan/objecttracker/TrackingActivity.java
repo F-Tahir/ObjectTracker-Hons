@@ -1,16 +1,13 @@
 package uk.ac.ed.faizan.objecttracker;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
@@ -46,11 +43,6 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     int trackingMode = 0;
     boolean templateSelectionInitialized = false;
 
-    private final int REQUEST_PERMISSIONS = 1;
-    private String[] permissionList = {
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.CAMERA};
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -103,67 +95,21 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // Called after onCreate() in an Android activity lifecycle.
     @Override
     protected void onResume() {
+        Log.i(TAG, "In resume");
         super.onResume();
+        mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
+        mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
+        mCameraControl.enableView();
 
-        // Request runtime permissions on devices >= API 23, before starting tracking activity
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            // At least one required permission not granted, request it.
-            // Dialog pauses activity, so when permissions are set, this check is done again, as
-            // the activity is resumed when dialog closes.
-            if(!Utilities.hasPermissions(this, permissionList)) {
-                ActivityCompat.requestPermissions(this, permissionList, REQUEST_PERMISSIONS);
-
-
-                // All required permissions granted, start the camera preview
-            } else {
-                mCameraControl.enableView();
-
-                // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
-                mCameraPreview = new CameraPreview(
-                    this,
-                    mCameraControl,
-                    (SurfaceView) findViewById(R.id.transparent_view),
-                    (TextView) findViewById(R.id.timestamp),
-                    (ImageView) findViewById(R.id.record_button));
-            }
-
-        } else {
-            // API < 23, so permissions were already set on installation. No need to check permissions.
-            mCameraControl.enableView();
-
-            // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
-            mCameraPreview = new CameraPreview(
-                this,
-                mCameraControl,
-                (SurfaceView) findViewById(R.id.transparent_view),
-                (TextView) findViewById(R.id.timestamp),
-                (ImageView) findViewById(R.id.record_button));
-        }
-
+        // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
+        mCameraPreview = new CameraPreview(
+            this,
+            mCameraControl,
+            (SurfaceView) findViewById(R.id.transparent_view),
+            (TextView) findViewById(R.id.timestamp),
+            (ImageView) findViewById(R.id.record_button));
     }
 
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-    {
-        if (requestCode == REQUEST_PERMISSIONS) {
-
-
-            // At least one required permission not granted, show toast and don't start intent
-            if (!Utilities.allPermissionsGranted(grantResults)) {
-
-                Toast.makeText(this, "This app requires camera, audio and storage permissions to start tracking.",
-                    Toast.LENGTH_LONG).show();
-                finish();
-
-            }
-            /* The else part is taken care of onResume() - the permissions dialog pauses the activity,
-            and thus when permission setting is finished, the activity is resumed; onResume() is called.
-            So once the permissions are set, onResume() is called and if all permissions were granted,
-            onResume() enables the camera view and initializes variables.*/
-        }
-    }
 
 
     /**
