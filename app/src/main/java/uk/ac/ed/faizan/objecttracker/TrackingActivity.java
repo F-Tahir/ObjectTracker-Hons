@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -104,7 +103,6 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // Called after onCreate() in an Android activity lifecycle.
     @Override
     protected void onResume() {
-        Log.i(TAG, "On resume");
         super.onResume();
 
         // Request runtime permissions on devices >= API 23, before starting tracking activity
@@ -117,7 +115,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 ActivityCompat.requestPermissions(this, permissionList, REQUEST_PERMISSIONS);
 
 
-            // All required permissions granted, start the camera preview
+                // All required permissions granted, start the camera preview
             } else {
                 mCameraControl.enableView();
 
@@ -127,9 +125,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     mCameraControl,
                     (SurfaceView) findViewById(R.id.transparent_view),
                     (TextView) findViewById(R.id.timestamp),
-                    (ImageView) findViewById(R.id.record_button),
-                    trackingMode);
-                Log.i(TAG, "Or Here");
+                    (ImageView) findViewById(R.id.record_button));
             }
 
         } else {
@@ -142,8 +138,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 mCameraControl,
                 (SurfaceView) findViewById(R.id.transparent_view),
                 (TextView) findViewById(R.id.timestamp),
-                (ImageView) findViewById(R.id.record_button),
-                trackingMode);
+                (ImageView) findViewById(R.id.record_button));
         }
 
     }
@@ -381,7 +376,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     }
 
 
-	/**
+    /**
      * This method is called once the user acquires the object within the camera frame, and has selected
      * the rectangle region of the template. We then read the rectangle's coordinates in this function,
      * and then cut the template from the source image accordingly. The template is then converted
@@ -490,7 +485,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
      */
     class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
 
-		/**
+        /**
          * Calls the prepareVideoRecorder() method in an AsyncTask so it does not slow down the UI
          * thread.
          *
@@ -513,7 +508,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         }
 
 
-		/**
+        /**
          * If the MediaRecorder preparations were a success, this method starts the MediaRecorder,
          * starts the timer, and changes the drawable resource and isRecording boolean. This method
          * is also responsible for disabling/enabling UI buttons such as the "Mode" and freeze button,

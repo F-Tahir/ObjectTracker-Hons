@@ -73,11 +73,11 @@ public class CameraPreview implements View.OnTouchListener,
     private static Canvas canvas;
 
     // Used to resize the input image to speed up template matching.
-    private static double resizeRatio = 0.5;
+    private static double resizeRatio = 0.25;
 
 
     public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
-                         TextView timestamp, ImageView recordButton, int trackingMode) {
+                         TextView timestamp, ImageView recordButton) {
         mContext = context;
         mCameraControl = preview;
         mCameraControl.setCvCameraViewListener(this);
@@ -148,8 +148,6 @@ public class CameraPreview implements View.OnTouchListener,
                 resizeRatio, resizeRatio, Imgproc.INTER_AREA);
         }
 
-        frameCount = 0;
-
         mMediaRecorder = new MediaRecorder();
 
         // TODO: Possibly provide an option to disable audio source so no audio is recorded.
@@ -206,8 +204,6 @@ public class CameraPreview implements View.OnTouchListener,
      * we also change the ic_stop icon back to ic_record, and set isRecording = false.
      */
     public synchronized void releaseMediaRecorder(){
-
-        frameCount = 0;
 
         // If recording is stopped, clear the canvas so that no circles are present
         // after recording
