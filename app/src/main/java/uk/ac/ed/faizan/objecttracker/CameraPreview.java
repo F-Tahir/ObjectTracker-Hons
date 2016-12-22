@@ -1,6 +1,7 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.content.Context;
+import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -12,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,14 +42,19 @@ import java.io.IOException;
 public class CameraPreview implements View.OnTouchListener,
     CameraBridgeViewBase.CvCameraViewListener2 {
 
-    private final String TAG = "object:tracker";
+    public final String TAG = CameraPreview.class.getSimpleName();
     private CameraControl mCameraControl;
     private SurfaceView mOverlayView;
     private SurfaceHolder mOverlayHolder;
+
     private TextView mTimestamp;
     private ImageView mRecordButton;
+    private Button mFreezeButton;
+    private Button mModeButton;
+
+
     private Context mContext;
-    private int mTrackingMode; // 0 for manual tracking, 1 for automatic
+
 
     private Mat mCameraMat;
     private Mat mTemplateMat;
@@ -60,12 +67,14 @@ public class CameraPreview implements View.OnTouchListener,
     File mMediaFile;
     MediaRecorder mMediaRecorder;
     Timer mTimer;
+    StorageSpace mStorageSpace;
     int frameCount = 0;
 
     boolean isRecording = false;
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
     boolean correctTemplate = false;
+    private int mTrackingMode; // 0 for manual tracking, 1 for automatic
 
     // Values used for touch positions during manual tracking
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -76,8 +85,8 @@ public class CameraPreview implements View.OnTouchListener,
     private static double resizeRatio = 0.25;
 
 
-    public CameraPreview(Context context, CameraControl preview, SurfaceView overlay,
-                         TextView timestamp, ImageView recordButton) {
+    public CameraPreview(Context context, CameraControl preview, Button freezeButton, Button modeButton,
+                         SurfaceView overlay, TextView timestamp, ImageView recordButton, TextView storage) {
         mContext = context;
         mCameraControl = preview;
         mCameraControl.setCvCameraViewListener(this);
@@ -90,8 +99,11 @@ public class CameraPreview implements View.OnTouchListener,
 
         mTimestamp = timestamp;
         mRecordButton = recordButton;
+        mModeButton = modeButton;
+        mFreezeButton = freezeButton;
 
         mTimer = new Timer(timestamp);
+        mStorageSpace = new StorageSpace(storage);
 
         mCameraControl.setOnTouchListener(this);
 
@@ -172,12 +184,37 @@ public class CameraPreview implements View.OnTouchListener,
         mMediaFile = Utilities.getVideoFile(now);
         mDataFile = Utilities.getDataFile(now);
 
+        // Utilities.getVideoFile() returns false if storage is not writable, so check this.
         if (mMediaFile == null) {
+            Toast.makeText(mContext, "Recording failed. Please ensure storage is writable.",
+                Toast.LENGTH_LONG).show();
             Log.i(TAG, "Output file was not created successfully!");
             return false;
         }
+
         mMediaRecorder.setOutputFile(mMediaFile.getPath());
 
+        mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
+
+            public void onInfo(MediaRecorder mediaRec, int error, int extra) {
+                // TODO Auto-generated method stub
+
+                if(error==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
+
+                    Toast.makeText(mContext, "Out of space - recording stopped. Saved in " +
+                        mMediaFile, Toast.LENGTH_LONG).show();
+
+
+                    // Set buttons to full alpha and release resources/change booleans and icons
+                    releaseMediaRecorder();
+                    Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, isRecording);
+
+                }
+            }
+        });
+
+        // Specify 5MB less so we have space for things such as the .yml file
+        mMediaRecorder.setMaxFileSize(Utilities.getAvailableSpaceInBytes() - 5242880);
 
         // Try to prepare/start the media recorder
         try {
@@ -234,7 +271,10 @@ public class CameraPreview implements View.OnTouchListener,
             }
 
             mTimestamp.setText(R.string.timestamp);
+
+            // Stop updating UI threads
             mTimer.customHandler.removeCallbacks(mTimer.updateTimerThread);
+            mStorageSpace.customHandler.removeCallbacks(mStorageSpace.updateStorageSpaceThread);
 
             mRecordButton.setImageResource(R.drawable.ic_record);
             isRecording = false;

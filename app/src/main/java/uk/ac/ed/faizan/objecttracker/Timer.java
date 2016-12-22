@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.widget.TextView;
 
-import org.opencv.android.FpsMeter;
 
 import java.util.Locale;
 

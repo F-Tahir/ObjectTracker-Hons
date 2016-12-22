@@ -13,7 +13,7 @@ import java.util.List;
 
 public class CameraControl extends JavaCameraView {
 
-    public final String TAG = "object:tracker";
+    public final String TAG = CameraControl.class.getSimpleName();
     public CameraControl(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -31,25 +31,12 @@ public class CameraControl extends JavaCameraView {
     }
 
 
-    /**
-     * Call this method to check to see if the camera supports a flash. If the developer wants to enable
-     * flash, it is recommended to call this function before calling enableFlash(). This simply ensures
-     * that the list returned from getFlashModes() is non-empty.
-     *
-     * @return True if camera has a built-in flash, false otherwise.
-     */
-    public boolean hasCameraFlash() {
-        Camera.Parameters p = mCamera.getParameters();
-        return p.getFlashMode() != null;
-    }
-
-
     /*
      ** This method returns all the supported flash modes. It does not check if the device actually
      * supports flash, so could return null. Because of this, it is recommended to call hasCameraFlash()
      * before calling this method.
      *
-     * @retuen A list of all the supported flashes. This list could return null.
+     * @return A list of all the supported flashes. This list could return null.
      */
     public List<String> getFlashModes() {
         return mCamera.getParameters().getSupportedFlashModes();
@@ -60,29 +47,26 @@ public class CameraControl extends JavaCameraView {
      * First check to see if a suitable flash mode exists within the device, and if so, enable it
      *
      * @param flashModes A list of flash modes that the device supports
+     * @return True if flash was enabled successfully, false otherwise
      */
-    public void enableFlash(List<String> flashModes) {
+    public boolean enableFlash(List<String> flashModes) {
         if (flashModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
             Camera.Parameters p = mCamera.getParameters();
             p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             mCamera.setParameters(p);
             mCamera.startPreview();
-            Log.i(TAG, "Flash on");
+            return true;
 
         } else if (flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
             mCamera.getParameters().setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
             mCamera.startPreview();
-            Log.i(TAG, "Flash auto");
+            return true;
         }
+        // No relevant flash mode supported, so return false.
+        Log.i(TAG, "Flash not turned on successfully. Perhaps not supported.");
+        return false;
     }
 
-
-    public void lockAutoExposure() {
-        Camera.Parameters p = mCamera.getParameters();
-        if ( p.isAutoExposureLockSupported() )
-            p.setAutoExposureLock( true );
-        mCamera.setParameters( p );
-    }
 
     /**
      * This function is called when the flash button is pressed by the user while flash is enabled.
@@ -92,17 +76,30 @@ public class CameraControl extends JavaCameraView {
      * If a flash on mode exists, then a corresponding flash off mode has to exist.
      *
      * @param flashModes A list of flash modes that the device supports
+     * @return True if flash was disabled successfully, false otherwise. Should never return false/
      */
-    public void disableFlash(List<String> flashModes) {
+    public boolean disableFlash(List<String> flashModes) {
         if (flashModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
             Camera.Parameters parameters2 = mCamera.getParameters();
             parameters2.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             mCamera.setParameters(parameters2);
+            return true;
         }
+        // Should not reach here, as this function can only be called after flash is turned on
+        Log.e(TAG, "Flash not turned off successfully!");
+        return false;
     }
 
 
-
+    /**
+     * Locks the cameras exposure
+     */
+    public void lockAutoExposure() {
+        Camera.Parameters p = mCamera.getParameters();
+        if ( p.isAutoExposureLockSupported() )
+            p.setAutoExposureLock( true );
+        mCamera.setParameters( p );
+    }
 
 
 

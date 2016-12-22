@@ -25,7 +25,7 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
 
-	private String TAG = "object:tracker";
+	public final String TAG = MainActivity.class.getSimpleName();
 	private static final int REQUEST_PERMISSIONS = 1;
 	private String[] permissionList = {
 		Manifest.permission.WRITE_EXTERNAL_STORAGE,

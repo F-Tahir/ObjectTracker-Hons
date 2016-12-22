@@ -28,6 +28,7 @@ import org.opencv.core.Mat;
 import org.opencv.android.Utils;
 
 import java.util.List;
+import java.util.Locale;
 
 
 public class  TrackingActivity extends Activity implements View.OnClickListener {
@@ -62,10 +63,8 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         // Set up UI to make full screen, low profile soft-keys, etc.
         setupScreen();
 
-        // Inflate layout
         setContentView(R.layout.activity_tracking);
 
-        // Register onClickListeners for various views
         findViewById(R.id.select_color_button).setOnClickListener(this);
         findViewById(R.id.record_button).setOnClickListener(this);
         findViewById(R.id.flash_button).setOnClickListener(this);
@@ -97,6 +96,11 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     protected void onResume() {
         Log.i(TAG, "In resume");
         super.onResume();
+
+        ( (TextView) findViewById(R.id.storage_space)).setText(String.format(Locale.ENGLISH,
+            "Free Space: %.2f GB", Utilities.getAvailableSpaceInGB()));
+
+
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
         mCameraControl.enableView();
@@ -105,9 +109,12 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         mCameraPreview = new CameraPreview(
             this,
             mCameraControl,
+            (Button) findViewById(R.id.freeze_button),
+            (Button) findViewById(R.id.tracking_mode_button),
             (SurfaceView) findViewById(R.id.transparent_view),
             (TextView) findViewById(R.id.timestamp),
-            (ImageView) findViewById(R.id.record_button));
+            (ImageView) findViewById(R.id.record_button),
+            (TextView) findViewById(R.id.storage_space));
     }
 
 
@@ -158,7 +165,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     // Reconfigure UI to enable or disable MODE and freeze buttons, depending on
                     // what the tracking mode is (the function takes care of this for us).
                     Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
-                        findViewById(R.id.freeze_button), trackingMode, mCameraPreview.isRecording);
+                        findViewById(R.id.freeze_button),  mCameraPreview.isRecording);
                     break;
                 }
 
@@ -244,23 +251,27 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                 List<String> flashModes = mCameraControl.getFlashModes();
                 Button flashButton = (Button) v;
 
-                if (mCameraControl.hasCameraFlash()) {
-                    if (!mCameraPreview.isFlashOn) {
-                        mCameraControl.enableFlash(flashModes);
+                if (!mCameraPreview.isFlashOn) {
+                    if (mCameraControl.enableFlash(flashModes)) {
                         mCameraPreview.isFlashOn = true;
                         flashButton.setText(getResources().getString(R.string.flash_state_on));
                         flashButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_flash_on, 0, 0);
-
                     } else {
-                        mCameraControl.disableFlash(flashModes);
+                        Toast.makeText(this, "Your device does not support flash.", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    if (mCameraControl.disableFlash(flashModes)) {
                         mCameraPreview.isFlashOn = false;
                         flashButton.setText(getResources().getString(R.string.flash_state_off));
                         flashButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_flash_off, 0, 0);
+                    } else {
+                        Toast.makeText(this, "Flash cannot be turned off. Please exit the application.",
+                            Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Toast.makeText(this, "Camera does not support flash!", Toast.LENGTH_LONG).show();
                 }
                 break;
+
+
 
 
             // TODO: Clean up this code a little
@@ -479,17 +490,20 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
                     recordButton.setImageResource(R.drawable.ic_stop);
                     mCameraPreview.isRecording = true;
 
-                    // Start updating the timestamp for recording if preparation is successful.
+                    // Start updating the timestamp and available storage space for recording
+                    // if preparation is successful.
                     mCameraPreview.mTimer.startTime = SystemClock.uptimeMillis();
                     mCameraPreview.mTimer.customHandler.postDelayed(mCameraPreview.mTimer.updateTimerThread, 0);
-                    Log.i(TAG, "MediaRecorder started properly");
+
+                    mCameraPreview.mStorageSpace.customHandler.postDelayed(mCameraPreview.
+                        mStorageSpace.updateStorageSpaceThread, 0);
 
                 } catch (RuntimeException e) {
                     Log.i(TAG, "MediaRecorder did not start properly.");
                 }
 
                 Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
-                    findViewById(R.id.freeze_button), trackingMode, mCameraPreview.isRecording);
+                    findViewById(R.id.freeze_button), mCameraPreview.isRecording);
 
                 // This runnable is stopped in CameraPreview.releaseMediaRecorder();
             }
