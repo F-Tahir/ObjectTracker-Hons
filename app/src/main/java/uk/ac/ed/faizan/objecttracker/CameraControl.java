@@ -29,7 +29,11 @@ public class CameraControl extends JavaCameraView {
      */
     public int getMaxZoomVal() {
         if (checkZoomSupport()) {
-            return mCamera.getParameters().getMaxZoom();
+            if (mCamera != null) {
+                return mCamera.getParameters().getMaxZoom();
+            } else {
+                return -1;
+            }
         } else {
             return -1;
         }
@@ -41,7 +45,11 @@ public class CameraControl extends JavaCameraView {
      * @return True if camera supports zoom, false otherwise.
      */
     public boolean checkZoomSupport() {
-        return mCamera.getParameters().isZoomSupported();
+        if (mCamera != null) {
+            return mCamera.getParameters().isZoomSupported();
+        } else {
+            return false;
+        }
     }
 
 	/**
@@ -59,24 +67,6 @@ public class CameraControl extends JavaCameraView {
             mCamera.setParameters(params);
     }
 
-	/**
-     * Accessor function used to get a list of all the supported camera parameters, such as whether
-     * focus is supported, zoom is supported, etc.
-     *
-     * @return A list of the devices' camera parameters
-     */
-    public Parameters getCameraParams() {
-        return mCamera.getParameters();
-    }
-
-    /**
-     * Modifier function used to set a list of camera parameters.
-     *
-     * @params params list of camera parameters that should be set
-     */
-    public void setCameraParams(Parameters params) {
-        mCamera.setParameters(params);
-    }
 
 
     /**

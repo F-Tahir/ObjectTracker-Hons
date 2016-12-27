@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.os.Build.VERSION_CODES.M;
+import static uk.ac.ed.faizan.objecttracker.R.id.template_initialization_cancel;
 
 
 public class TrackingActivity extends Activity implements View.OnClickListener {
@@ -74,6 +75,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.flash_button).setOnClickListener(this);
         findViewById(R.id.freeze_button).setOnClickListener(this);
         findViewById(R.id.tracking_mode_button).setOnClickListener(this);
+        findViewById(R.id.template_initialization_cancel).setOnClickListener(this);
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
@@ -219,6 +221,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     templateSelectionInitialized = true;
                     mTemplateSelection.setClearCanvas(false);
 
+                    findViewById(R.id.template_initialization_cancel).setVisibility(View.VISIBLE);
+
                     // Next step is done when Freeze button is pressed
                     Toast.makeText(this, "To select a template, focus the camera on the object," +
                         " then press the \"Live\" button.", Toast.LENGTH_LONG).show();
@@ -268,7 +272,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                         if (templateSelectionInitialized) {
                             boolean successful = initializeTemplate();
 
-                            // Only change icons etc if template matching was successful.
+                            // Only change icons and hide cancel button etc if template matching was successful.
                             if (successful) {
                                 mTemplateSelection.setClearCanvas(true);
                                 mTemplateSelection.invalidate();
@@ -279,17 +283,40 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                                 freezeButton.setText(getResources().getString(R.string.freeze_disabled));
                                 freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
 
+                                findViewById(R.id.template_initialization_cancel).setVisibility(View.INVISIBLE);
                                 Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
 
                             } else {
                                 Toast.makeText(this, "Template not selected properly, perhaps the template" +
-                                    "was too small.", Toast.LENGTH_LONG).show();
+                                    " was too small.", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
 
 
                 }
+                break;
+
+
+            // Template initialization cancelled - change booleans, and icons
+            case R.id.template_initialization_cancel:
+                Button freeze = (Button) findViewById(R.id.freeze_button);
+                templateSelectionInitialized = false;
+                mCameraPreview.isPreviewFrozen = false;
+                Toast.makeText(this, "Template initialization cancelled", Toast.LENGTH_SHORT).show();
+
+                // Clear tracking boundary and set tracking canvas to invisible
+                mTemplateSelection.setClearCanvas(true);
+                mTemplateSelection.invalidate();
+                findViewById(R.id.select_template).setVisibility(View.INVISIBLE);
+
+                // Change the freeze button
+                freeze.setText(getResources().getString(R.string.freeze_disabled));
+                freeze.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
+                findViewById(R.id.template_initialization_cancel).setVisibility(View.INVISIBLE);
+
+                Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
+                    findViewById(R.id.freeze_button),  mCameraPreview.isRecording);
                 break;
 
 

@@ -68,9 +68,24 @@
             android:layout_height="wrap_content"/>
     </RelativeLayout>
 
+    <Button
+        android:paddingTop="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/template_initialization_cancel"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:textAllCaps="true"
+        android:textSize="12sp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textColor="@android:color/white"
+        android:visibility="invisible"
+        android:text="Cancel Initialization"/>
+
 
 
     <LinearLayout
+        android:paddingTop="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
