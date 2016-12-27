@@ -160,7 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 					// If user has no file manager app, notify the user to install one.
 				} else {
-					Toast.makeText(this, "Please install a File Manager application", Toast.LENGTH_LONG)
+					Toast.makeText(this, "Please install a File Manager application. ES File Explorer " +
+						"works well with this app.", Toast.LENGTH_LONG)
 						.show();
 				}
 				break;

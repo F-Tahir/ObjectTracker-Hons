@@ -43,7 +43,7 @@
 - [ ] Fix bugs with changing between tracking modes when initialising template
 - [ ] Fix bug where app crashes if a template is not selected but user unfreezes preview
 - [ ] Add code to clear the selected template each time automatic tracking is initialized again (All 3 bugs 1 day)
-- [ ] Look into camera control (such as zoom, white balance) to potentially improve tracking (1 day)
+- [x] Look into camera control (such as zoom, white balance) to potentially improve tracking (1 day)
 - [ ] Add code to access sensor (accelerometer and gyroscope for now) readings (more info to come) (Rest of time until 9th Jan)
     - [ ] Figure out reasonable sensor polling time
     - [ ] Append sensor data to some file
@@ -60,7 +60,7 @@
     - [x] Request runtime permissions for Audio (Microphone)
     - [x] Request permissions at runtime for Storage
 - [ ] Create own filepicker for app (http://stackoverflow.com/questions/18097763/how-to-open-the-my-files-folder-in-android-programatically-using-intent)
-- [ ] Look into querying free space to ensure user has enough space to save
+- [x] Look into querying free space to ensure user has enough space to save
 - [ ] Add a settings pane in main screen, allowing user to set default tracking mode and overlay color
     - [ ] Read from the persistent settings to change to the user-set tracking mode/overlay color each time app is run
 - [ ] Generally clean up main-screen UI

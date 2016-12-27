@@ -2,6 +2,7 @@ package uk.ac.ed.faizan.objecttracker;
 
 import android.content.Context;
 import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -11,11 +12,70 @@ import org.opencv.android.JavaCameraView;
 import java.util.List;
 
 
+
 public class CameraControl extends JavaCameraView {
 
     public final String TAG = CameraControl.class.getSimpleName();
     public CameraControl(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
+
+
+    /**
+     * This function is called to determine what the maximum zoom value of the camera is. First check
+     * whether the camera supports zoom. If not, return -1.
+     *
+     * @return A value determining maximum zoom value of camera, -1 if zoom is not supported.
+     */
+    public int getMaxZoomVal() {
+        if (checkZoomSupport()) {
+            return mCamera.getParameters().getMaxZoom();
+        } else {
+            return -1;
+        }
+    }
+
+	/**
+     * This function is called to check whether the camera supports software zoom.
+     *
+     * @return True if camera supports zoom, false otherwise.
+     */
+    public boolean checkZoomSupport() {
+        return mCamera.getParameters().isZoomSupported();
+    }
+
+	/**
+	 * This function is called to set the camera zoom value. The value is taken from the SeekBar widget
+     * and is of a value between 0 and the  number returned by getMaxZoomVal()
+     *
+     * @param zoomVal the value used to set the zoom.
+     */
+    public void setZoomVal(int zoomVal) {
+        Parameters params = mCamera.getParameters();
+        params.setZoom(zoomVal);
+        Log.i(TAG, "ZoomValue is: " +zoomVal);
+
+        if (mCamera != null)
+            mCamera.setParameters(params);
+    }
+
+	/**
+     * Accessor function used to get a list of all the supported camera parameters, such as whether
+     * focus is supported, zoom is supported, etc.
+     *
+     * @return A list of the devices' camera parameters
+     */
+    public Parameters getCameraParams() {
+        return mCamera.getParameters();
+    }
+
+    /**
+     * Modifier function used to set a list of camera parameters.
+     *
+     * @params params list of camera parameters that should be set
+     */
+    public void setCameraParams(Parameters params) {
+        mCamera.setParameters(params);
     }
 
 

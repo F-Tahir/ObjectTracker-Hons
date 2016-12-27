@@ -16,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.PopupMenu;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class  TrackingActivity extends Activity implements View.OnClickListener {
+public class TrackingActivity extends Activity implements View.OnClickListener {
 
     private final String TAG = getClass().getSimpleName();
 
@@ -43,6 +44,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
     boolean templateSelectionInitialized = false;
+    float mDist;
 
 
     // Default color for overlay color when tracking objects (Red)
@@ -70,9 +72,9 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         findViewById(R.id.flash_button).setOnClickListener(this);
         findViewById(R.id.freeze_button).setOnClickListener(this);
         findViewById(R.id.tracking_mode_button).setOnClickListener(this);
-
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
+
     }
 
     // Called when activity becomes obscured.
@@ -91,6 +93,8 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         }
     }
 
+
+
     // Called after onCreate() in an Android activity lifecycle.
     @Override
     protected void onResume() {
@@ -100,10 +104,37 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
         ( (TextView) findViewById(R.id.storage_space)).setText(String.format(Locale.ENGLISH,
             "Free Space: %.2f GB", Utilities.getAvailableSpaceInGB()));
 
-
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
         mCameraControl.enableView();
+
+        // Set the max value of the zoom bar programatically - whatever the camera supports
+        SeekBar zoombar = (SeekBar) findViewById(R.id.camerazoom);
+        zoombar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                if (mCameraControl.checkZoomSupport()) {
+                    Log.i(TAG, "Camera max zoom is " + mCameraControl.getMaxZoomVal());
+                    seekBar.setProgress(progress);
+
+                    // SeekBAr's max value is 100, so set zoom progress in accordance to the max value
+                    double zoomProgress = ((mCameraControl.getMaxZoomVal()/100.0)*progress);
+                    mCameraControl.setZoomVal((int) Math.floor(zoomProgress));
+                } else {
+                    Toast.makeText(TrackingActivity.this, "Zoom not supported.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
 
         // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
         mCameraPreview = new CameraPreview(
@@ -431,6 +462,7 @@ public class  TrackingActivity extends Activity implements View.OnClickListener 
             .build()
             .show();
     }
+
 
 
 
