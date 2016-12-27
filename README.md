@@ -41,7 +41,7 @@
 - [X] Create .yml data file for automatic tracking also
 - [X] Add alpha option to automatic tracking overlay color
 - [ ] Fix bugs with changing between tracking modes when initialising template
-- [ ] Fix bug where app crashes if a template is not selected but user unfreezes preview
+- [x] Fix bug where app crashes if a template is not selected but user unfreezes preview
 - [ ] Add code to clear the selected template each time automatic tracking is initialized again (All 3 bugs 1 day)
 - [x] Look into camera control (such as zoom, white balance) to potentially improve tracking (1 day)
 - [ ] Add code to access sensor (accelerometer and gyroscope for now) readings (more info to come) (Rest of time until 9th Jan)

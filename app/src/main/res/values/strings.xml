@@ -75,4 +75,5 @@
     <string name="freeze_preview_toast_string1">To select a template, firstly focus the camera on the object,
         and then press the</string>
     <string name="freeze_preview_toast_string2"> button</string>
+    <string name="tracking_mode_text">Mode: Manual</string>
 </resources>

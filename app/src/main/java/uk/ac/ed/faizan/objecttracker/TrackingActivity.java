@@ -31,6 +31,8 @@ import org.opencv.android.Utils;
 import java.util.List;
 import java.util.Locale;
 
+import static android.os.Build.VERSION_CODES.M;
+
 
 public class TrackingActivity extends Activity implements View.OnClickListener {
 
@@ -252,24 +254,37 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
                         // Pressed after template is selected
                     } else {
-                        mCameraPreview.isPreviewFrozen = false;
-                        freezeButton.setText(getResources().getString(R.string.freeze_disabled));
-                        freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
+
+                        // If manual tracking, change icon regardless, no verification of template matching
+                        // required
+                        if (trackingMode == 0) {
+                            mCameraPreview.isPreviewFrozen = false;
+                            freezeButton.setText(getResources().getString(R.string.freeze_disabled));
+                            freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
+                        }
 
                         // User is done with template selection, and has unfrozen the preview, so save
                         // the selected template by calling initializeTemplate()
                         if (templateSelectionInitialized) {
-                            initializeTemplate();
+                            boolean successful = initializeTemplate();
 
-                            // Set clearCanvas boolean to true so old rectangle can be overwritten
-                            // TODO: Figure out why this doesn't call onDraw()
+                            // Only change icons etc if template matching was successful.
+                            if (successful) {
+                                mTemplateSelection.setClearCanvas(true);
+                                mTemplateSelection.invalidate();
+                                findViewById(R.id.select_template).setVisibility(View.INVISIBLE);
+                                templateSelectionInitialized = false;
 
-                            mTemplateSelection.setClearCanvas(true);
-                            mTemplateSelection.invalidate();
-                            findViewById(R.id.select_template).setVisibility(View.INVISIBLE);
-                            templateSelectionInitialized = false;
+                                mCameraPreview.isPreviewFrozen = false;
+                                freezeButton.setText(getResources().getString(R.string.freeze_disabled));
+                                freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
 
-                            Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
+
+                            } else {
+                                Toast.makeText(this, "Template not selected properly, perhaps the template" +
+                                    "was too small.", Toast.LENGTH_LONG).show();
+                            }
                         }
                     }
 
@@ -324,8 +339,9 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                             case R.id.manual:
                                 item.setChecked(true);
                                 trackingMode = 0;
-                                Toast.makeText(TrackingActivity.this, "Tracking mode set to manual.",
-                                    Toast.LENGTH_SHORT).show();
+
+                                ((TextView) findViewById(R.id.tracking_mode_text)).setText(String.format(Locale.ENGLISH,
+                                    "Mode: %s", "Manual"));
 
                                 findViewById(R.id.freeze_button).setEnabled(false);
                                 findViewById(R.id.freeze_button).setAlpha(0.5f);
@@ -334,10 +350,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                             // Automatic option selected
                             case R.id.automatic:
                                 item.setChecked(true);
-
                                 trackingMode = 1;
-                                Toast.makeText(TrackingActivity.this, "Tracking mode set to automatic.",
-                                    Toast.LENGTH_SHORT).show();
+
+                                ((TextView) findViewById(R.id.tracking_mode_text)).setText(String.format(Locale.ENGLISH,
+                                    "Mode: %s", "Auto"));
 
                                 // We don't use alpha for colors in automatic tracking, so reset to 255.
                                 overlayColor = overlayColor | 0xFF000000;
@@ -370,8 +386,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
      * and then cut the template from the source image accordingly. The template is then converted
      * to a Mat object, and we set the mTemplateMat object in CameraPreview.java to this newly created
      * template Mat. We are then ready to start recording.
+     *
+     * @return True if template selection was carried out correctly, false otherwise
      */
-    public void initializeTemplate() {
+    public boolean initializeTemplate() {
         TemplateSelection templateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
         // Create a new bitmap with dimensions that are the same as the camera frame.
@@ -392,6 +410,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             (int) (Math.abs(templateSelection.getTopCoord() - templateSelection.getBottomCoord())
                 * frameHeightRatio);
 
+        // Template selection was unsuccessful (user selected too small of an area)
+        // TODO: Check whether these minimum template sizes are fine.
+        if (templateWidth < 15 || templateHeight < 15) {
+            return false;
+        }
+
         // Get the region of the template selection, and crop the camera frame using this info, to
         // create a bitmap for the template. getLeftCoord() returns first x coord of template region,
         // getTopCoord() returns first y coord.
@@ -405,8 +429,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         // Set the template to the newly created mat
         mCameraPreview.setTemplateMat(mat);
 
-        // Now attempt to start recording
+        // Now attempt to start recording. Check if template is null before?
         new MediaPrepareTask().execute(null, null, null);
+        return true;
+
     }
 
 

@@ -29,7 +29,6 @@
 
 
     <RelativeLayout
-
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,17 +69,35 @@
     </RelativeLayout>
 
 
-    <TextView
-        android:id="@+id/storage_space"
-        android:paddingTop="16dp"
-        android:textSize="15sp"
-        android:paddingEnd="16dp"
-        android:paddingStart="16dp"
-        android:textColor="@android:color/white"
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"/>
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/storage_space"
+            android:paddingTop="16dp"
+            android:textSize="12sp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:textColor="@android:color/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/tracking_mode_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:textColor="@android:color/white"
+            android:text="@string/tracking_mode_text"/>
+    </LinearLayout>
+
 
     <RelativeLayout
         android:paddingTop="8dp"

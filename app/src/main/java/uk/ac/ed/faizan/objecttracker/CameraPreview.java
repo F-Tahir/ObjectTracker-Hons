@@ -120,6 +120,14 @@ public class CameraPreview implements View.OnTouchListener,
     }
 
     /**
+     * Retrieve the current template.
+     * @return Mat object that wraps the current template selected by user.
+     */
+    public Mat getTemplateMat() {
+        return mTemplateMat;
+    }
+
+    /**
      * Used to set the template after user has carried out the template selection process.
      *
      * @param templateMat A bitmap object converted to a Mat, used for template matching
@@ -361,7 +369,7 @@ public class CameraPreview implements View.OnTouchListener,
                 MinMaxLocResult mmr = Core.minMaxLoc(mResult);
 
                 Point matchLoc;
-                // TODO: Allow option for different match methods
+                // TODO: Allow option for different match methods possibly
                 if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
                     matchLoc = mmr.minLoc;
                 } else {
