@@ -50,6 +50,7 @@ public class CameraPreview implements View.OnTouchListener,
     private ImageView mRecordButton;
     private Button mFreezeButton;
     private Button mModeButton;
+    private Button mMethodButton;
 
 
     private Context mContext;
@@ -61,6 +62,8 @@ public class CameraPreview implements View.OnTouchListener,
     private Mat mCameraMatResized;
     private Mat mTemplateMatResized;
     private Mat mCorrectedTemplateMat;
+    private Point mMatchLoc;
+    private int mMatchMethod;
 
     private File mDataFile;
     File mMediaFile;
@@ -81,11 +84,12 @@ public class CameraPreview implements View.OnTouchListener,
     private static Canvas canvas;
 
     // Used to resize the input image to speed up template matching.
-    private static double resizeRatio = 0.25;
+    private static double resizeRatio = 0.5;
 
 
     public CameraPreview(Context context, CameraControl preview, Button freezeButton, Button modeButton,
-                         SurfaceView overlay, TextView timestamp, ImageView recordButton, TextView storage) {
+                         SurfaceView overlay, TextView timestamp, ImageView recordButton, TextView storage,
+                        Button methodButton) {
         mContext = context;
         mCameraControl = preview;
         mCameraControl.setCvCameraViewListener(this);
@@ -100,6 +104,7 @@ public class CameraPreview implements View.OnTouchListener,
         mRecordButton = recordButton;
         mModeButton = modeButton;
         mFreezeButton = freezeButton;
+        mMethodButton = methodButton;
 
         mTimer = new Timer(timestamp);
         mStorageSpace = new StorageSpace(storage);
@@ -119,15 +124,8 @@ public class CameraPreview implements View.OnTouchListener,
         return mCameraMat;
     }
 
-    /**
-     * Retrieve the current template.
-     * @return Mat object that wraps the current template selected by user.
-     */
-    public Mat getTemplateMat() {
-        return mTemplateMat;
-    }
 
-    /**
+      /**
      * Used to set the template after user has carried out the template selection process.
      *
      * @param templateMat A bitmap object converted to a Mat, used for template matching
@@ -144,10 +142,11 @@ public class CameraPreview implements View.OnTouchListener,
      * preferred size by calling the built in getPreferredSize() method. The returned value of this
      * method differs over different devices.
      *
-     * @params tracking mode is 0 if manual tracking is selected, 1 for automatic tracking.
+     * @param trackingMode 0 if manual tracking is selected, 1 for automatic tracking.
+     * @param matchMethod Passed in from TrackingActivity, range of 6 values deciding which formula to mathc with.
      * @return boolean States whether or not the MediaRecorder preview was successful.
      */
-    public boolean prepareVideoRecorder(int trackingMode) {
+    public boolean prepareVideoRecorder(final int trackingMode, int matchMethod) {
 
         mTrackingMode = trackingMode;
 
@@ -155,12 +154,8 @@ public class CameraPreview implements View.OnTouchListener,
         if (mTrackingMode == 1) {
 
             Imgproc.cvtColor(mTemplateMat, mTemplateMat, Imgproc.COLOR_BGR2RGBA);
-
-            if (mTemplateMat == null) {
-
-                Log.i("object:tracker", "mTemplateMat is null!");
-
-            }
+            mMatchMethod = matchMethod;
+            mMatchLoc = null;
 
             // Resize the template image (as well as input image), so that template matching is faster.
             Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
@@ -214,7 +209,7 @@ public class CameraPreview implements View.OnTouchListener,
 
                     // Set buttons to full alpha and release resources/change booleans and icons
                     releaseMediaRecorder();
-                    Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, isRecording);
+                    Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, mMethodButton, isRecording, trackingMode);
 
                 }
             }
@@ -353,7 +348,6 @@ public class CameraPreview implements View.OnTouchListener,
                 Imgproc.resize(mCameraMat, mCameraMatResized, new org.opencv.core.Size(), resizeRatio,
                     resizeRatio, Imgproc.INTER_AREA);
 
-                int matchMethod = Imgproc.TM_CCOEFF_NORMED;
 
                 // mTemplateMat resized in terms of video size in prepareMediaRecorder.
                 int result_cols = mCameraMat.cols() - mTemplateMat.cols() + 1;
@@ -361,35 +355,45 @@ public class CameraPreview implements View.OnTouchListener,
 
                 mResult = new Mat(result_rows, result_cols, CvType.CV_32F);
 
+
                 // TODO: Move this to a new thread (e.g. an Asynctask)
-                Imgproc.matchTemplate(mCameraMatResized, mTemplateMatResized, mResult, matchMethod);
-                Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
+                Imgproc.matchTemplate(mCameraMatResized, mTemplateMatResized, mResult, mMatchMethod);
+
+
+                // If we normalize the result image when CCORR is used as matching method, matching is
+                // very inaccurate.
+                if (mMatchMethod != Imgproc.TM_CCORR && mMatchMethod != Imgproc.TM_CCORR_NORMED) {
+                    Log.i(TAG, "In here");
+                    Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
+                }
+
 
                 // Localizing the best match with minMaxLoc
                 MinMaxLocResult mmr = Core.minMaxLoc(mResult);
 
-                Point matchLoc;
                 // TODO: Allow option for different match methods possibly
-                if (matchMethod == Imgproc.TM_SQDIFF || matchMethod == Imgproc.TM_SQDIFF_NORMED) {
-                    matchLoc = mmr.minLoc;
+                if (mMatchMethod == Imgproc.TM_SQDIFF || mMatchMethod == Imgproc.TM_SQDIFF_NORMED) {
+                    mMatchLoc = mmr.minLoc;
+                    Log.i(TAG, "First method lol");
                 } else {
-                    matchLoc = mmr.maxLoc;
+                    mMatchLoc = mmr.maxLoc;
+                    Log.i(TAG, "Second method lol");
                 }
 
                 // Need to scale coordinates back up as we are working with images that are scaled down.
-                matchLoc.x = matchLoc.x*(1.0/resizeRatio);
-                matchLoc.y = matchLoc.y*(1.0/resizeRatio);
+                mMatchLoc.x = mMatchLoc.x*(1.0/resizeRatio);
+                mMatchLoc.y = mMatchLoc.y*(1.0/resizeRatio);
 
                 // Draw a boundary around the detected object.
-                Imgproc.rectangle(mCameraMat, matchLoc, new Point((matchLoc.x + mTemplateMat.cols()),
-                    (matchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
+                Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
+                    (mMatchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
                     TrackingActivity.b, TrackingActivity.a), 2);
 
 
                 // Append center coord of rectangle, as well as time and frame number to .yml file
-                // Add mTemplate.cols()/2.0 because matchLoc.x/y returns top left coordinate, we want center
-                Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (matchLoc.x +
-                    (mTemplateMat.cols()/2.0f)), (int) (matchLoc.y + (mTemplateMat.cols()/2.0f)));
+                // Add mTemplate.cols()/2.0 because mMatchLoc.x/y returns top left coordinate, we want center
+                Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
+                    (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)));
 
 
                 // correctTemplate boolean is set in onTouch method. The new template is stored in
@@ -402,9 +406,9 @@ public class CameraPreview implements View.OnTouchListener,
                     // Otherwise, if correctTemplate is false, no correction is needed, just update
                     // current template.
                 } else {
-                    if (isNewTemplateInRange((int)matchLoc.x, (int)matchLoc.y)) {
+                    if (isNewTemplateInRange((int)mMatchLoc.x, (int)mMatchLoc.y)) {
 
-                        Rect roi = new Rect((int) matchLoc.x, (int) matchLoc.y, mTemplateMat.width(), mTemplateMat.height());
+                        Rect roi = new Rect((int) mMatchLoc.x, (int) mMatchLoc.y, mTemplateMat.width(), mTemplateMat.height());
                         mTemplateMat = new Mat(mCameraMat, roi);
 
                         // Resize the template to make template matching faster

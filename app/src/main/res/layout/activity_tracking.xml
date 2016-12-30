@@ -28,6 +28,8 @@
     </FrameLayout>
 
 
+
+
     <RelativeLayout
         android:id="@+id/toolbar_bottom"
         android:layout_width="match_parent"
@@ -56,6 +58,7 @@
             android:layout_toStartOf="@id/timestamp"
             android:clickable="true"
             android:src="@drawable/ic_record"/>
+
 
         <SeekBar
             android:id="@+id/camerazoom"
@@ -123,6 +126,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
 
+
         <Button
             android:id="@+id/tracking_mode_button"
             android:layout_width="wrap_content"
@@ -134,6 +138,26 @@
             android:textColor="@android:color/white"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"/>
+
+        <Button
+            android:id="@+id/matching_method_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_function"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/match_method"
+            android:textAllCaps="false"
+            android:textSize="10sp"
+            android:enabled="false"
+            android:visibility="visible"
+            android:alpha="0.5"
+            android:textColor="@android:color/white"
+            android:drawablePadding="-12dp"
+            android:layout_marginBottom="-4dp"
+            android:layout_below="@id/tracking_mode_button"
+            />
+
+
 
         <Button
             android:id="@+id/select_color_button"
@@ -148,9 +172,8 @@
             android:textColor="@android:color/white"
             android:drawablePadding="-12dp"
             android:layout_marginBottom="-4dp"
-            android:layout_below="@id/tracking_mode_button"
+            android:layout_below="@id/matching_method_button"
             />
-
 
 
         <Button
@@ -166,7 +189,6 @@
             android:drawablePadding="-16dp"
             android:layout_marginBottom="-4dp"
             android:layout_below="@id/select_color_button"/>
-
 
 
         <Button
@@ -185,6 +207,22 @@
             android:drawablePadding="-12dp"
             android:layout_marginBottom="-4dp"
             android:layout_below="@id/flash_button"/>
+
+        <Button
+            android:id="@+id/help_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_help"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="@string/help"
+            android:textAllCaps="false"
+            android:textSize="10sp"
+            android:enabled="true"
+            android:textColor="@android:color/white"
+            android:drawablePadding="-12dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            />
 
         <SurfaceView
             android:id="@+id/transparent_view"

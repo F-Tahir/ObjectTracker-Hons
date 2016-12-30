@@ -27,12 +27,10 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import org.opencv.core.Mat;
 import org.opencv.android.Utils;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 import java.util.Locale;
-
-import static android.os.Build.VERSION_CODES.M;
-import static uk.ac.ed.faizan.objecttracker.R.id.template_initialization_cancel;
 
 
 public class TrackingActivity extends Activity implements View.OnClickListener {
@@ -46,8 +44,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
+    int matchMethod = Imgproc.TM_CCOEFF_NORMED; // Used for automatic tracking
     boolean templateSelectionInitialized = false;
-    float mDist;
 
 
     // Default color for overlay color when tracking objects (Red)
@@ -76,6 +74,9 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         findViewById(R.id.freeze_button).setOnClickListener(this);
         findViewById(R.id.tracking_mode_button).setOnClickListener(this);
         findViewById(R.id.template_initialization_cancel).setOnClickListener(this);
+        findViewById(R.id.matching_method_button).setOnClickListener(this);
+        findViewById(R.id.help_button).setOnClickListener(this);
+
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
@@ -149,7 +150,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             (SurfaceView) findViewById(R.id.transparent_view),
             (TextView) findViewById(R.id.timestamp),
             (ImageView) findViewById(R.id.record_button),
-            (TextView) findViewById(R.id.storage_space));
+            (TextView) findViewById(R.id.storage_space),
+            (Button) findViewById(R.id.matching_method_button));
     }
 
 
@@ -200,7 +202,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     // Reconfigure UI to enable or disable MODE and freeze buttons, depending on
                     // what the tracking mode is (the function takes care of this for us).
                     Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
-                        findViewById(R.id.freeze_button),  mCameraPreview.isRecording);
+                        findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
+                        mCameraPreview.isRecording, trackingMode);
                     break;
                 }
 
@@ -220,6 +223,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     // Set to true to state that we are in template selection phase
                     templateSelectionInitialized = true;
                     mTemplateSelection.setClearCanvas(false);
+
+                    findViewById(R.id.tracking_mode_button).setEnabled(false);
+                    findViewById(R.id.matching_method_button).setEnabled(false);
+                    findViewById(R.id.tracking_mode_button).setAlpha(0.5f);
+                    findViewById(R.id.matching_method_button).setAlpha(0.5f);
+
 
                     findViewById(R.id.template_initialization_cancel).setVisibility(View.VISIBLE);
 
@@ -253,7 +262,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                         if (templateSelectionInitialized) {
                             findViewById(R.id.select_template).setVisibility(View.VISIBLE);
                             Toast.makeText(this, "Now select the template. For instructions, click on " +
-                                "MODE > Help.", Toast.LENGTH_LONG).show();
+                                "Help.", Toast.LENGTH_LONG).show();
                         }
 
                         // Pressed after template is selected
@@ -297,6 +306,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 }
                 break;
 
+            // TODO: Fill in description for "Matching Methods"
+            case R.id.help_button:
+                AlertDialog.Builder adb = new AlertDialog.Builder(TrackingActivity.this);
+                adb.setView(R.layout.tracking_mode_help_layout);
+
+                adb.show();
+                break;
+
 
             // Template initialization cancelled - change booleans, and icons
             case R.id.template_initialization_cancel:
@@ -316,7 +333,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 findViewById(R.id.template_initialization_cancel).setVisibility(View.INVISIBLE);
 
                 Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
-                    findViewById(R.id.freeze_button),  mCameraPreview.isRecording);
+                    findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
+                    mCameraPreview.isRecording, trackingMode);
                 break;
 
 
@@ -345,6 +363,53 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 break;
 
 
+            case R.id.matching_method_button:
+                PopupMenu _popup = new PopupMenu(this, v);
+                _popup.inflate(R.menu.match_method_menu);
+
+                // Set the menu item according to whatever is saved in trackingMode field.
+                _popup.getMenu().getItem(matchMethod).setChecked(true);
+
+                _popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+
+                            case R.id.ccoeff:
+                                matchMethod = Imgproc.TM_CCOEFF;
+                                return true;
+
+                            case R.id.ccoef_normed:
+                                matchMethod = Imgproc.TM_CCOEFF_NORMED;
+                                return true;
+
+                            case R.id.sqdiff:
+                                matchMethod = Imgproc.TM_SQDIFF;
+                                return true;
+
+                            case R.id.sqdiff_normed:
+                                matchMethod = Imgproc.TM_SQDIFF_NORMED;
+                                return true;
+
+                            case R.id.ccorr:
+                                matchMethod = Imgproc.TM_CCORR;
+                                return true;
+
+                            case R.id.ccorr_normed:
+                                matchMethod = Imgproc.TM_CCORR_NORMED;
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                _popup.show();
+                break;
+
+
+
+
 
 
             // TODO: Clean up this code a little
@@ -370,17 +435,23 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                                 ((TextView) findViewById(R.id.tracking_mode_text)).setText(String.format(Locale.ENGLISH,
                                     "Mode: %s", "Manual"));
 
-                                findViewById(R.id.freeze_button).setEnabled(false);
-                                findViewById(R.id.freeze_button).setAlpha(0.5f);
+                                Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
+                                    findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
+                                    mCameraPreview.isRecording, trackingMode);
                                 return true;
 
                             // Automatic option selected
                             case R.id.automatic:
                                 item.setChecked(true);
                                 trackingMode = 1;
+                                Log.i(TAG, "Tracking mode is 1");
 
                                 ((TextView) findViewById(R.id.tracking_mode_text)).setText(String.format(Locale.ENGLISH,
                                     "Mode: %s", "Auto"));
+
+                                Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
+                                    findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
+                                    mCameraPreview.isRecording, trackingMode);
 
                                 // We don't use alpha for colors in automatic tracking, so reset to 255.
                                 overlayColor = overlayColor | 0xFF000000;
@@ -388,13 +459,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                                 a = 255;
                                 return true;
 
-                            // Help button selected
-                            case R.id.help:
 
-                                AlertDialog.Builder adb = new AlertDialog.Builder(TrackingActivity.this);
-                                adb.setView(R.layout.tracking_mode_help_layout);
-
-                                adb.show();
 
                             default:
                                 return false;
@@ -404,6 +469,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 popup.show();
 
         }
+
     }
 
 
@@ -536,7 +602,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         @Override
         protected Boolean doInBackground(Void... voids) {
             // initialize video camera
-            if (mCameraPreview.prepareVideoRecorder(trackingMode)) {
+            if (mCameraPreview.prepareVideoRecorder(trackingMode, matchMethod)) {
                 // Camera is available, MediaRecorder is prepared,
                 // now you can start recording. Goes to onPostExecute() with true as
                 // a parameter.
@@ -588,7 +654,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 }
 
                 Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
-                    findViewById(R.id.freeze_button), mCameraPreview.isRecording);
+                    findViewById(R.id.freeze_button),  findViewById(R.id.matching_method_button),
+                    mCameraPreview.isRecording, trackingMode);
 
                 // This runnable is stopped in CameraPreview.releaseMediaRecorder();
             }

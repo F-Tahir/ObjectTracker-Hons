@@ -156,15 +156,18 @@ public final class Utilities {
 	 * @param freezeButton       The id of the button used to freeze the camera preview.
 	 * @param isRecording        Boolean to state whether the device is recording a current video or not.
 	 */
-	public static void reconfigureUIButtons(View trackingModeButton, View freezeButton,
-											boolean isRecording) {
+	public static void reconfigureUIButtons(View trackingModeButton, View freezeButton, View methodButton,
+											boolean isRecording, int trackingMode) {
 
 		if (isRecording) {
 			trackingModeButton.setEnabled(false);
 			freezeButton.setEnabled(false);
+			methodButton.setEnabled(false);
 
 			trackingModeButton.setAlpha(0.5f);
 			freezeButton.setAlpha(0.5f);
+			methodButton.setAlpha(0.5f);
+
 
 
 		} else {
@@ -173,6 +176,14 @@ public final class Utilities {
 
 			trackingModeButton.setAlpha(1.0f);
 			freezeButton.setAlpha(0.5f);
+
+			if (trackingMode == 1) {
+				methodButton.setEnabled(true);
+				methodButton.setAlpha(1.0f);
+			} else {
+				methodButton.setEnabled(false);
+				methodButton.setAlpha(0.5f);
+			}
 
 		}
 	}

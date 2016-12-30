@@ -30,6 +30,7 @@
     <!-- Help Dialog -->
     <string name="help_dialog_manual_tracking">Manual Tracking</string>
     <string name="help_dialog_automatic_tracking">Automatic Tracking</string>
+    <string name="help_dialog_matching_methods">Matching Methods</string>
     <string name="help_dialog_manual_tracking_desc">
         Manual tracking is the simplest type of tracking mode this app offers. Simply select the
         "Manual Tracking" option by clicking on the <i>MODE</i> button. After pressing the record button, you
@@ -42,12 +43,16 @@
     <string name="help_dialog_automatic_tracking_desc">
         Automatic tracking uses a more advanced technique called "template matching". When selecting
         this method, the user will be presented with an option to select a template of the image
-        that they wish to track. Upon selecting the template and pressing record, template matching
+        that they wish to track. The user can also select a matching method (the default being CCOEFF Normalized). This
+        is explained in the"Matching Methods" selection below.
+        \n\n
+        Upon selecting the template and pressing record, template matching
         uses a method that searches the entire image frame for the template specified by the user.
         Upon finding a closest match, a bounding box will be drawn around the location of the detected
         object*.
         \n\n<b>To select a template for template matching</b>:
-        \n\n 1) Click the <i>MODE</i> button and select <i>Automatic Tracking</i> (Manual Tracking is default).
+        \n\n1) Click the <i>MODE</i> button and select <i>Automatic Tracking</i> (Manual Tracking is default).
+        \n\t\t1.1) Optionally, select a different matching method. Each match methods have their own benefits, explained below.
         \n 2) Ensure that the object you wish to track is clearly displayed on screen (with no blur).
         \n 3) Press the <i>Live</i> <img src="@drawable/freeze_button"/> button to freeze the camera preview. This allows you to select the template
         with ease, as the object will not move.
@@ -70,10 +75,48 @@
         thus disabled for automatic tracking.
     </string>
 
+    <string name = "help_dialog_matching_methods_desc">
+        This application allows for 6 different template matching methods when using automatic tracking.
+        Each method has its own benefits, including speed vs accuracy tradeoffs.\n\n
 
-    <!-- Strings for custom toast that shows instructions on how to select for template matching -->
-    <string name="freeze_preview_toast_string1">To select a template, firstly focus the camera on the object,
-        and then press the</string>
-    <string name="freeze_preview_toast_string2"> button</string>
+        <b>CCOEFF</b>
+        \nDescription here.\n\n
+
+        <b>CCOEFF Normed</b>
+        \nThis matching method is default, and for good reason. Although this function involves the
+        most computation compared to the other 5 (and is thus slower), the extra computation results
+        in higher accuracy when template matching. On modern Android phones (2015 and above), this
+        matching method performs well, with acceptable FPS. Older phones may experience some noticeable
+        FPS drops. \n\n
+
+        <b>CCORR</b>
+        \nDescription here\n\n
+
+        <b>CCORR Normed</b>
+        \nDescription Here\n\n
+
+        <b>SQDIFF</b>
+        \nThis matching method involves the least computation, and as a result, is the fastest.\n\n
+
+        <b>SQDIFF Normed</b>
+        \nDescription here\n\n
+
+
+
+
+
+        \n\n\n\n\n\n
+
+
+    </string>
+
+
     <string name="tracking_mode_text">Mode: Manual</string>
+    <string name="match_method">Method</string>
+    <string name="ccoeff_normed">CCOEFF Normed</string>
+    <string name="ccoef">CCOEF</string>
+    <string name="ccorr_normed">CCORR Normed</string>
+    <string name="ccorr">CCORR</string>
+    <string name="square_diff_normed">SQDIFF Normed</string>
+    <string name="square_difference">SQDIFF</string>
 </resources>

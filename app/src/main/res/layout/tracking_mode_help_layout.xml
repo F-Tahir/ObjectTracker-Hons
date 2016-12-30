@@ -43,6 +43,23 @@
             android:textColor="@android:color/white"
             android:text="@string/help_dialog_automatic_tracking_desc"/>
 
+        <TextView
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textColor="@android:color/white"
+            android:text="@string/help_dialog_matching_methods"/>
+
+        <TextView
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:text="@string/help_dialog_matching_methods_desc"/>
+
 
 
     </LinearLayout>
