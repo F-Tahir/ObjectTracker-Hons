@@ -44,7 +44,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
     // trackingMode 0 states manual mode, 1 states automatic mode
     int trackingMode = 0;
-    int matchMethod = Imgproc.TM_CCOEFF_NORMED; // Used for automatic tracking
+    int matchMethod = Imgproc.TM_CCOEFF_NORMED; // Default method used for template matching
     boolean templateSelectionInitialized = false;
 
 
@@ -375,29 +375,36 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
 
-                            case R.id.ccoeff:
-                                matchMethod = Imgproc.TM_CCOEFF;
-                                return true;
-
-                            case R.id.ccoef_normed:
-                                matchMethod = Imgproc.TM_CCOEFF_NORMED;
-                                return true;
-
                             case R.id.sqdiff:
+                                if (!item.isChecked()) item.setChecked(true);
                                 matchMethod = Imgproc.TM_SQDIFF;
                                 return true;
 
                             case R.id.sqdiff_normed:
+                                if (!item.isChecked()) item.setChecked(true);
                                 matchMethod = Imgproc.TM_SQDIFF_NORMED;
                                 return true;
 
                             case R.id.ccorr:
+                                if (!item.isChecked()) item.setChecked(true);
                                 matchMethod = Imgproc.TM_CCORR;
                                 return true;
 
                             case R.id.ccorr_normed:
+                                if (!item.isChecked()) item.setChecked(true);
                                 matchMethod = Imgproc.TM_CCORR_NORMED;
                                 return true;
+
+                            case R.id.ccoeff:
+                                if (!item.isChecked()) item.setChecked(true);
+                                matchMethod = Imgproc.TM_CCOEFF;
+                                return true;
+
+                            case R.id.ccoef_normed:
+                                if (!item.isChecked()) item.setChecked(true);
+                                matchMethod = Imgproc.TM_CCOEFF_NORMED;
+                                return true;
+
 
                             default:
                                 return false;

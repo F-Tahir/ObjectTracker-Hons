@@ -344,9 +344,9 @@ public class CameraPreview implements View.OnTouchListener,
             // Automatic tracking
             if (mTrackingMode == 1) {
 
-                // Downscale the image to speed up template matching
+                // Downscale the image to speed up template matching (INTER_LINEAR is fastest resize method)
                 Imgproc.resize(mCameraMat, mCameraMatResized, new org.opencv.core.Size(), resizeRatio,
-                    resizeRatio, Imgproc.INTER_AREA);
+                    resizeRatio, Imgproc.INTER_LINEAR);
 
 
                 // mTemplateMat resized in terms of video size in prepareMediaRecorder.
@@ -363,7 +363,6 @@ public class CameraPreview implements View.OnTouchListener,
                 // If we normalize the result image when CCORR is used as matching method, matching is
                 // very inaccurate.
                 if (mMatchMethod != Imgproc.TM_CCORR && mMatchMethod != Imgproc.TM_CCORR_NORMED) {
-                    Log.i(TAG, "In here");
                     Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
                 }
 
@@ -371,13 +370,13 @@ public class CameraPreview implements View.OnTouchListener,
                 // Localizing the best match with minMaxLoc
                 MinMaxLocResult mmr = Core.minMaxLoc(mResult);
 
+                Log.i(TAG, "Match Method is " + mMatchMethod);
+
                 // TODO: Allow option for different match methods possibly
                 if (mMatchMethod == Imgproc.TM_SQDIFF || mMatchMethod == Imgproc.TM_SQDIFF_NORMED) {
                     mMatchLoc = mmr.minLoc;
-                    Log.i(TAG, "First method lol");
                 } else {
                     mMatchLoc = mmr.maxLoc;
-                    Log.i(TAG, "Second method lol");
                 }
 
                 // Need to scale coordinates back up as we are working with images that are scaled down.
@@ -413,7 +412,8 @@ public class CameraPreview implements View.OnTouchListener,
 
                         // Resize the template to make template matching faster
                         Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
-                            resizeRatio, resizeRatio, Imgproc.INTER_AREA);
+                            resizeRatio, resizeRatio, Imgproc.INTER_LINEAR);
+
                     }
                 }
             }

@@ -58,7 +58,6 @@
     - [x] Request permissions at runtime for Camera
     - [x] Request runtime permissions for Audio (Microphone)
     - [x] Request permissions at runtime for Storage
-- [ ] Create own filepicker for app (http://stackoverflow.com/questions/18097763/how-to-open-the-my-files-folder-in-android-programatically-using-intent)
 - [x] Look into querying free space to ensure user has enough space to save
 - [ ] Add a settings pane in main screen, allowing user to set default tracking mode and overlay color
     - [ ] Read from the persistent settings to change to the user-set tracking mode/overlay color each time app is run

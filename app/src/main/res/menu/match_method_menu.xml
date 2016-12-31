@@ -8,20 +8,20 @@
         android:id="@+id/evaluation_mode">
 
         <item
-            android:id="@+id/ccorr"
-            android:title="@string/ccorr"/>
-
-        <item
-            android:id="@+id/ccorr_normed"
-            android:title="@string/ccorr_normed" />
-
-        <item
             android:id="@+id/sqdiff"
             android:title="@string/square_difference"/>
 
         <item
             android:id="@+id/sqdiff_normed"
             android:title="@string/square_diff_normed" />
+
+        <item
+            android:id="@+id/ccorr"
+            android:title="@string/ccorr"/>
+
+        <item
+            android:id="@+id/ccorr_normed"
+            android:title="@string/ccorr_normed" />
 
         <item
             android:id="@+id/ccoeff"
