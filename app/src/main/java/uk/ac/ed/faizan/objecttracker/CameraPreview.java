@@ -52,10 +52,7 @@ public class CameraPreview implements View.OnTouchListener,
     private Button mFreezeButton;
     private Button mModeButton;
     private Button mMethodButton;
-
-
     private Context mContext;
-
 
     private Mat mCameraMat;
     private Mat mTemplateMat;
@@ -68,6 +65,8 @@ public class CameraPreview implements View.OnTouchListener,
     private int mMatchMethod;
     private int dX; // Used for template matching to search smaller region
     private int dY;
+    private int convertedX; // Coordinate of new manually corrected template
+    private int convertedY;
 
     private File mDataFile;
     File mMediaFile;
@@ -79,7 +78,7 @@ public class CameraPreview implements View.OnTouchListener,
     boolean isRecording = false;
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
-    boolean correctTemplate = false;
+    private boolean correctTemplate = false;
     private int mTrackingMode; // 0 for manual tracking, 1 for automatic
 
     // Values used for touch positions during manual tracking
@@ -339,11 +338,8 @@ public class CameraPreview implements View.OnTouchListener,
         if (isPreviewFrozen) {
             return null;
         }
-
-        // Update frame counter for .yml file
         frameCount++;
 
-        // Otherwise if preview is not frozen, update the frame.
         mCameraMat = inputFrame.rgba();
 
         // TODO: Move as much out of here as possible
@@ -383,7 +379,6 @@ public class CameraPreview implements View.OnTouchListener,
                     Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
                 }
 
-                // Localizing the best match with minMaxLoc
                 MinMaxLocResult mmr = Core.minMaxLoc(mResult);
 
                 if (mMatchMethod == Imgproc.TM_SQDIFF || mMatchMethod == Imgproc.TM_SQDIFF_NORMED) {
@@ -408,8 +403,7 @@ public class CameraPreview implements View.OnTouchListener,
                     mMatchLoc.x = mMatchLoc.x*(1.0/resizeRatio);
                     mMatchLoc.y = mMatchLoc.y*(1.0/resizeRatio);
 
-                    // First frame, so mLastFrameLoc.x is in terms of full region, just scale up to 100%
-                    // image size
+                    // First frame
                 } else {
                     mMatchLoc.x = mLastFrameLoc.x*(1.0/resizeRatio);
                     mMatchLoc.y = mLastFrameLoc.y*(1.0/resizeRatio);
@@ -431,22 +425,25 @@ public class CameraPreview implements View.OnTouchListener,
                 // correctTemplate boolean is set in onTouch method. The new template is stored in
                 // mCorrectedTemplateMat. So resize that object, and store the result in mTemplateMatResized
                 if (correctTemplate) {
+
+                    // Set mLastFrameLoc.x and mLastFrameLoc.y to center of new template, used for
+                    // next frame to extract region
+                    mLastFrameLoc.x = convertedX/(1.0/resizeRatio);
+                    mLastFrameLoc.y = convertedY/(1.0/resizeRatio);
+
                     Imgproc.resize(mCorrectedTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
                         resizeRatio, resizeRatio, Imgproc.INTER_AREA);
                     correctTemplate = false;
 
-                    // Otherwise, if correctTemplate is false, no correction is needed, just update
-                    // current template.
+                    // Otherwise just update template
                 } else {
                     if (isNewTemplateInRange((int)mMatchLoc.x, (int)mMatchLoc.y)) {
 
                         Rect roi = new Rect((int) mMatchLoc.x, (int) mMatchLoc.y, mTemplateMat.width(), mTemplateMat.height());
                         mTemplateMat = new Mat(mCameraMat, roi);
 
-                        // Resize the template to make template matching faster
                         Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
                             resizeRatio, resizeRatio, Imgproc.INTER_LINEAR);
-
                     }
                 }
             }
@@ -467,16 +464,12 @@ public class CameraPreview implements View.OnTouchListener,
                 if (mOverlayHolder.getSurface().isValid()) {
 
                     // If recording, and manual tracking is selected, this indicates to draw a circle
-                    // overlay to show touch position
                     if (isRecording && mTrackingMode == 0) {
 
                         drawCircle(mX, mY);
-                        Log.i(TAG, "Drawing circle for manual tracking.");
 
-                        // Otherwise if tracking mode is automatic, this means we need to carry out
-                        // manual template correction
+                        // Otherwise if tracking mode is automatic, carry ut template correction
                     } else if (isRecording && mTrackingMode == 1) {
-
                         templateCorrection(mX, mY);
                     }
                 }
@@ -525,7 +518,6 @@ public class CameraPreview implements View.OnTouchListener,
         // Finally append to file
         Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY);
 
-
     }
 
     /**
@@ -544,19 +536,15 @@ public class CameraPreview implements View.OnTouchListener,
      */
     private void templateCorrection(float mX, float mY) {
 
-        // Convert the touched coordinate in terms of the camera res (1280x720) - currently its in terms
-        // of screen resolution
-        int convertedX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
+        // Convert the touched coordinate in terms of the camera res (1280x720)
+        convertedX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
             mCameraControl.getWidth());
-        int convertedY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
+        convertedY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
             mCameraControl.getHeight());
 
         // We have the center coordinate, but we want the top left coordinate, so do some maths
         int startingX = (int) (convertedX - (mTemplateMat.width()/2.0f));
         int startingY = (int) (convertedY - (mTemplateMat.height()/2.0f));
-
-        Log.i(TAG, "(Starting x, startingY) = (" + startingX + ", " + startingY + ")");
-        Log.i(TAG, "(mTemplateWidth, mTemplateHeight) = (" + mTemplateMat.width() + ", " + mTemplateMat.height() + ")");
 
 
         // Ensure the new template is within boundary of camera resolution, otherwise throw an error
@@ -569,15 +557,14 @@ public class CameraPreview implements View.OnTouchListener,
             // The corrected Mat is stored in mCorrectedTemplateMat.
             correctTemplate = true;
 
-            // Create a region of interest and extract template from this region
             Rect roi = new Rect(startingX, startingY, mTemplateMat.width(), mTemplateMat.height());
             mCorrectedTemplateMat = new Mat(mCameraMat, roi);
 
             // Note that resizing is done in onCameraFrame() - if correctTemplate is true, then onCameraFrame
-            // resizes the Mat stored in mCorrectedTemplateMat. The resizing is done in onCameraFrame() and not
-            // here, to avoid the automatic template updating from rewriting the new manually corrected template.
+            // resizes the Mat stored in mCorrectedTemplateMat.
         }
     }
+
 
     /**
      * This method is used to check that when manual template correction is carried out, the new template
@@ -590,9 +577,7 @@ public class CameraPreview implements View.OnTouchListener,
     private boolean isNewTemplateInRange(int x, int y) {
         if (x + mTemplateMat.width() < 0 || x + mTemplateMat.width() > 1280 || x < 0) {
             return false;
-        }
-
-        if (y + mTemplateMat.height() < 0 || y + mTemplateMat.height() > 720 || y < 0) {
+        } else if (y + mTemplateMat.height() < 0 || y + mTemplateMat.height() > 720 || y < 0) {
             return false;
         }
 
@@ -649,7 +634,7 @@ public class CameraPreview implements View.OnTouchListener,
         if (topLeftY + (2*dY + mTemplateMatResized.rows()) > mFullRegionImg.height()) {
             height = mFullRegionImg.rows() - topLeftY;
         } else {
-            height = (2*dY + mTemplateMatResized.cols());
+            height = (2*dY + mTemplateMatResized.rows());
         }
 
         // Create the new image and return it
