@@ -36,8 +36,8 @@
     - [X] Update template on each frame
     - [X] Allow for manual correction of template by clicking on location
     - [ ] Implement 2D gaussian (or other ways) to improve accuracy
-    - [ ] Add logic that doesn't allow automatic tracking to jump more than a certain amount between frames
-    - [ ] Speed up template matching (e.g. by adding concurrency)
+    - [x] Add logic that doesn't allow automatic tracking to jump more than a certain amount between frames
+    - [x] Speed up template matching (e.g. by adding concurrency)
 - [X] Create .yml data file for automatic tracking also
 - [X] Add alpha option to automatic tracking overlay color
 - [x] Fix bugs with changing between tracking modes when initialising template

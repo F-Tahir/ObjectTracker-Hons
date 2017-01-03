@@ -33,6 +33,7 @@ import java.io.IOException;
 
 
 
+
 /*
  * This class is responsible for setting up the SurfacePreview, getting the Camera instance,
  * updating the SurfaceView with images from the Camera, updating timestamp, and releasing resources
@@ -63,7 +64,10 @@ public class CameraPreview implements View.OnTouchListener,
     private Mat mTemplateMatResized;
     private Mat mCorrectedTemplateMat;
     private Point mMatchLoc;
+    private Point mLastFrameLoc;
     private int mMatchMethod;
+    private int dX; // Used for template matching to search smaller region
+    private int dY;
 
     private File mDataFile;
     File mMediaFile;
@@ -160,6 +164,10 @@ public class CameraPreview implements View.OnTouchListener,
             // Resize the template image (as well as input image), so that template matching is faster.
             Imgproc.resize(mTemplateMat, mTemplateMatResized, new org.opencv.core.Size(),
                 resizeRatio, resizeRatio, Imgproc.INTER_AREA);
+
+            // Used to create a smaller region image for matchTemplate();
+            dX = (int) (mTemplateMatResized.cols()*1.5);
+            dY = (int) (mTemplateMatResized.rows()*1.5);
         }
 
         mMediaRecorder = new MediaRecorder();
@@ -349,15 +357,24 @@ public class CameraPreview implements View.OnTouchListener,
                     resizeRatio, Imgproc.INTER_LINEAR);
 
 
-                // mTemplateMat resized in terms of video size in prepareMediaRecorder.
                 int result_cols = mCameraMat.cols() - mTemplateMat.cols() + 1;
                 int result_rows = mCameraMat.rows() - mTemplateMat.rows() + 1;
-
                 mResult = new Mat(result_rows, result_cols, CvType.CV_32F);
 
+                int topLeftX = -1;
+                int topLeftY = -1;
 
-                // TODO: Move this to a new thread (e.g. an Asynctask)
-                Imgproc.matchTemplate(mCameraMatResized, mTemplateMatResized, mResult, mMatchMethod);
+                // Search only a small region around the last known point, to speed up matching
+                if (frameCount >= 2) {
+                    topLeftX = getTopLeftXCoordOfRegion();
+                    topLeftY = getTopLeftYCoordOfRegion();
+                    Imgproc.matchTemplate(getROIFromImage(mCameraMatResized, topLeftX, topLeftY),
+                        mTemplateMatResized, mResult, mMatchMethod);
+
+                    // First frame, don't know the current location yet.
+                } else {
+                    Imgproc.matchTemplate(mCameraMatResized, mTemplateMatResized, mResult, mMatchMethod);
+                }
 
 
                 // If we normalize the result image when CCORR is used as matching method, matching is
@@ -366,22 +383,38 @@ public class CameraPreview implements View.OnTouchListener,
                     Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
                 }
 
-
                 // Localizing the best match with minMaxLoc
                 MinMaxLocResult mmr = Core.minMaxLoc(mResult);
 
-                Log.i(TAG, "Match Method is " + mMatchMethod);
-
-                // TODO: Allow option for different match methods possibly
                 if (mMatchMethod == Imgproc.TM_SQDIFF || mMatchMethod == Imgproc.TM_SQDIFF_NORMED) {
-                    mMatchLoc = mmr.minLoc;
+                    mLastFrameLoc = mmr.minLoc;
                 } else {
-                    mMatchLoc = mmr.maxLoc;
+                    mLastFrameLoc = mmr.maxLoc;
                 }
 
-                // Need to scale coordinates back up as we are working with images that are scaled down.
-                mMatchLoc.x = mMatchLoc.x*(1.0/resizeRatio);
-                mMatchLoc.y = mMatchLoc.y*(1.0/resizeRatio);
+                mMatchLoc = new Point();
+                // Coord is in terms of a small region, we want it in terms of full image
+                if (frameCount >= 2 && topLeftX != -1 && topLeftY != -1) {
+                    mMatchLoc.x = mLastFrameLoc.x + topLeftX;
+                    mMatchLoc.y = mLastFrameLoc.y + topLeftY;
+
+                    // mLastFrameLoc is used in the next frame to create the roi. This last frame location
+                    // is in terms of the resized image.
+                    mLastFrameLoc.x = mMatchLoc.x;
+                    mLastFrameLoc.y = mMatchLoc.y;
+
+                    // Need to scale coordinates back to full sized image up as we are working with images
+                    // that are scaled down.
+                    mMatchLoc.x = mMatchLoc.x*(1.0/resizeRatio);
+                    mMatchLoc.y = mMatchLoc.y*(1.0/resizeRatio);
+
+                    // First frame, so mLastFrameLoc.x is in terms of full region, just scale up to 100%
+                    // image size
+                } else {
+                    mMatchLoc.x = mLastFrameLoc.x*(1.0/resizeRatio);
+                    mMatchLoc.y = mLastFrameLoc.y*(1.0/resizeRatio);
+                }
+
 
                 // Draw a boundary around the detected object.
                 Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
@@ -566,4 +599,61 @@ public class CameraPreview implements View.OnTouchListener,
         return true;
     }
 
+
+	/**
+     * This function is called during template matching (automatic tracking) to obtain the top left X
+     * coordinate of the region of interest. The region of interest is used to extract a smaller image from
+     * the full sized image, increasing the speed of matchTemplate().
+     *
+     * @return The top left x-coordinate of the smaller region image
+     */
+    private int getTopLeftXCoordOfRegion() {
+        return Math.max(0, (int) (mLastFrameLoc.x - (mTemplateMatResized.cols()/2.0) - dX));
+    }
+
+    /**
+     * This function is called during template matching (automatic tracking) to obtain the top left y
+     * coordinate of the region of interest. The region of interest is used to extract a smaller image from
+     * the full sized image, increasing the speed of matchTemplate().
+     *
+     * @return The top left y-coordinate of the smaller region image
+     */
+    private int getTopLeftYCoordOfRegion() {
+        return Math.max(0, (int) (mLastFrameLoc.y - (mTemplateMatResized.rows()/2.0) - dY));
+    }
+
+
+	/**
+	 * This function is used to speed up template matching. After knowing the position of the object
+     * from the last frame, this position is used to extract a region of interest, so that we can create
+     * a smaller region to search from, rather than searching the entire image.
+     *
+     * @param mFullRegionImg The full image from the camera feed (downsized according to resizeRatio)
+     * @param topLeftX The top left x-coordinate of the region of interest, calculated by calling getLeftXCoord()
+     * @param topLeftY The top left y-coordinate of the region of interest, calculated by calling getLeftYCoord()
+     * @return A new Mat that contains a small region of the full image. This is passed into matchTemplate
+     */
+    private Mat getROIFromImage(Mat mFullRegionImg, int topLeftX, int topLeftY) {
+
+        // Create the ROI - http://answers.opencv.org/question/120681/opencv4android-mask-for-matchtemplate/
+        int width;
+        int height;
+
+        // Make sure width/height isn't going to be greater than the entire image size
+        if (topLeftX + (2*dX + mTemplateMatResized.cols()) > mFullRegionImg.cols()) {
+            width = mFullRegionImg.cols() - topLeftX;
+        } else {
+            width = (2*dX + mTemplateMatResized.cols());
+        }
+
+        if (topLeftY + (2*dY + mTemplateMatResized.rows()) > mFullRegionImg.height()) {
+            height = mFullRegionImg.rows() - topLeftY;
+        } else {
+            height = (2*dY + mTemplateMatResized.cols());
+        }
+
+        // Create the new image and return it
+        Rect smallerRegionROI = new Rect(topLeftX, topLeftY, width, height);
+        return new Mat(mFullRegionImg, smallerRegionROI);
+    }
 }
