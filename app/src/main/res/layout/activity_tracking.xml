@@ -83,7 +83,7 @@
         android:background="?android:attr/selectableItemBackground"
         android:textColor="@android:color/white"
         android:visibility="invisible"
-        android:text="Cancel Initialization"/>
+        android:text="@string/cancel_initialization"/>
 
 
 
@@ -126,6 +126,15 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true">
 
+        <!-- This surface view is used to show the circle overlay for manual tracking clicks -->
+        <SurfaceView
+            android:id="@+id/transparent_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"/>
+
+
 
         <Button
             android:id="@+id/tracking_mode_button"
@@ -139,6 +148,10 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"/>
 
+
+        <!-- This button is disabled by default (as it is only needed in automatic tracking,
+       and the default mode for this app is manual
+       !-->
         <Button
             android:id="@+id/matching_method_button"
             android:layout_width="wrap_content"
@@ -154,9 +167,7 @@
             android:textColor="@android:color/white"
             android:drawablePadding="-12dp"
             android:layout_marginBottom="-4dp"
-            android:layout_below="@id/tracking_mode_button"
-            />
-
+            android:layout_below="@id/tracking_mode_button"/>
 
 
         <Button
@@ -168,7 +179,6 @@
             android:text="@string/set_color"
             android:textAllCaps="false"
             android:textSize="10sp"
-            android:enabled="true"
             android:textColor="@android:color/white"
             android:drawablePadding="-12dp"
             android:layout_marginBottom="-4dp"
@@ -190,7 +200,9 @@
             android:layout_marginBottom="-4dp"
             android:layout_below="@id/select_color_button"/>
 
-
+        <!-- This button is disabled by default (as it is only needed in automatic tracking,
+        and the default mode for this app is manual
+        !-->
         <Button
             android:id="@+id/freeze_button"
             android:layout_width="wrap_content"
@@ -199,8 +211,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:text="@string/freeze_disabled"
             android:textSize="10sp"
-            android:enabled="true"
-            android:visibility="visible"
+            android:enabled="false"
             android:alpha="0.5"
             android:textAllCaps="false"
             android:textColor="@android:color/white"
@@ -221,15 +232,7 @@
             android:textColor="@android:color/white"
             android:drawablePadding="-12dp"
             android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
-            />
-
-        <SurfaceView
-            android:id="@+id/transparent_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"/>
+            android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
 

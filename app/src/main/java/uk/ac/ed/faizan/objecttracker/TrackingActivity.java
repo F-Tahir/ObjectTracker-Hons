@@ -609,7 +609,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         @Override
         protected Boolean doInBackground(Void... voids) {
             // initialize video camera
-            if (mCameraPreview.prepareVideoRecorder(trackingMode, matchMethod)) {
+            if (mCameraPreview.prepareVideoRecorder(trackingMode, matchMethod, System.currentTimeMillis())) {
                 // Camera is available, MediaRecorder is prepared,
                 // now you can start recording. Goes to onPostExecute() with true as
                 // a parameter.

@@ -46,6 +46,7 @@ public class CameraPreview implements View.OnTouchListener,
     private CameraControl mCameraControl;
     private SurfaceView mOverlayView;
     private SurfaceHolder mOverlayHolder;
+    private SensorFramework mSensorFramework;
 
     private TextView mTimestamp;
     private ImageView mRecordButton;
@@ -96,7 +97,7 @@ public class CameraPreview implements View.OnTouchListener,
         mContext = context;
         mCameraControl = preview;
         mCameraControl.setCvCameraViewListener(this);
-
+        mSensorFramework = new SensorFramework(context, this);
 
         mOverlayView = overlay;
         mOverlayHolder = mOverlayView.getHolder();
@@ -137,6 +138,7 @@ public class CameraPreview implements View.OnTouchListener,
         mTemplateMat = templateMat;
     }
 
+
     /**
      * This function is called when the user hits the record button. This function will set up the
      * audio and video source, video framerate, encoding bitrate, create the video and data files,
@@ -149,7 +151,7 @@ public class CameraPreview implements View.OnTouchListener,
      * @param matchMethod Passed in from TrackingActivity, range of 6 values deciding which formula to mathc with.
      * @return boolean States whether or not the MediaRecorder preview was successful.
      */
-    public boolean prepareVideoRecorder(final int trackingMode, int matchMethod) {
+    public boolean prepareVideoRecorder(final int trackingMode, int matchMethod, long time) {
 
         mTrackingMode = trackingMode;
 
@@ -189,9 +191,11 @@ public class CameraPreview implements View.OnTouchListener,
         mCameraControl.lockAutoExposure();
 
         // Create the data and video file output
-        long now = System.currentTimeMillis();
-        mMediaFile = Utilities.getVideoFile(now);
-        mDataFile = Utilities.getDataFile(now);
+        mMediaFile = Utilities.getVideoFile(time);
+        mDataFile = Utilities.getDataFile(time);
+
+        mSensorFramework.setListeners(Utilities.getSensorDataFile(time));
+
 
         // Utilities.getVideoFile() returns false if storage is not writable, so check this.
         if (mMediaFile == null) {
@@ -272,6 +276,10 @@ public class CameraPreview implements View.OnTouchListener,
                 MediaScannerConnection.scanFile(mContext, new String[] {
                         mMediaFile.getPath() },
                     new String[] { "video/mp4" }, null);
+
+
+                // Stop listening for sensor data
+                mSensorFramework.unsetListeners();
 
             } catch (RuntimeException e) {
                 // RuntimeException is thrown when stop() is called immediately after start().
@@ -418,7 +426,7 @@ public class CameraPreview implements View.OnTouchListener,
 
                 // Append center coord of rectangle, as well as time and frame number to .yml file
                 // Add mTemplate.cols()/2.0 because mMatchLoc.x/y returns top left coordinate, we want center
-                Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
+                Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
                     (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)));
 
 
@@ -427,7 +435,7 @@ public class CameraPreview implements View.OnTouchListener,
                 if (correctTemplate) {
 
                     // Set mLastFrameLoc.x and mLastFrameLoc.y to center of new template, used for
-                    // next frame to extract region
+                    // next frame to extract region. Converting in terms of downsampled image.
                     mLastFrameLoc.x = convertedX/(1.0/resizeRatio);
                     mLastFrameLoc.y = convertedY/(1.0/resizeRatio);
 
@@ -516,8 +524,7 @@ public class CameraPreview implements View.OnTouchListener,
             mCameraControl.getHeight());
 
         // Finally append to file
-        Utilities.appendToFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY);
-
+        Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY);
     }
 
     /**

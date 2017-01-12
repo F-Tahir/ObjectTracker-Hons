@@ -2,12 +2,10 @@ package uk.ac.ed.faizan.objecttracker;
 
 
 import android.os.Handler;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Locale;
 
-import static android.content.ContentValues.TAG;
 
 
 /* Helper methods to start and stop the storage space update */

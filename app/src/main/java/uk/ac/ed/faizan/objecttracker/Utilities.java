@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 /**
  * Application Utilities. Consists of functions used to create the media and data files used during
@@ -60,17 +59,29 @@ public final class Utilities {
 	 */
 	@Nullable
 	public static File getVideoFile(long time) {
-		return getExternalFile(time, "mp4");
+		return getExternalFile(time, "VID", "mp4");
 	}
 
 	/**
-	 * Creates a non-clashable data output (.yml) file in the root ObjectTracker folder
+	 * Creates a non-clashable data output (.yml) file in the root ObjectTracker folder. This data
+	 * file is used to store (x,y) coordinates as well as frame/timestamps of the object being tracked.
 	 *
 	 * @param time This parameter ensures a file with a non-clashable name is created.
 	 */
 	@Nullable
 	public static File getDataFile(long time) {
-		return getExternalFile(time, "yml");
+		return getExternalFile(time, "DATA", "yml");
+	}
+
+	/**
+	 * Creates a non-clashable data output (.yml) file in the root ObjectTracker folder. This file is
+	 * used to store sensor readings from the accelerometer and gyroscope.
+	 *
+	 * @param time This parameter ensures a file with a non-clashable name is created.
+	 */
+	@Nullable
+	public static File getSensorDataFile(long time) {
+		return getExternalFile(time, "SENSOR", "yml");
 	}
 
 
@@ -85,7 +96,7 @@ public final class Utilities {
 	 * @return Returns the path to the newly created .mp4 or .yml file.
 	 */
 	@Nullable
-	private static File getExternalFile(long time, String ext) {
+	private static File getExternalFile(long time, String type, String ext) {
 		if (!isExternalStorageMounted()) {
 			return null;
 		}
@@ -96,8 +107,8 @@ public final class Utilities {
 			return null;
 		}
 
-		return new File(dir, String.format(Locale.ENGLISH, "%s.%s",
-			sFileDateFormat.get().format(time), ext));
+		return new File(dir, String.format(Locale.ENGLISH, "%s_%s.%s",
+			sFileDateFormat.get().format(time), type, ext));
 	}
 
 
@@ -116,7 +127,7 @@ public final class Utilities {
 	 * @param yCoord    The y-coordinate of the touch
 	 * @see CameraPreview
 	 */
-	public static void appendToFile(@NonNull File dataFile, int frameCount, String timeStamp, float xCoord, float yCoord) {
+	public static void appendToDataFile(@NonNull File dataFile, int frameCount, String timeStamp, float xCoord, float yCoord) {
 		try {
 			if (!dataFile.exists() && !dataFile.createNewFile()) {
 				return;

@@ -142,4 +142,5 @@
     <string name="ccorr">CCORR</string>
     <string name="square_diff_normed">SQDIFF Normed</string>
     <string name="square_difference">SQDIFF</string>
+    <string name="cancel_initialization">Cancel Initialization</string>
 </resources>
