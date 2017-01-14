@@ -5,25 +5,36 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Locale;
 
 
 public class SensorFramework implements SensorEventListener {
 
-	private final String TAG = getClass().getSimpleName();
+	private static String TAG = SensorFramework.class.getSimpleName();
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer = null;
 	private Sensor mGyroscope = null;
 	private Context mContext = null;
 	private File mSensorFile;
 	private CameraPreview mCameraPreview;
+	private static float[] accelValues = new float[3];
+	private static float[] gyroValues = new float[3];
 
 
 	/**
 	 * Create a SensorFramework object, passing in the context that this constructor was called from.
 	 * Also instantiate mSensorManager.
+	 *
+	 * This constructor is invoked only in CameraPreview's constructor.
+	 *
+	 * @see CameraPreview
 	 */
 	public SensorFramework(Context context, CameraPreview cameraPreview) {
 		mContext = context;
@@ -42,6 +53,8 @@ public class SensorFramework implements SensorEventListener {
 	 * constructor must be invoked before this method is called.
 	 *
 	 * hasAccelerometer() should always be called before this method.
+	 *
+	 * @
 	 */
 	private void setAccelerometer() {
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -85,9 +98,10 @@ public class SensorFramework implements SensorEventListener {
 	 * methods which instantiate the member variables. The sensors are then registered for callback info.
 	 * This method is also responsible for setting the data file which the sensor data is recorded to.
 	 *
-	 * @param file The .yml file used to record the sensor data
-	 *
 	 * This method is called in CameraPreview.prepareVideoRecorder();
+	 * @see CameraPreview
+	 *
+	 * @param file The .yml file used to record the sensor data
 	 */
 	public void setListeners(File file) {
 
@@ -98,8 +112,8 @@ public class SensorFramework implements SensorEventListener {
 			setAccelerometer();
 			setGyroscope();
 
-			mSensorManager.registerListener(this, mAccelerometer, 3000000);
-			mSensorManager.registerListener(this, mGyroscope, 3000000);
+			mSensorManager.registerListener(this, mAccelerometer, 10000000);
+			mSensorManager.registerListener(this, mGyroscope, 10000000);
 
 		} else {
 			Log.i(TAG, "Attempting to register listener, but device does not have an accelerometer " +
@@ -111,11 +125,14 @@ public class SensorFramework implements SensorEventListener {
 	/**
 	 * Called after recording is stopped. Sensor data only needs to be accessed during active recording.
 	 * This is called in CameraPreview.releaseMediaRecorder()
+	 *
+	 * @see CameraPreview
 	 */
 	public void unsetListeners() {
 		Log.i(TAG, "Listener has been unset");
 		mSensorManager.unregisterListener(this);
 	}
+
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
@@ -124,14 +141,22 @@ public class SensorFramework implements SensorEventListener {
 
 
 		if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			Log.i(TAG, "Accelerometer stuff changed");
+			Log.i(TAG, "Accelerometer readings changed");
+			accelValues = event.values;
 		} else if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-			Log.i(TAG, "Gyroscope stuff changed");
+			Log.i(TAG, "Gyroscope readings changed");
+			gyroValues = event.values;
 		}
+
+		Utilities.appendToSensorFile(mSensorFile, mCameraPreview.frameCount, mCameraPreview.mTimer.ymlTimestamp,
+			accelValues, gyroValues);
 	}
 
 	@Override
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
 		// Not in use
 	}
+
+
+
 }

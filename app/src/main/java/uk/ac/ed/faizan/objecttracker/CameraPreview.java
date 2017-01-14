@@ -194,8 +194,6 @@ public class CameraPreview implements View.OnTouchListener,
         mMediaFile = Utilities.getVideoFile(time);
         mDataFile = Utilities.getDataFile(time);
 
-        mSensorFramework.setListeners(Utilities.getSensorDataFile(time));
-
 
         // Utilities.getVideoFile() returns false if storage is not writable, so check this.
         if (mMediaFile == null) {
@@ -234,6 +232,9 @@ public class CameraPreview implements View.OnTouchListener,
             mMediaRecorder.prepare();
             Log.i(TAG, "Prepare was successful");
 
+            // Set listeners for sensor data
+            mSensorFramework.setListeners(Utilities.getSensorDataFile(time));
+
             mCameraControl.setRecorder(mMediaRecorder);
 
         } catch (IllegalStateException e) {
@@ -266,6 +267,9 @@ public class CameraPreview implements View.OnTouchListener,
             Log.i(TAG, "Canvas is null");
         }
 
+        // Stop listening for sensor data. If no listener is set, nothing will happen
+        mSensorFramework.unsetListeners();
+
         if (isRecording) {
             try {
                 mCameraControl.releaseRecording();
@@ -277,9 +281,6 @@ public class CameraPreview implements View.OnTouchListener,
                         mMediaFile.getPath() },
                     new String[] { "video/mp4" }, null);
 
-
-                // Stop listening for sensor data
-                mSensorFramework.unsetListeners();
 
             } catch (RuntimeException e) {
                 // RuntimeException is thrown when stop() is called immediately after start().

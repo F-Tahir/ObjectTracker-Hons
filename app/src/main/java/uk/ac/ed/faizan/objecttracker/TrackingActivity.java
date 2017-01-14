@@ -64,8 +64,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
 
         // Set up UI to make full screen, low profile soft-keys, etc.
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setupScreen();
-
         setContentView(R.layout.activity_tracking);
 
         findViewById(R.id.select_color_button).setOnClickListener(this);
@@ -80,6 +80,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        setupScreen();
     }
 
     // Called when activity becomes obscured.
@@ -162,7 +168,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
      */
     public void setupScreen() {
         // Hide title and status bar
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         getWindow().getDecorView().setSystemUiVisibility(

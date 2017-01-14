@@ -159,6 +159,52 @@ public final class Utilities {
 
 
 	/**
+	 * This function is called in onSensorChanged(), and appends the new sensor readings to the input file.
+	 * Only accelerometer and gyroscope readings are recorded.
+	 *
+	 * @param sensorDataFile  	The file to append data to
+	 * @param timeStamp 	  	The time of touch (in terms of record time)
+	 * @param frameCount		The frame number that the append method was called on
+	 * @param accelValues 		The latest accelerometer readings, in an array of size 3
+	 * @param gyroValues 		The latest gyroscopen readings, in an array of size 3
+	 * @see CameraPreview
+	 */
+	public static void appendToSensorFile(@NonNull File sensorDataFile, int frameCount, String timeStamp,
+										  float[] accelValues, float[] gyroValues) {
+		try {
+			if (!sensorDataFile.exists() && !sensorDataFile.createNewFile()) {
+				return;
+			}
+		} catch (IOException e) {
+			Log.e(TAG, "appendToFile", e);
+		}
+
+		try {
+			FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(sensorDataFile.toString(), true);
+				byte[] buffer = String.format(Locale.UK, "framestamp: %d\n\ttimestamp: %s\n\taccelerometer:" +
+						"\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\tgyroscope: \n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
+					frameCount, timeStamp, accelValues[0], accelValues[1], accelValues[2], gyroValues[0],
+					gyroValues[1], gyroValues[2]).getBytes();
+
+				fos.write(buffer);
+				fos.flush();
+				Log.i(TAG, "Wrote to " + sensorDataFile);
+			} finally {
+				if (fos != null) {
+					fos.close();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			Log.i(TAG, "Sensor data file was not found - check that it was created properly.");
+		} catch (IOException e) {
+			Log.i(TAG, "IOException occured when trying to close FileOutputStream for data file.");
+		}
+	}
+
+
+	/**
 	 * This method is called ewery time the UI buttons need to be enabled or disabled. In the object
 	 * tracking scenario, it is called every time the record button is pressed.  UI buttons are disabled
 	 * during recording so that the user cannot select a different tracking mode whilst recording, for example.
