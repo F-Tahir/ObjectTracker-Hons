@@ -113,21 +113,47 @@ public final class Utilities {
 
 
 	/**
-	 * Appends data to the file created in getOutputDataFile(). This function is called in manual
-	 * tracking mode, each time the user clicks on the screen. A circle is drawn, and the touch
-	 * coordinates are stored using this function.
-	 * <p>
-	 * The <i>xCoord</i> and <i>yCoord</i> parameters that are passed in are in terms of the video
-	 * size, not the screen size (which can be different). The maths is done in the drawCircle() function
-	 * in CameraPreview
+	 * This function is called after mMediaRecorder.prepare() in CameraPreview to document some data
+	 * at the start of the yml file. Data such as the tracking mode (automatic or manual), matching
+	 * method (if automatic mode), as well as image resolution are recorded at the start of the yml file.
 	 *
-	 * @param dataFile  The file to append data to
-	 * @param timeStamp The time of touch (in terms of record time)
-	 * @param xCoord    The x-coordinate of the touch
-	 * @param yCoord    The y-coordinate of the touch
-	 * @see CameraPreview
+	 * This method is overloaded - the other method of the same name is used to append the object data
+	 * at each frame (or click, if in manual mode).
+	 *
+	 * @param dataFile 			The file to append to
+	 * @param trackingMode		Automatic or manual tracking
+	 * @param matchingMode		Matching method (if in automatic mode)
+	 * @param resolutionWidth	Resolution (width) of the image being displayed on-screen
+	 * @param resolutionHeight	Resolution (height) of the image being displayed on-screen
 	 */
-	public static void appendToDataFile(@NonNull File dataFile, int frameCount, String timeStamp, float xCoord, float yCoord) {
+	public static void appendToDataFile(@NonNull File dataFile, int trackingMode, int matchingMode,
+										int resolutionWidth, int resolutionHeight) {
+
+		String trackingModeString;
+		String matchingModeString;
+
+		if (trackingMode == 0) {
+			trackingModeString = "Manual Tracking";
+		} else {
+			trackingModeString = "Automatic Tracking";
+		}
+
+		if (matchingMode == 0) {
+			matchingModeString = "Square Difference";
+		} else if (matchingMode == 1) {
+			matchingModeString = "Square Difference Normalized";
+		} else if (matchingMode == 2) {
+			matchingModeString = "Cross-Correlation";
+		} else if (matchingMode == 3) {
+			matchingModeString = "Cross-Correlation Normalized";
+		} else if (matchingMode == 4) {
+			matchingModeString = "Correlation Coefficient";
+		} else if (matchingMode == 5) {
+			matchingModeString = "Correlation Coefficient Normalized";
+		} else {
+			matchingModeString = "N/A (manual tracking mode)";
+		}
+
 		try {
 			if (!dataFile.exists() && !dataFile.createNewFile()) {
 				return;
@@ -140,8 +166,11 @@ public final class Utilities {
 			FileOutputStream fos = null;
 			try {
 				fos = new FileOutputStream(dataFile.toString(), true);
-				byte[] buffer = String.format(Locale.UK, "framestamp: %d\n\ttimestamp: %s\n\tx: %d\n\ty: %d\n",
-					frameCount, timeStamp, (int) xCoord, (int) yCoord).getBytes();
+				byte[] buffer = String.format(Locale.ENGLISH, "# General Recording Information\n\n" +
+					"tracking_mode: %s\nmathing_mode: %s\nimage_size: %dx%d\n\n\n\n " +
+					"# Tracking Information\n\n", trackingModeString,
+					matchingModeString, resolutionWidth, resolutionHeight).getBytes();
+
 				fos.write(buffer);
 				fos.flush();
 				Log.i(TAG, "Wrote to " + dataFile);
@@ -158,21 +187,28 @@ public final class Utilities {
 	}
 
 
+
 	/**
-	 * This function is called in onSensorChanged(), and appends the new sensor readings to the input file.
-	 * Only accelerometer and gyroscope readings are recorded.
+	 * Appends data to the file created in getOutputDataFile(). This function is called in manual
+	 * tracking mode, each time the user clicks on the screen. A circle is drawn, and the touch
+	 * coordinates are stored using this function.
+	 * <p>
+	 * The <i>xCoord</i> and <i>yCoord</i> parameters that are passed in are in terms of the video
+	 * size, not the screen size (which can be different). The maths is done in the drawCircle() function
+	 * in CameraPreview
 	 *
-	 * @param sensorDataFile  	The file to append data to
-	 * @param timeStamp 	  	The time of touch (in terms of record time)
-	 * @param frameCount		The frame number that the append method was called on
+	 * @param dataFile  		The file to append data to
+	 * @param timeStamp 		The time of touch (in terms of record time)
+	 * @param xCoord    		The x-coordinate of the touch
+	 * @param yCoord    		The y-coordinate of the touch
 	 * @param accelValues 		The latest accelerometer readings, in an array of size 3
 	 * @param gyroValues 		The latest gyroscopen readings, in an array of size 3
 	 * @see CameraPreview
 	 */
-	public static void appendToSensorFile(@NonNull File sensorDataFile, int frameCount, String timeStamp,
-										  float[] accelValues, float[] gyroValues) {
+	public static void appendToDataFile(@NonNull File dataFile, int frameCount, String timeStamp, float xCoord, float yCoord,
+										float[] accelValues, float[] gyroValues) {
 		try {
-			if (!sensorDataFile.exists() && !sensorDataFile.createNewFile()) {
+			if (!dataFile.exists() && !dataFile.createNewFile()) {
 				return;
 			}
 		} catch (IOException e) {
@@ -182,26 +218,40 @@ public final class Utilities {
 		try {
 			FileOutputStream fos = null;
 			try {
-				fos = new FileOutputStream(sensorDataFile.toString(), true);
-				byte[] buffer = String.format(Locale.UK, "framestamp: %d\n\ttimestamp: %s\n\taccelerometer:" +
-						"\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\tgyroscope: \n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
-					frameCount, timeStamp, accelValues[0], accelValues[1], accelValues[2], gyroValues[0],
-					gyroValues[1], gyroValues[2]).getBytes();
+				fos = new FileOutputStream(dataFile.toString(), true);
 
+				byte[] buffer;
+				if (xCoord != -1 && yCoord != -1) {
+					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\tobject_position" +
+							"\n\t\tx: %d\n\t\ty: %d \n\taccelerometer_values:\n\t\tx: %.2f\n\t\ty: %.2f" +
+							"\n\t\tz: %.2f\n\tgyroscope_values:\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
+						frameCount, timeStamp, (int) xCoord, (int) yCoord, accelValues[0], accelValues[1],
+						accelValues[2], gyroValues[0], gyroValues[1], gyroValues[2]).getBytes();
+
+					// Sensor changing in manual mode, but user has not clicked. Need to record
+					// new sensor readings only.
+				} else {
+					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\taccelerometer_values:" +
+						"\n\t\tx: %.2f\n\t\ty: %.2f \n\t\tz: %.2f\n\tgyroscope_values:" +
+						"\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
+						frameCount, timeStamp, accelValues[0], accelValues[1],
+						accelValues[2], gyroValues[0], gyroValues[1], gyroValues[2]).getBytes();
+				}
 				fos.write(buffer);
 				fos.flush();
-				Log.i(TAG, "Wrote to " + sensorDataFile);
+				Log.i(TAG, "Wrote to " + dataFile);
 			} finally {
 				if (fos != null) {
 					fos.close();
 				}
 			}
 		} catch (FileNotFoundException e) {
-			Log.i(TAG, "Sensor data file was not found - check that it was created properly.");
+			Log.i(TAG, "Data file was not found - check that it was created properly.");
 		} catch (IOException e) {
 			Log.i(TAG, "IOException occured when trying to close FileOutputStream for data file.");
 		}
 	}
+
 
 
 	/**

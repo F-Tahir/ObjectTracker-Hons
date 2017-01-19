@@ -80,7 +80,7 @@ public class CameraPreview implements View.OnTouchListener,
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
     private boolean correctTemplate = false;
-    private int mTrackingMode; // 0 for manual tracking, 1 for automatic
+    int mTrackingMode; // 0 for manual tracking, 1 for automatic
 
     // Values used for touch positions during manual tracking
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -148,7 +148,7 @@ public class CameraPreview implements View.OnTouchListener,
      * method differs over different devices.
      *
      * @param trackingMode 0 if manual tracking is selected, 1 for automatic tracking.
-     * @param matchMethod Passed in from TrackingActivity, range of 6 values deciding which formula to mathc with.
+     * @param matchMethod Passed in from TrackingActivity, range of 6 values deciding which formula to match with.
      * @return boolean States whether or not the MediaRecorder preview was successful.
      */
     public boolean prepareVideoRecorder(final int trackingMode, int matchMethod, long time) {
@@ -169,6 +169,10 @@ public class CameraPreview implements View.OnTouchListener,
             // Used to create a smaller region image for matchTemplate();
             dX = (int) (mTemplateMatResized.cols()*1.5);
             dY = (int) (mTemplateMatResized.rows()*1.5);
+
+            // Used in Utilities.appendToDataFile() to signify that we are doing manual tracking
+        } else {
+            matchMethod = -1;
         }
 
         mMediaRecorder = new MediaRecorder();
@@ -208,8 +212,6 @@ public class CameraPreview implements View.OnTouchListener,
         mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
 
             public void onInfo(MediaRecorder mediaRec, int error, int extra) {
-                // TODO Auto-generated method stub
-
                 if(error==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
 
                     Toast.makeText(mContext, "Out of space - recording stopped. Saved in " +
@@ -233,9 +235,13 @@ public class CameraPreview implements View.OnTouchListener,
             Log.i(TAG, "Prepare was successful");
 
             // Set listeners for sensor data
-            mSensorFramework.setListeners(Utilities.getSensorDataFile(time));
-
+            mSensorFramework.setListeners(mDataFile);
             mCameraControl.setRecorder(mMediaRecorder);
+
+            // Append tracking info (such as tracking mode etc) to start of yml file.
+            Utilities.appendToDataFile(mDataFile, mTrackingMode, matchMethod, mCameraMat.cols(),
+                mCameraMat.rows());
+
 
         } catch (IllegalStateException e) {
             Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
@@ -428,7 +434,8 @@ public class CameraPreview implements View.OnTouchListener,
                 // Append center coord of rectangle, as well as time and frame number to .yml file
                 // Add mTemplate.cols()/2.0 because mMatchLoc.x/y returns top left coordinate, we want center
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
-                    (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)));
+                    (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)),
+                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
 
 
                 // correctTemplate boolean is set in onTouch method. The new template is stored in
@@ -525,7 +532,8 @@ public class CameraPreview implements View.OnTouchListener,
             mCameraControl.getHeight());
 
         // Finally append to file
-        Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY);
+        Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY,
+            mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
     }
 
     /**

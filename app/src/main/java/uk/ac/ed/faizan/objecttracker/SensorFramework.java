@@ -5,14 +5,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Locale;
 
 
 public class SensorFramework implements SensorEventListener {
@@ -22,10 +17,11 @@ public class SensorFramework implements SensorEventListener {
 	private Sensor mAccelerometer = null;
 	private Sensor mGyroscope = null;
 	private Context mContext = null;
-	private File mSensorFile;
+	private File mDataFile;
 	private CameraPreview mCameraPreview;
 	private static float[] accelValues = new float[3];
 	private static float[] gyroValues = new float[3];
+
 
 
 	/**
@@ -45,6 +41,22 @@ public class SensorFramework implements SensorEventListener {
 		}
 	}
 
+	/**
+	 * This getter method is used to access the latest accelerometer readings.
+	 * @return A 3-dimensional array containing the x, y and z components of the accelerometer readings
+	 */
+	public float[] getAccelValues() {
+		return accelValues;
+	}
+
+
+	/**
+	 * This getter method is used to access the latest gyroscope readings.
+	 * @return A 3-dimensional array containing the x, y and z components of the gyroscope readings
+	 */
+	public float[] getGyroValues() {
+		return gyroValues;
+	}
 
 
 	/**
@@ -101,14 +113,14 @@ public class SensorFramework implements SensorEventListener {
 	 * This method is called in CameraPreview.prepareVideoRecorder();
 	 * @see CameraPreview
 	 *
-	 * @param file The .yml file used to record the sensor data
 	 */
 	public void setListeners(File file) {
+
+		mDataFile = file;
 
 		Log.i(TAG, "Listener has been set");
 
 		if (hasAccelerometer() && hasGyroscope()) {
-			mSensorFile = file;
 			setAccelerometer();
 			setGyroscope();
 
@@ -119,6 +131,7 @@ public class SensorFramework implements SensorEventListener {
 			Log.i(TAG, "Attempting to register listener, but device does not have an accelerometer " +
 				"or gyroscope.");
 		}
+
 	}
 
 
@@ -148,8 +161,17 @@ public class SensorFramework implements SensorEventListener {
 			gyroValues = event.values;
 		}
 
-		Utilities.appendToSensorFile(mSensorFile, mCameraPreview.frameCount, mCameraPreview.mTimer.ymlTimestamp,
-			accelValues, gyroValues);
+		// Automatic tracking appends to yml file for each frame, but manual tracking doesn't.
+		// We should update the yml file with new sensor readings in manual tracking mode,
+		// regardless of whether or not user tapped the screen.
+
+		// TODO: Possibly call this for each frame for manual tracking also, as opposed to each time
+		// readings change.
+		if (mCameraPreview.mTrackingMode == 0) {
+			Utilities.appendToDataFile(mDataFile, mCameraPreview.frameCount,
+				mCameraPreview.mTimer.ymlTimestamp, -1, -1, accelValues, gyroValues);
+		}
+
 	}
 
 	@Override

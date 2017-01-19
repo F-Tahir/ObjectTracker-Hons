@@ -32,10 +32,9 @@
     
 ### Additions for next few months - prioritise these(date TBA)
 
-- [ ] Improve template matching (4 days max)
+- [X] Improve template matching (4 days max)
     - [X] Update template on each frame
     - [X] Allow for manual correction of template by clicking on location
-    - [ ] Implement 2D gaussian (or other ways) to improve accuracy
     - [x] Add logic that doesn't allow automatic tracking to jump more than a certain amount between frames
     - [x] Speed up template matching (e.g. by adding concurrency)
 - [X] Create .yml data file for automatic tracking also
@@ -43,9 +42,19 @@
 - [x] Fix bugs with changing between tracking modes when initialising template
 - [x] Fix bug where app crashes if a template is not selected but user unfreezes preview
 - [x] Look into camera control (such as zoom, white balance) to potentially improve tracking (1 day)
-- [ ] Add code to access sensor (accelerometer and gyroscope for now) readings (more info to come) (Rest of time until 9th Jan)
-    - [ ] Figure out reasonable sensor polling time
-    - [ ] Append sensor data to some file
+- [X] Add code to access sensor (accelerometer and gyroscope for now) readings (more info to come) (Rest of time until 9th Jan)
+    - [X] Figure out reasonable sensor polling time
+    - [X] Append sensor data to some file
+
+### Todo for 23rd Jan
+
+- [x] Merge data and sensor files
+    - [ ] For automatic tracking, add a manual flag that is true when the template is corrected or initialized
+- [x] Poll sensors for each frame rather than only when changes occur 
+    - [ ] Possibly use this approach for manual tracking too?
+- [ ] Look at accelerometer/gyroscope calculations for camera trajectories
+- [ ] Allow option for user to record the rectangle in automatic tracking mode, so that user can save video without the bounding box
+- [ ] Work on interim report
 
  
 ### Changes/implementations to be made but are currently not prioritized
