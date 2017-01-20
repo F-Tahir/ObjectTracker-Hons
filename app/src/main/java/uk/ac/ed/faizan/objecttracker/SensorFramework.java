@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.util.Log;
 
 import java.io.File;
+import java.util.Arrays;
 
 
 public class SensorFramework implements SensorEventListener {
@@ -58,6 +59,33 @@ public class SensorFramework implements SensorEventListener {
 		return gyroValues;
 	}
 
+
+	/**
+	 * This is a setter method used to fill all the accelerometer sensor values to 0. Filling it
+	 * to 0 simply means that there is no change from accelerometer readings, and will allow us
+	 * to calculate camera trajectories more accurately. This is called each time the sensor is polled
+	 * and accelValues is filled in - we then record the accelerometer readings into a yml file, and
+	 * then reset the values. This means that if the sensor readings do not change between frames,
+	 * then a value of 0 is recorded, as opposed to the last known reading, as this will make
+	 * calculations inaccurate.
+	 */
+	public void setAccelValues() {
+		Arrays.fill(accelValues, 0);
+	}
+
+
+	/**
+	 * This is a setter method used to fill all the accelerometer sensor values to 0. Filling it
+	 * to 0 simply means that there is no change from accelerometer readings, and will allow us
+	 * to calculate camera trajectories more accurately. This is called each time the sensor is polled
+	 * and accelValues is filled in - we then record the accelerometer readings into a yml file, and
+	 * then reset the values. This means that if the sensor readings do not change between frames,
+	 * then a value of 0 is recorded, as opposed to the last known reading, as this will make
+	 * calculations inaccurate.
+	 */
+	public void setGryoValues() {
+		Arrays.fill(gyroValues, 0);
+	}
 
 	/**
 	 * This method is used to set the mAccelerometer member variable to the devices accelerometer.
@@ -124,8 +152,8 @@ public class SensorFramework implements SensorEventListener {
 			setAccelerometer();
 			setGyroscope();
 
-			mSensorManager.registerListener(this, mAccelerometer, 10000000);
-			mSensorManager.registerListener(this, mGyroscope, 10000000);
+			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+			mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_UI);
 
 		} else {
 			Log.i(TAG, "Attempting to register listener, but device does not have an accelerometer " +
@@ -161,16 +189,6 @@ public class SensorFramework implements SensorEventListener {
 			gyroValues = event.values;
 		}
 
-		// Automatic tracking appends to yml file for each frame, but manual tracking doesn't.
-		// We should update the yml file with new sensor readings in manual tracking mode,
-		// regardless of whether or not user tapped the screen.
-
-		// TODO: Possibly call this for each frame for manual tracking also, as opposed to each time
-		// readings change.
-		if (mCameraPreview.mTrackingMode == 0) {
-			Utilities.appendToDataFile(mDataFile, mCameraPreview.frameCount,
-				mCameraPreview.mTimer.ymlTimestamp, -1, -1, accelValues, gyroValues);
-		}
 
 	}
 

@@ -29,6 +29,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 
 
@@ -66,8 +67,12 @@ public class CameraPreview implements View.OnTouchListener,
     private int mMatchMethod;
     private int dX; // Used for template matching to search smaller region
     private int dY;
+
     private int convertedX; // Coordinate of new manually corrected template
     private int convertedY;
+    private int manualPosX = -1; // Coordinate of object when touched in manual mode
+    private int manualPosY = -1;
+
 
     private File mDataFile;
     File mMediaFile;
@@ -239,8 +244,8 @@ public class CameraPreview implements View.OnTouchListener,
             mCameraControl.setRecorder(mMediaRecorder);
 
             // Append tracking info (such as tracking mode etc) to start of yml file.
-            Utilities.appendToDataFile(mDataFile, mTrackingMode, matchMethod, mCameraMat.cols(),
-                mCameraMat.rows());
+            Utilities.appendToDataFile(mDataFile, mTrackingMode, matchMethod, Utilities.getTimeForDataFile(time),
+                mCameraMat.cols(), mCameraMat.rows());
 
 
         } catch (IllegalStateException e) {
@@ -388,8 +393,7 @@ public class CameraPreview implements View.OnTouchListener,
                 }
 
 
-                // If we normalize the result image when CCORR is used as matching method, matching is
-                // very inaccurate.
+                // If we normalize the result image when CCORR is used, matching is inaccurate
                 if (mMatchMethod != Imgproc.TM_CCORR && mMatchMethod != Imgproc.TM_CCORR_NORMED) {
                     Core.normalize(mResult, mResult, 0, 1, Core.NORM_MINMAX, -1, new Mat());
                 }
@@ -413,8 +417,7 @@ public class CameraPreview implements View.OnTouchListener,
                     mLastFrameLoc.x = mMatchLoc.x;
                     mLastFrameLoc.y = mMatchLoc.y;
 
-                    // Need to scale coordinates back to full sized image up as we are working with images
-                    // that are scaled down.
+                    // Need to scale coordinates back to full sized image
                     mMatchLoc.x = mMatchLoc.x*(1.0/resizeRatio);
                     mMatchLoc.y = mMatchLoc.y*(1.0/resizeRatio);
 
@@ -425,7 +428,6 @@ public class CameraPreview implements View.OnTouchListener,
                 }
 
 
-                // Draw a boundary around the detected object.
                 Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
                     (mMatchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
                     TrackingActivity.b, TrackingActivity.a), 2);
@@ -436,6 +438,10 @@ public class CameraPreview implements View.OnTouchListener,
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
                     (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)),
                     mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
+
+                // Reset sensor readings to 0 so that in the next frame, if readings do not change,
+                // 0 is recorded as opposed to the last known reading.
+                mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
 
 
                 // correctTemplate boolean is set in onTouch method. The new template is stored in
@@ -462,6 +468,26 @@ public class CameraPreview implements View.OnTouchListener,
                             resizeRatio, resizeRatio, Imgproc.INTER_LINEAR);
                     }
                 }
+
+                // Tracking mode is manual - append the values from manualPosX and manualPosY.
+                // These values are set in drawCircle().
+            } else {
+
+                // TODO: Possibly append in drawCircle() also, as currently if the user clicks on screen,
+                // the values are not appended till next frame, meaning they are out of sync by one frame.
+                Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, manualPosX, manualPosY,
+                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
+
+                // Reset sensor readings to 0 so that in the next frame, if readings do not change,
+                // 0 is recorded as opposed to the last known reading.
+                mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
+
+                // Set them to -1 after so that appendToDataFile()
+                // won't write object positions to file on next frame.
+                if (manualPosX != -1 || manualPosY != -1) {
+                    manualPosX = -1;
+                    manualPosY = -1;
+                }
             }
         }
         return mCameraMat;
@@ -476,12 +502,10 @@ public class CameraPreview implements View.OnTouchListener,
                 float mX = event.getX();
                 float mY = event.getY();
 
-                // Check to see if the current holder actually exists and is active
                 if (mOverlayHolder.getSurface().isValid()) {
 
                     // If recording, and manual tracking is selected, this indicates to draw a circle
                     if (isRecording && mTrackingMode == 0) {
-
                         drawCircle(mX, mY);
 
                         // Otherwise if tracking mode is automatic, carry ut template correction
@@ -526,14 +550,13 @@ public class CameraPreview implements View.OnTouchListener,
         mOverlayHolder.unlockCanvasAndPost(canvas);
 
         // Convert coordinates with respect to device resolution
-        int convertedX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
+        manualPosX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
             mCameraControl.getWidth());
-        int convertedY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
+        manualPosY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
             mCameraControl.getHeight());
+        Log.i(TAG, "manualPosX: " + manualPosX + ", manualPosY: " + manualPosY + " at timestamp: " +
+        mTimer.ymlTimestamp);
 
-        // Finally append to file
-        Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, convertedX, convertedY,
-            mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
     }
 
     /**

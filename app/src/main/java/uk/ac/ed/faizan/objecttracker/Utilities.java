@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import static uk.ac.ed.faizan.objecttracker.R.id.tracking_mode;
+
 
 /**
  * Application Utilities. Consists of functions used to create the media and data files used during
@@ -26,6 +28,11 @@ import java.util.Locale;
 public final class Utilities {
 	private static final String TAG = Utilities.class.getSimpleName();
 
+
+	/**
+	 * This is used to format the time in a yyyyMMdd_HHmmss format, and the data and video file
+	 * are named according to this format, to create unclashable names.
+	 */
 	private static ThreadLocal<SimpleDateFormat> sFileDateFormat = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
@@ -33,12 +40,28 @@ public final class Utilities {
 		}
 	};
 
+	/**
+	 * This is used to format the time in a yyyyMMdd format, and a folder is created according to this
+	 * name. This means that all recordings and data files in one day are stored in the same folder.
+	 */
 	private static ThreadLocal<SimpleDateFormat> sDirDateFormat = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
 			return new SimpleDateFormat("yyyyMMdd", Locale.ENGLISH);
 		}
 	};
+
+	/**
+	 * This is used to format the time in a day-month-year-time format, and this is appended to the start
+	 * of the yml file.
+	 */
+	private static ThreadLocal<SimpleDateFormat> sDataTimeFormat = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue() {
+			return new SimpleDateFormat("E, dd MMM yyyy, HH:mm:ss", Locale.ENGLISH);
+		}
+	};
+
 
 
 	/**
@@ -73,16 +96,6 @@ public final class Utilities {
 		return getExternalFile(time, "DATA", "yml");
 	}
 
-	/**
-	 * Creates a non-clashable data output (.yml) file in the root ObjectTracker folder. This file is
-	 * used to store sensor readings from the accelerometer and gyroscope.
-	 *
-	 * @param time This parameter ensures a file with a non-clashable name is created.
-	 */
-	@Nullable
-	public static File getSensorDataFile(long time) {
-		return getExternalFile(time, "SENSOR", "yml");
-	}
 
 
 	/**
@@ -113,6 +126,18 @@ public final class Utilities {
 
 
 	/**
+	 * This method returns the current time, in "day, date month year @ hours:mins:seconds" format.
+	 * This string is then apppended to the start of the yml data file.
+	 *
+	 * @param time Time in milliseconds from current epoch.
+	 * @return		Time in milliseconds formatted in a human-readable way.
+	 */
+	public static String getTimeForDataFile(long time) {
+		return sDataTimeFormat.get().format(time);
+	}
+
+
+	/**
 	 * This function is called after mMediaRecorder.prepare() in CameraPreview to document some data
 	 * at the start of the yml file. Data such as the tracking mode (automatic or manual), matching
 	 * method (if automatic mode), as well as image resolution are recorded at the start of the yml file.
@@ -127,7 +152,7 @@ public final class Utilities {
 	 * @param resolutionHeight	Resolution (height) of the image being displayed on-screen
 	 */
 	public static void appendToDataFile(@NonNull File dataFile, int trackingMode, int matchingMode,
-										int resolutionWidth, int resolutionHeight) {
+										String time, int resolutionWidth, int resolutionHeight) {
 
 		String trackingModeString;
 		String matchingModeString;
@@ -167,9 +192,9 @@ public final class Utilities {
 			try {
 				fos = new FileOutputStream(dataFile.toString(), true);
 				byte[] buffer = String.format(Locale.ENGLISH, "# General Recording Information\n\n" +
-					"tracking_mode: %s\nmathing_mode: %s\nimage_size: %dx%d\n\n\n\n " +
-					"# Tracking Information\n\n", trackingModeString,
-					matchingModeString, resolutionWidth, resolutionHeight).getBytes();
+					"time_of_recording: %s \ntracking_mode: %s\nmatching_mode: %s\nimage_size: %dx%d\n\n\n\n " +
+					"# Tracking Information\n\n", time, trackingModeString, matchingModeString,
+					resolutionWidth, resolutionHeight).getBytes();
 
 				fos.write(buffer);
 				fos.flush();
@@ -191,11 +216,17 @@ public final class Utilities {
 	/**
 	 * Appends data to the file created in getOutputDataFile(). This function is called in manual
 	 * tracking mode, each time the user clicks on the screen. A circle is drawn, and the touch
-	 * coordinates are stored using this function.
-	 * <p>
-	 * The <i>xCoord</i> and <i>yCoord</i> parameters that are passed in are in terms of the video
+	 * coordinates are stored using this function. This function is also called in onCameraFrame()
+	 * when in automatic mode, so that we record the position of the object at each frame.
+	 *
+	 * <p>The <i>xCoord</i> and <i>yCoord</i> parameters that are passed in are in terms of the video
 	 * size, not the screen size (which can be different). The maths is done in the drawCircle() function
-	 * in CameraPreview
+	 * in CameraPreview.</p>
+	 *
+	 * <p>If xCoord = -1 or yCoord = -1, this means that this was just a sensor reading update,
+	 * and so the object position does not need to be written to file. This happens only in manual
+	 * tracking mode.</p>
+	 *
 	 *
 	 * @param dataFile  		The file to append data to
 	 * @param timeStamp 		The time of touch (in terms of record time)
@@ -222,7 +253,7 @@ public final class Utilities {
 
 				byte[] buffer;
 				if (xCoord != -1 && yCoord != -1) {
-					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\tobject_position" +
+					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\tobject_position:" +
 							"\n\t\tx: %d\n\t\ty: %d \n\taccelerometer_values:\n\t\tx: %.2f\n\t\ty: %.2f" +
 							"\n\t\tz: %.2f\n\tgyroscope_values:\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
 						frameCount, timeStamp, (int) xCoord, (int) yCoord, accelValues[0], accelValues[1],
