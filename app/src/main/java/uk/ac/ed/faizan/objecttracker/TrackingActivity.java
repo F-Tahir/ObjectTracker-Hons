@@ -43,6 +43,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     private CameraPreview mCameraPreview;
     private CameraControl mCameraControl;
     private TemplateSelection mTemplateSelection;
+    private SharedPreferences mSharedPreferences;
 
     // trackingMode 0 states manual mode, 1 states automatic mode. Read from sharedPrefs to set these
     int trackingMode;
@@ -50,7 +51,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
 
     static boolean templateSelectionInitialized = false;
-
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
     // Colours to be passed into OpenCV constructs
@@ -65,6 +65,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Set up UI to make full screen, low profile soft-keys, etc.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -83,9 +84,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        trackingMode = Integer.parseInt(sharedPref.getString("pref_key_tracking_mode", "0"));
-        matchMethod = Integer.parseInt(sharedPref.getString("pref_key_matching_method", "5"));
+        trackingMode = Integer.parseInt(mSharedPreferences.getString("pref_key_tracking_mode", "0"));
+        matchMethod = Integer.parseInt(mSharedPreferences.getString("pref_key_matching_method", "5"));
 
 
         // Configure the UI icons and text according to match method
@@ -148,11 +148,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
+        // Check whether or not the updateTemplate checkbox is selected in Settings, pass this to constructor
+        boolean updateTemplate = mSharedPreferences.getBoolean("pref_update_template", true);
+
         mCameraPreview = new CameraPreview(
             this,
             trackingMode,
             mCameraControl,
+            updateTemplate,
             (Button) findViewById(R.id.freeze_button),
             (Button) findViewById(R.id.tracking_mode_button),
             (SurfaceView) findViewById(R.id.transparent_view),
@@ -200,6 +203,10 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     public void setupScreen() {
         // Hide title and status bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        if (mSharedPreferences.getBoolean("pref_screen_brightness", false)) {
+            this.getWindow().getAttributes().screenBrightness = 1F;
+        }
 
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -427,10 +434,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
 
 
-
-
-
-            // TODO: Clean up this code a little
             case R.id.tracking_mode_button:
                 PopupMenu popup = new PopupMenu(this, v);
                 popup.inflate(R.menu.tracking_type_menu);
@@ -522,7 +525,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 * frameHeightRatio);
 
         // Template selection was unsuccessful (user selected too small of an area)
-        // TODO: Check whether these minimum template sizes are fine.
         if (templateWidth < 15 || templateHeight < 15) {
             return false;
         }

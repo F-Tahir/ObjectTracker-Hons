@@ -72,7 +72,7 @@ public class CameraPreview implements View.OnTouchListener,
 
 
     private File mDataFile;
-    File mMediaFile;
+    private File mMediaFile;
     MediaRecorder mMediaRecorder;
     Timer mTimer;
     StorageSpace mStorageSpace;
@@ -81,8 +81,9 @@ public class CameraPreview implements View.OnTouchListener,
     boolean isRecording = false;
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
+    private boolean mUpdateTemplateOnEachFrame;
     private boolean correctTemplate = false;
-    int mTrackingMode; // 0 for manual tracking, 1 for automatic
+    private int mTrackingMode; // 0 for manual tracking, 1 for automatic
 
     // Values used for touch positions during manual tracking
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -93,13 +94,15 @@ public class CameraPreview implements View.OnTouchListener,
     private static double resizeRatio = 0.5;
 
 
-    public CameraPreview(Context context, int trackingMode, CameraControl preview, Button freezeButton,
-                         Button modeButton, SurfaceView overlay, TextView timestamp, ImageView recordButton,
-                         TextView storage, Button methodButton) {
+    public CameraPreview(Context context, int trackingMode, CameraControl preview, boolean updateTemplateOnEachFrame,
+                         Button freezeButton, Button modeButton, SurfaceView overlay, TextView timestamp,
+                         ImageView recordButton, TextView storage, Button methodButton) {
 
         mContext = context;
         mTrackingMode = trackingMode;
         mCameraControl = preview;
+        mUpdateTemplateOnEachFrame = updateTemplateOnEachFrame;
+
         mCameraControl.setCvCameraViewListener(this);
         mSensorFramework = new SensorFramework(context, this);
 
@@ -427,6 +430,7 @@ public class CameraPreview implements View.OnTouchListener,
                 }
 
 
+                // TODO: Draw rectangle only if user selects the option from settings
                 Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
                     (mMatchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
                     TrackingActivity.b, TrackingActivity.a), 2);
@@ -456,8 +460,9 @@ public class CameraPreview implements View.OnTouchListener,
                         resizeRatio, resizeRatio, Imgproc.INTER_AREA);
                     correctTemplate = false;
 
-                    // Otherwise just update template
-                } else {
+                    // Otherwise just update template (unless user specifies not to in Settings)
+                } else if (mUpdateTemplateOnEachFrame) {
+                    Log.i(TAG, "Updating the template");
                     if (isNewTemplateInRange((int)mMatchLoc.x, (int)mMatchLoc.y)) {
 
                         Rect roi = new Rect((int) mMatchLoc.x, (int) mMatchLoc.y, mTemplateMat.width(), mTemplateMat.height());

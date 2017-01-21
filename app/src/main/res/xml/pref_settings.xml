@@ -2,33 +2,53 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <ListPreference
-        android:defaultValue="0"
-        android:entries="@array/pref_tracking_mode_entries"
-        android:entryValues="@array/pref_tracking_mode_values"
-        android:key="pref_key_tracking_mode"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_tracking_mode_title"
-        android:summary="@string/pref_tracking_mode_summary"/>
+    <PreferenceCategory
+        android:title="@string/general_settings_title"
+        android:key="pref_key_general_settings">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_tracking_mode_entries"
+            android:entryValues="@array/pref_tracking_mode_values"
+            android:key="pref_key_tracking_mode"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_tracking_mode_title"
+            android:summary="@string/pref_tracking_mode_summary"/>
+
+        <CheckBoxPreference
+            android:key="pref_screen_brightness"
+            android:title="@string/pref_screen_brightness_title"
+            android:summary="@string/pref_screen_brightness_summary"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
 
 
-    <ListPreference
-        android:defaultValue="5"
-        android:entries="@array/pref_matching_mode_entries"
-        android:entryValues="@array/pref_matching_mode_values"
-        android:key="pref_key_matching_method"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_matching_method_title"
-        android:summary="@string/pref_matching_method_summary"/>
+    <PreferenceCategory
+        android:title="@string/automatic_tracking_settings_title"
+        android:key="pref_key_automatic_settings">
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/pref_matching_mode_entries"
+            android:entryValues="@array/pref_matching_mode_values"
+            android:key="pref_key_matching_method"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_matching_method_title"
+            android:summary="@string/pref_matching_method_summary"/>
 
+        <CheckBoxPreference
+            android:key="pref_record_overlay"
+            android:title="@string/pref_record_overlay_title"
+            android:summary="@string/pref_record_overlay_summary"
+            android:defaultValue="true"/>
 
-    <CheckBoxPreference
-        android:key="pref_record_overlay"
-        android:title="@string/pref_record_overlay_title"
-        android:summary="@string/pref_record_overlay_summary"
-        android:defaultValue="true"/>
+        <CheckBoxPreference
+            android:key="pref_update_template"
+            android:title="@string/pref_update_template_title"
+            android:summary="@string/pref_update_template_summary"
+            android:defaultValue="true"/>
+    </PreferenceCategory>
 
 
 
