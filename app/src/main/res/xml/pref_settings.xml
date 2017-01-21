@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_tracking_mode_entries"
+        android:entryValues="@array/pref_tracking_mode_values"
+        android:key="pref_key_tracking_mode"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_tracking_mode_title"
+        android:summary="@string/pref_tracking_mode_summary"/>
+
+
+    <ListPreference
+        android:defaultValue="5"
+        android:entries="@array/pref_matching_mode_entries"
+        android:entryValues="@array/pref_matching_mode_values"
+        android:key="pref_key_matching_method"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_matching_method_title"
+        android:summary="@string/pref_matching_method_summary"/>
+
+
+    <CheckBoxPreference
+        android:key="pref_record_overlay"
+        android:title="@string/pref_record_overlay_title"
+        android:summary="@string/pref_record_overlay_summary"
+        android:defaultValue="true"/>
+
+
+
+</PreferenceScreen>

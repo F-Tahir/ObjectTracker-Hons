@@ -112,8 +112,7 @@
             android:textSize="12sp"
             android:paddingEnd="16dp"
             android:paddingStart="16dp"
-            android:textColor="@android:color/white"
-            android:text="@string/tracking_mode_text"/>
+            android:textColor="@android:color/white"/>
     </LinearLayout>
 
 

@@ -308,12 +308,13 @@ public final class Utilities {
 
 
 
-		} else {
+		} else if (!TrackingActivity.templateSelectionInitialized){
 			trackingModeButton.setEnabled(true);
+			freezeButton.setAlpha(0.5f);
 			freezeButton.setEnabled(false);
 
 			trackingModeButton.setAlpha(1.0f);
-			freezeButton.setAlpha(0.5f);
+
 
 			if (trackingMode == 1) {
 				methodButton.setEnabled(true);

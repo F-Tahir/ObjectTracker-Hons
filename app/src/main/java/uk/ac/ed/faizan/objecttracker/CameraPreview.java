@@ -29,9 +29,6 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
-
-
 
 
 
@@ -96,10 +93,12 @@ public class CameraPreview implements View.OnTouchListener,
     private static double resizeRatio = 0.5;
 
 
-    public CameraPreview(Context context, CameraControl preview, Button freezeButton, Button modeButton,
-                         SurfaceView overlay, TextView timestamp, ImageView recordButton, TextView storage,
-                        Button methodButton) {
+    public CameraPreview(Context context, int trackingMode, CameraControl preview, Button freezeButton,
+                         Button modeButton, SurfaceView overlay, TextView timestamp, ImageView recordButton,
+                         TextView storage, Button methodButton) {
+
         mContext = context;
+        mTrackingMode = trackingMode;
         mCameraControl = preview;
         mCameraControl.setCvCameraViewListener(this);
         mSensorFramework = new SensorFramework(context, this);
@@ -224,8 +223,6 @@ public class CameraPreview implements View.OnTouchListener,
 
                     // Set buttons to full alpha and release resources/change booleans and icons
                     releaseMediaRecorder();
-                    Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, mMethodButton, isRecording, trackingMode);
-
                 }
             }
         });
@@ -283,6 +280,8 @@ public class CameraPreview implements View.OnTouchListener,
         if (isRecording) {
             try {
                 mCameraControl.releaseRecording();
+
+                Toast.makeText(mContext, "Saved in" + mMediaFile, Toast.LENGTH_LONG).show();
                 mMediaRecorder.stop();  // stop the recording
 
                 // Tell the media scanner about the new file so that it is
@@ -316,6 +315,8 @@ public class CameraPreview implements View.OnTouchListener,
             mMediaRecorder = null;
 
         }
+
+        Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, mMethodButton, isRecording, mTrackingMode);
     }
 
     /* Functions implemented from setCvCameraListener*/

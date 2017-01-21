@@ -16,7 +16,9 @@
     <string name="help">Help</string>
     <string name="match_method">Method</string>
     <string name="cancel_initialization">Cancel Initialization</string>
-    <string name="tracking_mode_text">Mode: Manual</string>
+
+    <string name="manual_mode">Mode: Manual</string>
+    <string name="automatic_mode">Mode: Automatic</string>
 
 
     <!-- Flash popup menu -->

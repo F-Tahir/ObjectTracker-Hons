@@ -3,11 +3,13 @@ package uk.ac.ed.faizan.objecttracker;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
@@ -42,11 +44,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     private CameraControl mCameraControl;
     private TemplateSelection mTemplateSelection;
 
-    // trackingMode 0 states manual mode, 1 states automatic mode
-    int trackingMode = 0;
-    int matchMethod = Imgproc.TM_CCOEFF_NORMED; // Default method used for template matching
-    boolean templateSelectionInitialized = false;
+    // trackingMode 0 states manual mode, 1 states automatic mode. Read from sharedPrefs to set these
+    int trackingMode;
+    int matchMethod;
 
+
+    static boolean templateSelectionInitialized = false;
 
     // Default color for overlay color when tracking objects (Red)
     static int overlayColor = 0xffff0000;
@@ -80,6 +83,20 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         mCameraControl = (CameraControl) findViewById(R.id.camera_preview);
         mTemplateSelection = (TemplateSelection) findViewById(R.id.select_template);
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        trackingMode = Integer.parseInt(sharedPref.getString("pref_key_tracking_mode", "0"));
+        matchMethod = Integer.parseInt(sharedPref.getString("pref_key_matching_method", "5"));
+
+
+        // Configure the UI icons and text according to match method
+        if (trackingMode == 0) {
+            ((TextView) findViewById(R.id.tracking_mode_text)).setText(getString(R.string.manual_mode));
+        } else {
+            ((TextView) findViewById(R.id.tracking_mode_text)).setText(getString(R.string.automatic_mode));
+        }
+        Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button), findViewById(R.id.freeze_button),
+            findViewById(R.id.matching_method_button), false, trackingMode);
+
     }
 
     @Override
@@ -102,6 +119,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         if (mCameraPreview != null) {
             mCameraPreview.releaseMediaRecorder();
         }
+
     }
 
 
@@ -150,6 +168,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         // Pass in the timestamp widget and surfaceview into the mCameraPreview construct.
         mCameraPreview = new CameraPreview(
             this,
+            trackingMode,
             mCameraControl,
             (Button) findViewById(R.id.freeze_button),
             (Button) findViewById(R.id.tracking_mode_button),
@@ -201,15 +220,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 if (mCameraPreview.isRecording) {
                     // release the MediaRecorder object.
                     mCameraPreview.releaseMediaRecorder();
-                    Toast.makeText(this, "Saved in" +
-                        mCameraPreview.mMediaFile, Toast.LENGTH_LONG).show();
-
-                    // Reconfigure UI to enable or disable MODE and freeze buttons, depending on
-                    // what the tracking mode is (the function takes care of this for us).
-                    Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
-                        findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
-                        mCameraPreview.isRecording, trackingMode);
-                    break;
                 }
 
                 // Manual tracking and not recording.
@@ -444,8 +454,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                                 item.setChecked(true);
                                 trackingMode = 0;
 
-                                ((TextView) findViewById(R.id.tracking_mode_text)).setText(String.format(Locale.ENGLISH,
-                                    "Mode: %s", "Manual"));
+                                ((TextView) findViewById(R.id.tracking_mode_text)).setText(getString(
+                                    R.string.manual_mode));
 
                                 Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
                                     findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
@@ -458,8 +468,8 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                                 trackingMode = 1;
                                 Log.i(TAG, "Tracking mode is 1");
 
-                                ((TextView) findViewById(R.id.tracking_mode_text)).setText(String.format(Locale.ENGLISH,
-                                    "Mode: %s", "Auto"));
+                                ((TextView) findViewById(R.id.tracking_mode_text)).setText(getString(
+                                    R.string.automatic_mode));
 
                                 Utilities.reconfigureUIButtons(findViewById(R.id.tracking_mode_button),
                                     findViewById(R.id.freeze_button), findViewById(R.id.matching_method_button),
