@@ -18,5 +18,5 @@
     <color name="colorViewRecordingsGradEnd">#ff6d00</color>
 
     <!-- Camera Preview colours -->
-    <color name="cameraFrameColor">#111111</color>
+    <color name="helpBackground">#2196f3</color>
 </resources>
