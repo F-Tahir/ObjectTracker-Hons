@@ -11,6 +11,13 @@
 
     <!-- Camera UI Text -->
     <string name="timestamp">0:00:00</string>
+    <string name="set_color">Color</string>
+    <string name="mode">Mode</string>
+    <string name="help">Help</string>
+    <string name="match_method">Method</string>
+    <string name="cancel_initialization">Cancel Initialization</string>
+    <string name="tracking_mode_text">Mode: Manual</string>
+
 
     <!-- Flash popup menu -->
     <string name="flash_state_off">Off</string>
@@ -20,11 +27,18 @@
     <string name="freeze_enabled">Frozen</string>
     <string name="freeze_disabled">Live</string>
 
-    <string name="set_color">Color</string>
-    <string name="mode">Mode</string>
+
+    <!-- Match Method popop menu-->
+    <string name="ccoeff_normed">CCOEFF Normed</string>
+    <string name="ccoef">CCOEF</string>
+    <string name="ccorr_normed">CCORR Normed</string>
+    <string name="ccorr">CCORR</string>
+    <string name="square_diff_normed">SQDIFF Normed</string>
+    <string name="square_difference">SQDIFF</string>
+
+    <!-- Matching methods-->
     <string name="manual_tracking">Manual Tracking</string>
     <string name="automatic_tracking">Automatic Tracking</string>
-    <string name="help">Help</string>
 
 
     <!-- Help Dialog -->
@@ -85,7 +99,7 @@
         thus disabled for automatic tracking.
     </string>
 
-    <string name = "help_dialog_matching_methods_desc">
+    <string name="help_dialog_matching_methods_desc">
         This application allows for 6 different template matching methods when using automatic tracking.
         Each method has its own benefits, including speed vs accuracy tradeoffs.\n\n
 
@@ -113,7 +127,7 @@
 
     </string>
 
-    <string name = "help_dialog_tips_and_tricks_desc">
+    <string name="help_dialog_tips_and_tricks_desc">
         There are various hardware parameters that determine how well this application will run on
         your phone. Newer phones benefit from more powerful cameras and CPUs, meaning that the recorded
         video is more crisp, and automatic tracking is faster to process. However, if you have an older
@@ -134,13 +148,47 @@
     </string>
 
 
-    <string name="tracking_mode_text">Mode: Manual</string>
-    <string name="match_method">Method</string>
-    <string name="ccoeff_normed">CCOEFF Normed</string>
-    <string name="ccoef">CCOEF</string>
-    <string name="ccorr_normed">CCORR Normed</string>
-    <string name="ccorr">CCORR</string>
-    <string name="square_diff_normed">SQDIFF Normed</string>
-    <string name="square_difference">SQDIFF</string>
-    <string name="cancel_initialization">Cancel Initialization</string>
+
+    <!-- Strings related to settings activity-->
+    <string name="title_activity_settings">Settings</string>
+    <string name="pref_tracking_mode_title">Tracking Mode</string>
+    <string name="pref_tracking_mode_summary">Set the default object tracking mode of this application</string>
+    <string name="pref_matching_method_title">Matching Method</string>
+    <string name="pref_matching_method_summary">Set the default template matching method to be used in automatic tracking.</string>
+    <string name="pref_record_overlay_summary">Choose whether or not the rectangle overlay in automatic tracking is embedded into the recording.</string>
+    <string name="pref_record_overlay_title">Record overlay in Automatic Tracking</string>
+
+
+    <string-array name="pref_tracking_mode_entries">
+        <item>Manual Mode</item>
+        <item>Automatic Mode</item>
+
+    </string-array>
+
+    <string-array name="pref_tracking_mode_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+
+
+    <string-array name="pref_matching_mode_entries">
+        <item>SQDIFF</item>
+        <item>SQDIFF Normalized</item>
+        <item>CCORR</item>
+        <item>CCORR Normalized</item>
+        <item>CCOEFF</item>
+        <item>CCOEFF Normalized</item>
+    </string-array>
+
+    <string-array name="pref_matching_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+
+
 </resources>

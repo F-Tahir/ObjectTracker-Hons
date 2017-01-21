@@ -104,7 +104,6 @@ public class TemplateSelection extends View {
 
 		mRectPaint.setColor(TrackingActivity.overlayColor);
 
-		// TODO: be aware of multi-touches
 		switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 				mDrawRect = false;

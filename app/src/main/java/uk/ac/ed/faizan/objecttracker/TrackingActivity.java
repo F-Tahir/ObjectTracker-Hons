@@ -186,7 +186,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     // View v refers to the widget that was clicked. A second method is then called depending on the
     // type of view clicked. For instance, if the "Freeze Camera" button was clicked, then
     // case R.id.freeze_button would be executed
-    // TODO: Clean up this click listener code
+
     public void onClick(View v) {
 
         switch (v.getId()) {

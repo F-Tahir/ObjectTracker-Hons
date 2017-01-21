@@ -182,7 +182,6 @@ public class CameraPreview implements View.OnTouchListener,
 
         mMediaRecorder = new MediaRecorder();
 
-        // TODO: Possibly provide an option to disable audio source so no audio is recorded.
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT );
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
@@ -362,7 +361,6 @@ public class CameraPreview implements View.OnTouchListener,
 
         mCameraMat = inputFrame.rgba();
 
-        // TODO: Move as much out of here as possible
         if (isRecording) {
 
             // Automatic tracking
@@ -473,8 +471,8 @@ public class CameraPreview implements View.OnTouchListener,
                 // These values are set in drawCircle().
             } else {
 
-                // TODO: Possibly append in drawCircle() also, as currently if the user clicks on screen,
-                // the values are not appended till next frame, meaning they are out of sync by one frame.
+                /* TODO: Possibly append in drawCircle() also, as currently if the user clicks on screen,
+                 the values are not appended till next frame, meaning they are out of sync by one frame.*/
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, manualPosX, manualPosY,
                     mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
 

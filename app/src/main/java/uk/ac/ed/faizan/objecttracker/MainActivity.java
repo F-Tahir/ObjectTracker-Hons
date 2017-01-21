@@ -165,9 +165,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 						.show();
 				}
 				break;
+
 			case R.id.preferences_button:
-				// Start an intent to open the preferences window (may be removed)
+				Intent i = new Intent(this, SettingsActivity.class);
+				startActivity(i);
 				break;
+
 			default:
 				break;
 		}
