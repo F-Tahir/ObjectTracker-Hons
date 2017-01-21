@@ -232,6 +232,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 if (mCameraPreview.isRecording) {
                     // release the MediaRecorder object.
                     mCameraPreview.releaseMediaRecorder();
+                    break;
                 }
 
                 // Manual tracking and not recording.

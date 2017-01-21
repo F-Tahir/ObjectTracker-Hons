@@ -536,6 +536,8 @@ public class CameraPreview implements View.OnTouchListener,
      */
     private void drawCircle(float mX, float mY) {
 
+        // TODO: add an option to change circle size
+
         // Lock the canvas so that it can be drawn on
         canvas = mOverlayHolder.lockCanvas();
         paint.setStyle(Paint.Style.FILL);
@@ -545,7 +547,7 @@ public class CameraPreview implements View.OnTouchListener,
         // Clear any previous circles
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
-        canvas.drawCircle(mX, mY, 60, paint);
+        canvas.drawCircle(mX, mY, 30, paint);
         mOverlayHolder.unlockCanvasAndPost(canvas);
 
         // Convert coordinates with respect to device resolution
