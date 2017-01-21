@@ -148,14 +148,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             }
         });
 
-        // Check whether or not the updateTemplate checkbox is selected in Settings, pass this to constructor
-        boolean updateTemplate = mSharedPreferences.getBoolean("pref_update_template", true);
 
         mCameraPreview = new CameraPreview(
             this,
             trackingMode,
             mCameraControl,
-            updateTemplate,
+            mSharedPreferences,
             (Button) findViewById(R.id.freeze_button),
             (Button) findViewById(R.id.tracking_mode_button),
             (SurfaceView) findViewById(R.id.transparent_view),
@@ -204,7 +202,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         // Hide title and status bar
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        if (mSharedPreferences.getBoolean("pref_screen_brightness", false)) {
+        if (mSharedPreferences.getBoolean("pref_key_screen_brightness", false)) {
             this.getWindow().getAttributes().screenBrightness = 1F;
         }
 

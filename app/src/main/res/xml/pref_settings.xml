@@ -16,7 +16,7 @@
             android:summary="@string/pref_tracking_mode_summary"/>
 
         <CheckBoxPreference
-            android:key="pref_screen_brightness"
+            android:key="pref_key_screen_brightness"
             android:title="@string/pref_screen_brightness_title"
             android:summary="@string/pref_screen_brightness_summary"
             android:defaultValue="false"/>
@@ -38,13 +38,13 @@
             android:summary="@string/pref_matching_method_summary"/>
 
         <CheckBoxPreference
-            android:key="pref_record_overlay"
+            android:key="pref_key_record_overlay"
             android:title="@string/pref_record_overlay_title"
             android:summary="@string/pref_record_overlay_summary"
             android:defaultValue="true"/>
 
         <CheckBoxPreference
-            android:key="pref_update_template"
+            android:key="pref_key_update_template"
             android:title="@string/pref_update_template_title"
             android:summary="@string/pref_update_template_summary"
             android:defaultValue="true"/>

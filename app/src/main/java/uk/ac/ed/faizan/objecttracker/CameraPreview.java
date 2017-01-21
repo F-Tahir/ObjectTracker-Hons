@@ -1,6 +1,7 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -30,6 +31,8 @@ import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.io.IOException;
 
+import static android.R.attr.left;
+
 
 
 /*
@@ -52,6 +55,7 @@ public class CameraPreview implements View.OnTouchListener,
     private Button mModeButton;
     private Button mMethodButton;
     private Context mContext;
+    private SharedPreferences mSharedPreferences;
 
     private Mat mCameraMat;
     private Mat mTemplateMat;
@@ -81,9 +85,12 @@ public class CameraPreview implements View.OnTouchListener,
     boolean isRecording = false;
     boolean isFlashOn = false;
     boolean isPreviewFrozen = false;
-    private boolean mUpdateTemplateOnEachFrame;
     private boolean correctTemplate = false;
     private int mTrackingMode; // 0 for manual tracking, 1 for automatic
+
+    // Booleans from SharedPreferences
+    private boolean mUpdateTemplateOnEachFrame;
+    private boolean mRecordAutoTrackingOverlay;
 
     // Values used for touch positions during manual tracking
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -94,14 +101,14 @@ public class CameraPreview implements View.OnTouchListener,
     private static double resizeRatio = 0.5;
 
 
-    public CameraPreview(Context context, int trackingMode, CameraControl preview, boolean updateTemplateOnEachFrame,
+    public CameraPreview(Context context, int trackingMode, CameraControl preview, SharedPreferences sharedPrefs,
                          Button freezeButton, Button modeButton, SurfaceView overlay, TextView timestamp,
                          ImageView recordButton, TextView storage, Button methodButton) {
 
         mContext = context;
         mTrackingMode = trackingMode;
         mCameraControl = preview;
-        mUpdateTemplateOnEachFrame = updateTemplateOnEachFrame;
+        mSharedPreferences = sharedPrefs;
 
         mCameraControl.setCvCameraViewListener(this);
         mSensorFramework = new SensorFramework(context, this);
@@ -125,6 +132,10 @@ public class CameraPreview implements View.OnTouchListener,
         // Used only for template matching (automatic tracking), but initialize anyway.
         mCameraMatResized = new Mat();
         mTemplateMatResized = new Mat();
+
+        // Booleans extracted from SharedPreferences
+        mUpdateTemplateOnEachFrame = sharedPrefs.getBoolean("pref_key_update_template", true);
+        mRecordAutoTrackingOverlay = sharedPrefs.getBoolean("pref_key_record_overlay", true);
     }
 
     /**
@@ -233,7 +244,6 @@ public class CameraPreview implements View.OnTouchListener,
         // Specify 5MB less so we have space for things such as the .yml file
         mMediaRecorder.setMaxFileSize(Utilities.getAvailableSpaceInBytes() - 5242880);
 
-        // Try to prepare/start the media recorder
         try {
             mMediaRecorder.prepare();
             Log.i(TAG, "Prepare was successful");
@@ -272,12 +282,11 @@ public class CameraPreview implements View.OnTouchListener,
             canvas = mOverlayHolder.lockCanvas();
             canvas.drawColor(0, PorterDuff.Mode.CLEAR);
             mOverlayHolder.unlockCanvasAndPost(canvas);
-            Log.i(TAG, "Canvas cleared");
         } else {
             Log.i(TAG, "Canvas is null");
         }
 
-        // Stop listening for sensor data. If no listener is set, nothing will happen
+        // Stop listening for sensor data.
         mSensorFramework.unsetListeners();
 
         if (isRecording) {
@@ -311,12 +320,10 @@ public class CameraPreview implements View.OnTouchListener,
         }
 
         if (mMediaRecorder != null) {
-
             // clear recorder configuration and release the recorder object
             mMediaRecorder.reset();
             mMediaRecorder.release();
             mMediaRecorder = null;
-
         }
 
         Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, mMethodButton, isRecording, mTrackingMode);
@@ -335,7 +342,7 @@ public class CameraPreview implements View.OnTouchListener,
         if (mCameraMat != null)
             mCameraMat.release();
 
-        if (mTemplateMat != null)
+        if (mTemplateMatResized != null)
             mTemplateMatResized.release();
 
         if (mCameraMatResized != null)
@@ -346,6 +353,10 @@ public class CameraPreview implements View.OnTouchListener,
 
         if (mResult != null)
             mResult.release();
+
+        if (mCorrectedTemplateMat != null) {
+            mCorrectedTemplateMat.release();
+        }
     }
 
     /* We do our OpenCV frame processing here.
@@ -431,9 +442,15 @@ public class CameraPreview implements View.OnTouchListener,
 
 
                 // TODO: Draw rectangle only if user selects the option from settings
-                Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
-                    (mMatchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
-                    TrackingActivity.b, TrackingActivity.a), 2);
+
+                if (mRecordAutoTrackingOverlay) {
+                    Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
+                        (mMatchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
+                        TrackingActivity.b, TrackingActivity.a), 2);
+                } else {
+                    // TODO: Fix this method..
+                    drawRectangle((float) mMatchLoc.x, (float) mMatchLoc.y);
+                }
 
 
                 // Append center coord of rectangle, as well as time and frame number to .yml file
@@ -462,7 +479,6 @@ public class CameraPreview implements View.OnTouchListener,
 
                     // Otherwise just update template (unless user specifies not to in Settings)
                 } else if (mUpdateTemplateOnEachFrame) {
-                    Log.i(TAG, "Updating the template");
                     if (isNewTemplateInRange((int)mMatchLoc.x, (int)mMatchLoc.y)) {
 
                         Rect roi = new Rect((int) mMatchLoc.x, (int) mMatchLoc.y, mTemplateMat.width(), mTemplateMat.height());
@@ -536,33 +552,57 @@ public class CameraPreview implements View.OnTouchListener,
      * this method is only called when user is recording, and manual tracking is selected. Checks
      * are done in the onTouch method, so no checks are needed to be done here.
      *
-     * @param mX The x-coordinate of the touched position
-     * @param mY The y-coordinate of the touched position
+     * @param x The x-coordinate of the touched position
+     * @param y The y-coordinate of the touched position
      */
-    private void drawCircle(float mX, float mY) {
+    private void drawCircle(float x, float y) {
 
         // TODO: add an option to change circle size
 
         // Lock the canvas so that it can be drawn on
         canvas = mOverlayHolder.lockCanvas();
-        paint.setStyle(Paint.Style.FILL);
 
+        paint.setStyle(Paint.Style.FILL);
         paint.setColor(TrackingActivity.overlayColor);
 
         // Clear any previous circles
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
-        canvas.drawCircle(mX, mY, 30, paint);
+        canvas.drawCircle(x, y, 30, paint);
         mOverlayHolder.unlockCanvasAndPost(canvas);
 
-        // Convert coordinates with respect to device resolution
-        manualPosX = Utilities.convertDeviceXToCameraX(mX, mCameraControl.getFrameWidth(),
+        // Convert coordinates with respect to device resolution. These coordinates are then appended
+        // to the data file on the next onCameraFrame() call.
+        manualPosX = Utilities.convertDeviceXToCameraX(x, mCameraControl.getFrameWidth(),
             mCameraControl.getWidth());
-        manualPosY = Utilities.convertDeviceYToCameraY(mY, mCameraControl.getFrameHeight(),
+        manualPosY = Utilities.convertDeviceYToCameraY(y, mCameraControl.getFrameHeight(),
             mCameraControl.getHeight());
         Log.i(TAG, "manualPosX: " + manualPosX + ", manualPosY: " + manualPosY + " at timestamp: " +
         mTimer.ymlTimestamp);
+    }
 
+
+    private void drawRectangle(float x, float y) {
+        Log.i(TAG, "x is " + x + ", y is " + y);
+        Log.i(TAG, "frame width is " + mCameraControl.getWidth() + ", height is is " + mCameraControl.getHeight());
+        x = (x/mCameraMat.cols()) * mCameraControl.getWidth();
+        y = (y/mCameraMat.rows()) * mCameraControl.getHeight();
+
+        canvas = mOverlayHolder.lockCanvas();
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setColor(TrackingActivity.overlayColor);
+        paint.setStrokeWidth(2.0f);
+
+        // Clear previous rectangle
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+
+        float right = x+((mTemplateMat.cols()/mCameraMat.rows())*mCameraControl.getWidth());
+        float bottom = y+((mTemplateMat.rows()/mCameraMat.cols())*mCameraControl.getHeight());
+
+        Log.i(TAG, "top: " + x + ", left: " + y + ", bottom: " + bottom + ", right: " + right);
+
+        canvas.drawRect(x, y, right, bottom, paint);
+        mOverlayHolder.unlockCanvasAndPost(canvas);
     }
 
     /**
