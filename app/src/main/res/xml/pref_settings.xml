@@ -23,6 +23,19 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Manual Tracking Settings"
+        android:key="@string/manual_tracking_settings_title">
+
+        <EditTextPreference
+            android:defaultValue="30"
+            android:key="pref_key_manual_overlay_size"
+            android:inputType="number"
+            android:title="@string/pref_manual_tracking_overlay_title"
+            android:summary="@string/pref_manual_tracking_overlay_summary"/>
+
+    </PreferenceCategory>
+
 
     <PreferenceCategory
         android:title="@string/automatic_tracking_settings_title"

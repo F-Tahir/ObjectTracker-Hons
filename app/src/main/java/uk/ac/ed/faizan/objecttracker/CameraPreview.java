@@ -94,6 +94,7 @@ public class CameraPreview implements View.OnTouchListener,
 
     // Values used for touch positions during manual tracking
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int mManualTrackingOverlaySize;
 
     private static Canvas canvas;
 
@@ -136,6 +137,7 @@ public class CameraPreview implements View.OnTouchListener,
         // Booleans extracted from SharedPreferences
         mUpdateTemplateOnEachFrame = sharedPrefs.getBoolean("pref_key_update_template", true);
         mRecordAutoTrackingOverlay = sharedPrefs.getBoolean("pref_key_record_overlay", true);
+        mManualTrackingOverlaySize = Integer.parseInt(sharedPrefs.getString("pref_key_manual_overlay_size", "30"));
     }
 
     /**
@@ -568,7 +570,7 @@ public class CameraPreview implements View.OnTouchListener,
         // Clear any previous circles
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
-        canvas.drawCircle(x, y, 30, paint);
+        canvas.drawCircle(x, y, mManualTrackingOverlaySize, paint);
         mOverlayHolder.unlockCanvasAndPost(canvas);
 
         // Convert coordinates with respect to device resolution. These coordinates are then appended
