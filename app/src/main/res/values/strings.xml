@@ -158,7 +158,7 @@
     <string name="manual_tracking_settings_title">Manual Tracking Settings</string>
 
     <string name="pref_tracking_mode_title">Tracking Mode</string>
-    <string name="pref_tracking_mode_summary">Set the default object tracking mode of this application</string>
+    <string name="pref_tracking_mode_summary">Set the default object tracking mode of this application.</string>
 
     <string name="pref_screen_brightness_title">Turn screen brightness to max</string>
     <string name="pref_screen_brightness_summary">Select whether or not the screen brightness should be maximised
@@ -172,7 +172,7 @@
     <string name="pref_record_overlay_summary">Choose whether or not the rectangle overlay in automatic tracking is embedded into the recording.</string>
 
     <string name="pref_update_template_title">Update template</string>
-    <string name="pref_update_template_summary">Select whether or not the template used for template matching should be updated on each frame</string>
+    <string name="pref_update_template_summary">Select whether or not the template used for template matching should be updated on each frame.</string>
 
     <string name="pref_manual_tracking_overlay_title">Manual Tracking overlay size</string>
     <string name="pref_manual_tracking_overlay_summary">Set the size of the circle (in device-pixels) of the manual tracking overlay.</string>
