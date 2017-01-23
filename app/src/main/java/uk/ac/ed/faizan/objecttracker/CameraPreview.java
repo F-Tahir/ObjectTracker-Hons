@@ -3,9 +3,11 @@ package uk.ac.ed.faizan.objecttracker;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.RectF;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.util.Log;
@@ -32,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static android.R.attr.left;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 
 
@@ -56,6 +59,7 @@ public class CameraPreview implements View.OnTouchListener,
     private Button mMethodButton;
     private Context mContext;
     private SharedPreferences mSharedPreferences;
+    private Toast mToast;
 
     private Mat mCameraMat;
     private Mat mTemplateMat;
@@ -96,7 +100,7 @@ public class CameraPreview implements View.OnTouchListener,
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private int mManualTrackingOverlaySize;
 
-    private static Canvas canvas;
+    private static Canvas canvas = null;
 
     // Used to resize the input image to speed up template matching.
     private static double resizeRatio = 0.5;
@@ -276,14 +280,16 @@ public class CameraPreview implements View.OnTouchListener,
      * if the user was recording, then as well as stopping the recording in the onPause() method,
      * we also change the ic_stop icon back to ic_record, and set isRecording = false.
      */
-    public synchronized void releaseMediaRecorder(){
+    public synchronized void releaseMediaRecorder() {
 
         // If recording is stopped, clear the canvas so that no circles are present
         // after recording
+        Log.i(TAG, "Clearing canvas");
         if (canvas != null) {
             canvas = mOverlayHolder.lockCanvas();
             canvas.drawColor(0, PorterDuff.Mode.CLEAR);
             mOverlayHolder.unlockCanvasAndPost(canvas);
+            Log.i(TAG, "Canvas cleared");
         } else {
             Log.i(TAG, "Canvas is null");
         }
@@ -311,6 +317,7 @@ public class CameraPreview implements View.OnTouchListener,
                 throw new AssertionError(e);
             }
 
+            isRecording = false;
             mTimestamp.setText(R.string.timestamp);
 
             // Stop updating UI threads
@@ -318,7 +325,7 @@ public class CameraPreview implements View.OnTouchListener,
             mStorageSpace.customHandler.removeCallbacks(mStorageSpace.updateStorageSpaceThread);
 
             mRecordButton.setImageResource(R.drawable.ic_record);
-            isRecording = false;
+
         }
 
         if (mMediaRecorder != null) {
@@ -327,6 +334,7 @@ public class CameraPreview implements View.OnTouchListener,
             mMediaRecorder.release();
             mMediaRecorder = null;
         }
+
 
         Utilities.reconfigureUIButtons(mModeButton, mFreezeButton, mMethodButton, isRecording, mTrackingMode);
     }
@@ -368,7 +376,7 @@ public class CameraPreview implements View.OnTouchListener,
     * Note: Preview can only be frozen whilst user is not recording.
     */
     @Override
-    public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+    public synchronized Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         // Don't update the frame if camera preview is frozen - return early.
         if (isPreviewFrozen) {
@@ -443,14 +451,11 @@ public class CameraPreview implements View.OnTouchListener,
                 }
 
 
-                // TODO: Draw rectangle only if user selects the option from settings
-
                 if (mRecordAutoTrackingOverlay) {
                     Imgproc.rectangle(mCameraMat, mMatchLoc, new Point((mMatchLoc.x + mTemplateMat.cols()),
                         (mMatchLoc.y + mTemplateMat.rows())), new Scalar(TrackingActivity.r, TrackingActivity.g,
                         TrackingActivity.b, TrackingActivity.a), 2);
                 } else {
-                    // TODO: Fix this method..
                     drawRectangle((float) mMatchLoc.x, (float) mMatchLoc.y);
                 }
 
@@ -582,26 +587,40 @@ public class CameraPreview implements View.OnTouchListener,
     }
 
 
+	/**
+     * This method is called in onCameraFrame() in automatic tracking mode, when user wishes not to
+     * record the overlay. OpenCV's implementation of drawing a rectangle draws it directly onto the Mat
+     * object, and thus it is embedded into the final video. Android's version of drawRect() (used in this
+     * method) draws onto a canvas, which is not part of the final video, thus the rectangle is not
+     * embedded.
+     *
+     * <p>This function takes coordinates in terms of the preview size (1280x720), and because
+     * Android's drawRect() draws in terms of the screen size, the x and y coordinates must be converted
+     * in terms of screen size.</p>
+     *
+     * @param x The top-left x coordinate of the object, from matchTemplate()
+     * @param y The top-left y coordinate of the object, from matchTemplate()
+     */
     private void drawRectangle(float x, float y) {
-        Log.i(TAG, "x is " + x + ", y is " + y);
-        Log.i(TAG, "frame width is " + mCameraControl.getWidth() + ", height is is " + mCameraControl.getHeight());
-        x = (x/mCameraMat.cols()) * mCameraControl.getWidth();
-        y = (y/mCameraMat.rows()) * mCameraControl.getHeight();
+        float left = (x / (float) mCameraControl.getFrameWidth()) * (float) mCameraControl.getWidth();
+        float top = (y / (float) mCameraControl.getFrameHeight()) * (float) mCameraControl.getHeight();
 
         canvas = mOverlayHolder.lockCanvas();
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(TrackingActivity.overlayColor);
-        paint.setStrokeWidth(2.0f);
+        paint.setStrokeWidth(4.0f);
 
         // Clear previous rectangle
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
-        float right = x+((mTemplateMat.cols()/mCameraMat.rows())*mCameraControl.getWidth());
-        float bottom = y+((mTemplateMat.rows()/mCameraMat.cols())*mCameraControl.getHeight());
+        float right = left +
+            ((mTemplateMat.width() / (float) mCameraControl.getFrameWidth()) * (float) mCameraControl.getWidth());
+        float bottom = top +
+            ((mTemplateMat.height() / (float) mCameraControl.getFrameHeight()) * (float) mCameraControl.getHeight());
 
-        Log.i(TAG, "top: " + x + ", left: " + y + ", bottom: " + bottom + ", right: " + right);
 
-        canvas.drawRect(x, y, right, bottom, paint);
+        RectF rect = new RectF(left, top, right, bottom);
+        canvas.drawRect(rect, paint);
         mOverlayHolder.unlockCanvasAndPost(canvas);
     }
 

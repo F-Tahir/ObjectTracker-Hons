@@ -44,10 +44,12 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     private CameraControl mCameraControl;
     private TemplateSelection mTemplateSelection;
     private SharedPreferences mSharedPreferences;
+    private Toast mToast;
 
     // trackingMode 0 states manual mode, 1 states automatic mode. Read from sharedPrefs to set these
     int trackingMode;
     int matchMethod;
+
 
 
     static boolean templateSelectionInitialized = false;
@@ -168,8 +170,6 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
     protected void onPause() {
         super.onPause();
 
-
-        Log.i(TAG, "onPause");
         // release resources such as preview
         if (mCameraPreview != null) {
             mCameraPreview.releaseMediaRecorder();
@@ -182,11 +182,13 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
         Log.i(TAG, "onStop");
         super.onStop();
 
+
+
         if (mCameraControl != null) {
             mCameraControl.disableView();
         }
 
-        // If user stops activity during initialisation, then set UI and booleans back to normal.
+        // If user stops activity during template initialisation, then set UI and booleans back to normal.
         if (templateSelectionInitialized) {
             cancelTemplateInitialisation();
         }
@@ -266,8 +268,13 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     findViewById(R.id.template_initialization_cancel).setVisibility(View.VISIBLE);
 
                     // Next step is done when Freeze button is pressed
-                    Toast.makeText(this, "To select a template, focus the camera on the object," +
-                        " then press the \"Live\" button.", Toast.LENGTH_LONG).show();
+                    // If a previous toast is showing, cancel it and show the new one.
+                    if (mToast != null) {
+                        mToast.cancel();
+                    }
+                    mToast = Toast.makeText(this, "To select a template, focus the camera on the object," +
+                        " then press the \"Live\" button.", Toast.LENGTH_LONG);
+                    mToast.show();
 
                     // Freeze button is disabled by default, so enable it.
                     // Enable it only for template selection, and nowhere else.
@@ -293,9 +300,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                         // User has initialized automatic tracking, so start template selection -
                         // show instructions to user.
                         if (templateSelectionInitialized) {
+
+                            if (mToast != null) {
+                                mToast.cancel();
+                            }
                             findViewById(R.id.select_template).setVisibility(View.VISIBLE);
-                            Toast.makeText(this, "Now select the template. For instructions, click on " +
-                                "Help.", Toast.LENGTH_LONG).show();
+                            mToast = Toast.makeText(this, "Now select the template. For instructions, click on " +
+                                "Help.", Toast.LENGTH_LONG);
+                            mToast.show();
                         }
 
                         // Pressed after template is selected
@@ -326,7 +338,11 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                                 freezeButton.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_freeze_disabled, 0, 0);
 
                                 findViewById(R.id.template_initialization_cancel).setVisibility(View.INVISIBLE);
-                                Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT).show();
+                                if (mToast != null) {
+                                    mToast.cancel();
+                                }
+                                mToast = Toast.makeText(this, "Template saved. Now recording", Toast.LENGTH_SHORT);
+                                mToast.show();
 
                             } else {
                                 Toast.makeText(this, "Template not selected properly, perhaps the template" +
