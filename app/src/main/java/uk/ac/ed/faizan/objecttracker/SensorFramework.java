@@ -152,8 +152,8 @@ public class SensorFramework implements SensorEventListener {
 			setAccelerometer();
 			setGyroscope();
 
-			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
-			mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_UI);
+			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+			mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_FASTEST);
 
 		} else {
 			Log.i(TAG, "Attempting to register listener, but device does not have an accelerometer " +

@@ -464,11 +464,12 @@ public class CameraPreview implements View.OnTouchListener,
                 // Add mTemplate.cols()/2.0 because mMatchLoc.x/y returns top left coordinate, we want center
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
                     (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)),
-                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
+                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues(),
+                    System.currentTimeMillis());
 
-                // Reset sensor readings to 0 so that in the next frame, if readings do not change,
-                // 0 is recorded as opposed to the last known reading.
-                mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
+                // TODO: Reset sensor readings to 0 so that in the next frame, if readings do not change,
+                // 0 is recorded as opposed to the last known reading. FIGURE OUT IF THIS IS NEEDED.
+                // mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
 
 
                 // correctTemplate boolean is set in onTouch method. The new template is stored in
@@ -503,11 +504,12 @@ public class CameraPreview implements View.OnTouchListener,
                 /* TODO: Possibly append in drawCircle() also, as currently if the user clicks on screen,
                  the values are not appended till next frame, meaning they are out of sync by one frame.*/
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, manualPosX, manualPosY,
-                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues());
+                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues(),
+                    System.currentTimeMillis());
 
-                // Reset sensor readings to 0 so that in the next frame, if readings do not change,
-                // 0 is recorded as opposed to the last known reading.
-                mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
+                // TODO: Reset sensor readings to 0 so that in the next frame, if readings do not change,
+                // 0 is recorded as opposed to the last known reading. FIGURE OUT IF THIS IS NEEDED.
+                // mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
 
                 // Set them to -1 after so that appendToDataFile()
                 // won't write object positions to file on next frame.

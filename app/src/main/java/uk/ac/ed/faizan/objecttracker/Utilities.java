@@ -62,6 +62,17 @@ public final class Utilities {
 		}
 	};
 
+	/**
+	 * This is used to format the time in a hour:min:second:millisecond format, used for sensor
+	 * readings
+	 */
+	private static ThreadLocal<SimpleDateFormat> sWorldTimeFormat = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue() {
+			return new SimpleDateFormat("HH:mm:ss:SSS", Locale.ENGLISH);
+		}
+	};
+
 
 
 	/**
@@ -237,7 +248,7 @@ public final class Utilities {
 	 * @see CameraPreview
 	 */
 	public static void appendToDataFile(@NonNull File dataFile, int frameCount, String timeStamp, float xCoord, float yCoord,
-										float[] accelValues, float[] gyroValues) {
+										float[] accelValues, float[] gyroValues, long time) {
 		try {
 			if (!dataFile.exists() && !dataFile.createNewFile()) {
 				return;
@@ -253,19 +264,19 @@ public final class Utilities {
 
 				byte[] buffer;
 				if (xCoord != -1 && yCoord != -1) {
-					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\tobject_position:" +
+					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\tworld_time: %s\n\tobject_position:" +
 							"\n\t\tx: %d\n\t\ty: %d \n\taccelerometer_values:\n\t\tx: %.2f\n\t\ty: %.2f" +
 							"\n\t\tz: %.2f\n\tgyroscope_values:\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
-						frameCount, timeStamp, (int) xCoord, (int) yCoord, accelValues[0], accelValues[1],
+						frameCount, timeStamp, sWorldTimeFormat.get().format(time), (int) xCoord, (int) yCoord, accelValues[0], accelValues[1],
 						accelValues[2], gyroValues[0], gyroValues[1], gyroValues[2]).getBytes();
 
 					// Sensor changing in manual mode, but user has not clicked. Need to record
 					// new sensor readings only.
 				} else {
-					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\taccelerometer_values:" +
+					buffer = String.format(Locale.ENGLISH, "framestamp: %d\n\ttimestamp: %s\n\tworld_time: %s\n\taccelerometer_values:" +
 						"\n\t\tx: %.2f\n\t\ty: %.2f \n\t\tz: %.2f\n\tgyroscope_values:" +
 						"\n\t\tx: %.2f\n\t\ty: %.2f\n\t\tz: %.2f\n\n",
-						frameCount, timeStamp, accelValues[0], accelValues[1],
+						frameCount, timeStamp, sWorldTimeFormat.get().format(time), accelValues[0], accelValues[1],
 						accelValues[2], gyroValues[0], gyroValues[1], gyroValues[2]).getBytes();
 				}
 				fos.write(buffer);

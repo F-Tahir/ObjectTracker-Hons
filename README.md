@@ -51,9 +51,9 @@
 - [x] Merge data and sensor files
     - [ ] For automatic tracking, add a manual flag that is true when the template is corrected or initialized
 - [x] Poll sensors for each frame rather than only when changes occur 
-    - [ ] Possibly use this approach for manual tracking too?
+    - [x] Possibly use this approach for manual tracking too?
+- [x] Allow option for user to record the rectangle in automatic tracking mode, so that user can save video without the bounding box
 - [ ] Look at accelerometer/gyroscope calculations for camera trajectories
-- [ ] Allow option for user to record the rectangle in automatic tracking mode, so that user can save video without the bounding box
 - [ ] Work on interim report
 
  
