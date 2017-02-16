@@ -27,6 +27,7 @@ for line in f:
         timestamp = timestamp.split(':')
         # Ignore hours as the test recordings are only few mins long
         seconds = int(timestamp[2]) * 60 + int(timestamp[3]) + int(timestamp[4]) / 1000.0
+        print seconds
 
         # Loop through csv file to find closest timestamp with some threshold
         with open(opts.csv, "r") as csvfile:
