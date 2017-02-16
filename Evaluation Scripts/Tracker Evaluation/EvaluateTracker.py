@@ -59,10 +59,8 @@ print man_results[1][1][0]
 # Calculate Euclidean distance between points in same frame correspondence, between
 # automatic and manual tracking. Sum up and take average.
 if opts.type == "euclid":
-    for i in xrange(0, len(man_results)):
-        lhs = (man_results[i][1][0] - auto_results[i][1][0])**2
-        rhs = (man_results[i][1][1] - auto_results[i][1][1])**2
-        distance += math.sqrt(lhs + rhs)
+    distance += sum(math.hypot(man[1][0] - auto[1][0],
+        man[1][1] - auto[1][1]) for man, auto in zip (man_results, auto_results))
 
     print "Evaluation using Euclidean distance is %s" % str(distance/len(man_results))
     # Possibly print other valuable heuristic measurements too.
