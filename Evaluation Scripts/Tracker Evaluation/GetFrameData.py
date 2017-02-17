@@ -7,7 +7,7 @@ import optparse
 
 
 optparser = optparse.OptionParser()
-optparser.add_option("-r", "--rec", dest="rec", default="rec1.mp4", help="Recording to analyse.")
+optparser.add_option("-r", "--rec", dest="rec", default="../Data/rec1.mp4", help="Recording to analyse.")
 optparser.add_option("-o", "--out", dest="out", default="rec1output.yml", help="Output file to store data in")
 optparser.add_option("-f", "--frames", dest="frames", default=2000, type="int", help="Number of frames to analyze")
 opts = optparser.parse_args()[0]
@@ -47,6 +47,10 @@ def get_coord(event, x, y, flags, param):
 
 # Set callback to call get_coord
 cv2.setMouseCallback('video', get_coord)
+print "Starting manual tracking for ground truth"
+print "Video:" + opts.rec
+print "Output file: " + opts.out
+print "Number of frames to analyse: " + str(opts.frames)
 
 
 # Infinite loop while cap is opened - frame is only updated on click

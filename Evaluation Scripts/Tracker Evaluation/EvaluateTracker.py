@@ -8,11 +8,11 @@ import math
 
 optparser = optparse.OptionParser()
 optparser.add_option("-m", "--man", dest="man", default="rec2output.yml",
-    help="Original YML file (with automatic tracking results from app)")
-optparser.add_option("-a", "--aut", dest="aut", default="../Data/rec2.yml",
     help="New YML file (with ground truth results from GetFrameData.py)")
+optparser.add_option("-a", "--aut", dest="aut", default="../Data/rec2.yml",
+    help="Original YML file (with automatic tracking results from app)")
 optparser.add_option("-k", "--heur", dest="heuristic", default="euclid",
-    help="Evaluation heuristic.")
+    help="Evaluation heuristic (\"euclid\" or \"accuracy\").")
 optparser.add_option("-f", "--frames", dest="frames", default=2000, type="int", help="Number of frames to analyze")
 optparser.add_option("-t", "--thresh", dest="threshold", default=20, type="int", help="Threshold for error detection.")
 opts = optparser.parse_args()[0]
