@@ -4,7 +4,7 @@
 # or automatic tracking
 import optparse
 import math
-
+import matplotlib.pyplot as plt
 
 optparser = optparse.OptionParser()
 optparser.add_option("-m", "--man", dest="man", default="rec2output.yml",
@@ -98,3 +98,25 @@ elif opts.heuristic == "accuracy":
     print "Incorrect # frames: %s" % str(inaccurate)
     print "Total # Frames: %s" % str(len(man_results))
     print "Accuracy: %s\n\n" % str((float(accurate)/len(man_results))*100.0)
+
+# Return a graph that shows plots of both the manually obtained data, and the
+# automatically obtained data. The graphs overlayed on each other can show similarity.
+elif opts.heuristic == "graph":
+    print """Description: This heuristic method shows plots of the manually obtained
+    data against the automatically obtained data. The graphs overlayed on each otherwise
+    can show similarity."""
+
+    man_x = [seq[1][0] for seq in man_results]
+    man_y = [seq[1][1] for seq in man_results]
+    aut_x = [seq[1][0] for seq in auto_results]
+    aut_y = [seq[1][1] for seq in auto_results]
+    plt.plot(man_x, man_y)
+    plt.plot(aut_x, aut_y)
+
+    plt.legend(["Ground-truth", "Automatic Tracking"])
+    plt.show()
+    # plt.plot(man_results[])
+
+elif opts.heuristic == "similarity":
+    # Implement similarity code from INF2B
+    print "Todo"
