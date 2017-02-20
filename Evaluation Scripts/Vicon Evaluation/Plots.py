@@ -5,6 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import optparse
+import cv2
 
 optparser = optparse.OptionParser()
 optparser.add_option("-y", "--yml", dest="yml", default="rec1processed.yml", help="YML file needing to be parsed")
@@ -22,8 +23,8 @@ for line in f:
     # Step 1: Loop through all framestamp blocks and get accummulated accelerator readings
     if "accelerometer_values" in line:
         # Get the x and y readings from file, store in a tuple and append to list
-        acc_x = float(f.next().strip().split(":")[1])
-        acc_y = float(f.next().strip().split(":")[1])
+        acc_x += float(f.next().strip().split(":")[1])
+        acc_y += float(f.next().strip().split(":")[1])
         t_acc.append((acc_x, acc_y))
 
     # Step 2: Loop through all framestamp blocks and get phone's translation x and y readings
@@ -38,25 +39,36 @@ for line in f:
         t_vicon.append((phone_tx, phone_ty))
 
 
-
-# Plot the points in T_acc and T_vicon in separate graphs
-x_acc = [i[0] for i in t_vicon]
-y_acc = [i[1] for i in t_vicon]
+# Plot the points in t_acc
+x_acc = [i[0] for i in t_acc]
+y_acc = [i[1] for i in t_acc]
+acc_graph = plt.figure(1)
+acc_graph.canvas.set_window_title("Accelerometer Readings")
 plt.plot(x_acc, y_acc)
-plt.axis('equal')
-plt.show()
+plt.axis([-1500, 2500, -1500, 2500])
 
+# PLot the points in t_vicon
+x_vicon = [i[0] for i in t_vicon]
+y_vicon = [i[1] for i in t_vicon]
+vicon_graph = plt.figure(2)
+vicon_graph.canvas.set_window_title("Vicon Readings")
+plt.plot(x_vicon, y_vicon)
+plt.axis([-1500, 2500, -1500, 2500])
 
-# Step 3: Compute optimal affine transformation between T_acc and T_vicon, using opencv
-# => M = cv2.estimateRigidTransform(T_acc, T_vicon, false)
+# plt.show()
+
+# Step 3: Compute optimal affine transformation between T_acc and T_vicon
 # => Returns a 2x3 matrix containing rotaional matrix and translation matrix
+m = cv2.estimateRigidTransform(np.asarray(t_acc), np.asarray(t_vicon), True)
+print m # Returns None
 
-# Step 4: Transform T_acc using the transformation matrix
-# => T_acc` = cv2.transform(T_acc, M)
+# Step 4: Transform t_acc using the transformation matrix m
+# t_acc_transformed = cv2.transform(np.asarray(t_acc), m)
 
-# Step 5: Plot T_vicon against T_acc' (transformed values) on same graphs
+# Step 5: Plot t_vicon against t_acc_transfomed on same graphs
 # Outline of same graph should be similar, indicating our accelerometer is accurate
+
 
 # If outline is not accurate, check the following:
 # 1) Alignment of Vicon csv values against yml values (align frames correctly)
-# 2) Check whether we're over-simplifying accelerometer readings
+# 2) Check whether I'm over-simplifying accelerometer readings
