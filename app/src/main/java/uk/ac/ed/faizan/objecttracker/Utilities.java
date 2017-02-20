@@ -411,7 +411,12 @@ public final class Utilities {
 		return true;
 	}
 
-
+	/**
+	 * This function is called when the app wants to query the amount of free space available on the
+	 * device. This is done to ensure that the video file does not become corrupt due to no free space.
+	 *
+	 * @return Number of bytes available on external storage
+	 */
 	public static long getAvailableSpaceInBytes() {
 		long availableSpace = -1L;
 		StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());

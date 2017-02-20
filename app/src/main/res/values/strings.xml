@@ -68,15 +68,14 @@
         Upon finding a closest match, a bounding box will be drawn around the location of the detected
         object*.
         \n\n<b>To select a template for template matching</b>:
-        \n\n1) Click the <i>MODE</i> button and select <i>Automatic Tracking</i> (Manual Tracking is default).
+        \n\n1) Click the <i>MODE</i> button and select <i>Automatic Tracking</i> (Manual Tracking is default, unless specified in preferences).
         \n\t\t1.1) Optionally, select a different matching method. Each match methods have their own benefits, explained below.
         \n 2) Ensure that the object you wish to track is clearly displayed on screen (with no blur).
-        \n 3) Press the <i>Live</i> <img src="@drawable/freeze_button"/> button to freeze the camera preview. This allows you to select the template
+        \n 3) Press the <i>Live</i> button to freeze the camera preview. This allows you to select the template
         with ease, as the object will not move.
         \n 4) Once the camera preview is frozen, hold your finger and drag a box around the object you wish to track.
         \n 5) Once you are happy with the selection process, press the <i>Freeze</i> button to restart the camera preview.
         \n 6) Upon pressing the freeze button, the template will be saved, and automatic tracking will start.
-        \n\nNote: if the template selection rectangle is difficult to see, press the <i>Color</i> button to change the overlay color
 
         \n\n<b>Updating the template:</b>
         \n\nTo update the template, simply click on the location of the new template. The location
@@ -96,7 +95,7 @@
         you will be given the opportunity to reinitialize the whole process, or switch modes.
 
 
-        \n\n\n\n\n*You can change the circle overlay color by tapping the icon labelled \"Color\". Note that
+        \n\n\n*You can change the circle overlay color by tapping the icon labelled \"Color\". Note that
         due to limitations of OpenCV4Android, the alpha value can only be changed for manual tracking, and is
         thus disabled for automatic tracking.
     </string>
@@ -135,7 +134,7 @@
         video is more crisp, and automatic tracking is faster to process. However, if you have an older
         device, you can still benefit from this app.
 
-        <b>Increasing Performance</b>
+        \n\n<b>Increasing Performance</b>
         \n1) Exit from other applications so that your phone has more free RAM.
         \n2) Make use of your cameras autofocus before selecting a template for template matching
         \n3) Make use of the zoom feature to track smaller objects
@@ -144,8 +143,20 @@
         \n\n<b>General Tips</b>
         \n1) This application is optimised to record in landscape mode, so it is recommended that the user
         record in landscape whenever possible.
-        \n2)&#8320;
+        \n2) During automatic tracking, it is advised that the phone be kept at the same height during the entire
+        recording. Template matching is not scale-invariant, and changing the height of phone during recording
+        can lead to the objects scale changing.
         \n3)&#8320;
+
+        \n\n<b>Potential Problems</b>
+        \n1) If the accelerometer and gyroscope values only report 0 in the YML file, this is suggestive that
+        your phone does not support an accelerometer or gyroscope sensor.
+        \n2) If the template is not found in a large majority of frames during automatic tracking, it is recommended to restart
+        the tracking, with a larger template (by using the zoom feature). This will however decrease the FPS during recording.
+        \n3) If recording does not start, ensure that your camera is not being "locked" by another application - restarting
+        your phone should fix this issue.
+        \n4) Ensure you have sufficient storage before recording (500MB+). The amount of available storage space is reported
+        in the top right corner during recording, and the recording will stop if storage is not sufficient.
 
     </string>
 

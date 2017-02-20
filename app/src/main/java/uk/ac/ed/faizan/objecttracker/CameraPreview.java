@@ -3,7 +3,6 @@ package uk.ac.ed.faizan.objecttracker;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
@@ -33,9 +32,6 @@ import org.opencv.imgproc.Imgproc;
 import java.io.File;
 import java.io.IOException;
 
-import static android.R.attr.left;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-
 
 
 /*
@@ -50,7 +46,8 @@ public class CameraPreview implements View.OnTouchListener,
     private CameraControl mCameraControl;
     private SurfaceView mOverlayView;
     private SurfaceHolder mOverlayHolder;
-    private SensorFramework mSensorFramework;
+    private SensorFramework
+        mSensorFramework;
 
     private TextView mTimestamp;
     private ImageView mRecordButton;
@@ -59,7 +56,6 @@ public class CameraPreview implements View.OnTouchListener,
     private Button mMethodButton;
     private Context mContext;
     private SharedPreferences mSharedPreferences;
-    private Toast mToast;
 
     private Mat mCameraMat;
     private Mat mTemplateMat;
@@ -232,23 +228,19 @@ public class CameraPreview implements View.OnTouchListener,
 
         mMediaRecorder.setOutputFile(mMediaFile.getPath());
 
+        // Specify 10MB less so we have space for things such as the .yml file
+        mMediaRecorder.setMaxFileSize(Utilities.getAvailableSpaceInBytes() - 10000000);
         mMediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener() {
 
             public void onInfo(MediaRecorder mediaRec, int error, int extra) {
                 if(error==MediaRecorder.MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED) {
 
-                    Toast.makeText(mContext, "Out of space - recording stopped. Saved in " +
-                        mMediaFile, Toast.LENGTH_LONG).show();
-
-
                     // Set buttons to full alpha and release resources/change booleans and icons
-                    releaseMediaRecorder();
+                    releaseMediaRecorder(true);
                 }
             }
         });
 
-        // Specify 5MB less so we have space for things such as the .yml file
-        mMediaRecorder.setMaxFileSize(Utilities.getAvailableSpaceInBytes() - 5242880);
 
         try {
             mMediaRecorder.prepare();
@@ -265,11 +257,11 @@ public class CameraPreview implements View.OnTouchListener,
 
         } catch (IllegalStateException e) {
             Log.d(TAG, "IllegalStateException preparing MediaRecorder: " + e.getMessage());
-            releaseMediaRecorder();
+            releaseMediaRecorder(false);
             return false;
         } catch (IOException e) {
             Log.d(TAG, "IOException preparing MediaRecorder: " + e.getMessage());
-            releaseMediaRecorder();
+            releaseMediaRecorder(false);
             return false;
         }
         return true;
@@ -280,7 +272,7 @@ public class CameraPreview implements View.OnTouchListener,
      * if the user was recording, then as well as stopping the recording in the onPause() method,
      * we also change the ic_stop icon back to ic_record, and set isRecording = false.
      */
-    public synchronized void releaseMediaRecorder() {
+    public synchronized void releaseMediaRecorder(boolean outOfStorage) {
 
         // If recording is stopped, clear the canvas so that no circles are present
         // after recording
@@ -301,8 +293,14 @@ public class CameraPreview implements View.OnTouchListener,
             try {
                 mCameraControl.releaseRecording();
 
-                Toast.makeText(mContext, "Saved in" + mMediaFile, Toast.LENGTH_LONG).show();
-                mMediaRecorder.stop();  // stop the recording
+                if (outOfStorage) {
+                    Toast.makeText(mContext, "Out of space - recording stopped. Saved in " +
+                        mMediaFile, Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(mContext, "Saved in" + mMediaFile, Toast.LENGTH_LONG).show();
+                }
+
+                mMediaRecorder.stop();
 
                 // Tell the media scanner about the new file so that it is
                 // immediately available to the user.

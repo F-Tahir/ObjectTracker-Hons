@@ -172,7 +172,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
         // release resources such as preview
         if (mCameraPreview != null) {
-            mCameraPreview.releaseMediaRecorder();
+            mCameraPreview.releaseMediaRecorder(false);
         }
 
     }
@@ -238,7 +238,14 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
                 if (mCameraPreview.isRecording) {
                     // release the MediaRecorder object.
-                    mCameraPreview.releaseMediaRecorder();
+                    mCameraPreview.releaseMediaRecorder(false);
+                    break;
+                }
+
+                // Don't record if less than 100MB storage
+                if (Utilities.getAvailableSpaceInGB() < 0.1) {
+                    Toast.makeText(this, "Insufficient storage - at least 100MB needed. Recording failed",
+                        Toast.LENGTH_LONG).show();
                     break;
                 }
 
@@ -671,7 +678,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
             } else {
                 // Prepare didn't work, release the recorder
-                mCameraPreview.releaseMediaRecorder();
+                mCameraPreview.releaseMediaRecorder(false);
                 return false;
             }
         }
