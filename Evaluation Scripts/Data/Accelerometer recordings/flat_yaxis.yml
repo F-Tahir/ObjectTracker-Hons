@@ -1,0 +1,2051 @@
+# General Recording Information
+
+time_of_recording: Thu, 23 Feb 2017, 01:04:27 
+tracking_mode: Manual Tracking
+matching_mode: N/A (manual tracking mode)
+image_size: 1280x720
+
+
+
+ # Tracking Information
+
+framestamp: 1
+	timestamp: 0:00:00:059
+	world_time: 01:04:27:726
+	accelerometer_values:
+		x: 0.03
+		y: 0.12 
+		z: 9.70
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: 0.00
+
+framestamp: 2
+	timestamp: 0:00:00:117
+	world_time: 01:04:27:789
+	accelerometer_values:
+		x: 0.01
+		y: 0.15 
+		z: 9.74
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: 0.00
+
+framestamp: 3
+	timestamp: 0:00:00:169
+	world_time: 01:04:27:841
+	accelerometer_values:
+		x: 0.02
+		y: 0.12 
+		z: 9.76
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: 0.00
+
+framestamp: 4
+	timestamp: 0:00:00:236
+	world_time: 01:04:27:913
+	accelerometer_values:
+		x: 0.02
+		y: 0.13 
+		z: 9.71
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: 0.00
+
+framestamp: 5
+	timestamp: 0:00:00:272
+	world_time: 01:04:27:951
+	accelerometer_values:
+		x: 0.03
+		y: 0.12 
+		z: 9.75
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 6
+	timestamp: 0:00:00:341
+	world_time: 01:04:28:011
+	accelerometer_values:
+		x: 0.05
+		y: 0.11 
+		z: 9.72
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 7
+	timestamp: 0:00:00:405
+	world_time: 01:04:28:079
+	accelerometer_values:
+		x: 0.03
+		y: 0.11 
+		z: 9.72
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 8
+	timestamp: 0:00:00:459
+	world_time: 01:04:28:130
+	accelerometer_values:
+		x: 0.03
+		y: 0.13 
+		z: 9.73
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: -0.00
+
+framestamp: 9
+	timestamp: 0:00:00:523
+	world_time: 01:04:28:194
+	accelerometer_values:
+		x: 0.03
+		y: 0.14 
+		z: 9.74
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: -0.00
+
+framestamp: 10
+	timestamp: 0:00:00:603
+	world_time: 01:04:28:281
+	accelerometer_values:
+		x: 0.04
+		y: 0.11 
+		z: 9.76
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: -0.00
+
+framestamp: 11
+	timestamp: 0:00:00:682
+	world_time: 01:04:28:352
+	accelerometer_values:
+		x: 0.04
+		y: 0.14 
+		z: 9.71
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 12
+	timestamp: 0:00:00:764
+	world_time: 01:04:28:435
+	accelerometer_values:
+		x: 0.01
+		y: 0.10 
+		z: 9.74
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 13
+	timestamp: 0:00:00:830
+	world_time: 01:04:28:503
+	accelerometer_values:
+		x: 0.04
+		y: 0.13 
+		z: 9.77
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: 0.00
+
+framestamp: 14
+	timestamp: 0:00:00:882
+	world_time: 01:04:28:557
+	accelerometer_values:
+		x: 0.04
+		y: 0.13 
+		z: 9.71
+	gyroscope_values:
+		x: -0.01
+		y: -0.00
+		z: 0.00
+
+framestamp: 15
+	timestamp: 0:00:00:953
+	world_time: 01:04:28:623
+	accelerometer_values:
+		x: 0.04
+		y: 0.12 
+		z: 9.73
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: 0.00
+
+framestamp: 16
+	timestamp: 0:00:01:014
+	world_time: 01:04:28:685
+	accelerometer_values:
+		x: 0.03
+		y: 0.14 
+		z: 9.75
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: 0.00
+
+framestamp: 17
+	timestamp: 0:00:01:070
+	world_time: 01:04:28:743
+	accelerometer_values:
+		x: 0.02
+		y: 0.13 
+		z: 9.71
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 18
+	timestamp: 0:00:01:136
+	world_time: 01:04:28:806
+	accelerometer_values:
+		x: 0.03
+		y: 0.13 
+		z: 9.72
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: 0.00
+
+framestamp: 19
+	timestamp: 0:00:01:220
+	world_time: 01:04:28:894
+	accelerometer_values:
+		x: 0.06
+		y: 0.15 
+		z: 9.73
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: 0.00
+
+framestamp: 20
+	timestamp: 0:00:01:325
+	world_time: 01:04:29:001
+	accelerometer_values:
+		x: 0.02
+		y: 0.05 
+		z: 9.72
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: 0.04
+
+framestamp: 21
+	timestamp: 0:00:01:419
+	world_time: 01:04:29:084
+	accelerometer_values:
+		x: 0.56
+		y: 0.33 
+		z: 9.47
+	gyroscope_values:
+		x: 0.01
+		y: -0.02
+		z: 0.23
+
+framestamp: 22
+	timestamp: 0:00:01:515
+	world_time: 01:04:29:182
+	accelerometer_values:
+		x: 0.65
+		y: 0.01 
+		z: 9.72
+	gyroscope_values:
+		x: 0.00
+		y: 0.02
+		z: -0.02
+
+framestamp: 23
+	timestamp: 0:00:01:573
+	world_time: 01:04:29:246
+	accelerometer_values:
+		x: 0.10
+		y: 0.19 
+		z: 9.78
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: -0.08
+
+framestamp: 24
+	timestamp: 0:00:01:641
+	world_time: 01:04:29:316
+	accelerometer_values:
+		x: 0.20
+		y: 0.15 
+		z: 9.75
+	gyroscope_values:
+		x: -0.00
+		y: 0.00
+		z: 0.08
+
+framestamp: 25
+	timestamp: 0:00:01:673
+	world_time: 01:04:29:359
+	accelerometer_values:
+		x: 0.08
+		y: 0.14 
+		z: 9.68
+	gyroscope_values:
+		x: 0.00
+		y: 0.03
+		z: 0.01
+
+framestamp: 26
+	timestamp: 0:00:01:744
+	world_time: 01:04:29:413
+	accelerometer_values:
+		x: 0.89
+		y: 0.15 
+		z: 9.61
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: -0.09
+
+framestamp: 27
+	timestamp: 0:00:01:811
+	world_time: 01:04:29:482
+	accelerometer_values:
+		x: 0.42
+		y: -0.09 
+		z: 9.64
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: -0.14
+
+framestamp: 28
+	timestamp: 0:00:01:860
+	world_time: 01:04:29:530
+	accelerometer_values:
+		x: -0.53
+		y: 0.15 
+		z: 9.63
+	gyroscope_values:
+		x: 0.00
+		y: -0.02
+		z: -0.15
+
+framestamp: 29
+	timestamp: 0:00:01:909
+	world_time: 01:04:29:581
+	accelerometer_values:
+		x: 0.94
+		y: 0.45 
+		z: 9.75
+	gyroscope_values:
+		x: 0.01
+		y: 0.01
+		z: -0.09
+
+framestamp: 30
+	timestamp: 0:00:01:987
+	world_time: 01:04:29:657
+	accelerometer_values:
+		x: -0.29
+		y: 0.02 
+		z: 9.90
+	gyroscope_values:
+		x: 0.02
+		y: -0.04
+		z: 0.02
+
+framestamp: 31
+	timestamp: 0:00:02:072
+	world_time: 01:04:29:754
+	accelerometer_values:
+		x: -0.20
+		y: -0.22 
+		z: 9.65
+	gyroscope_values:
+		x: -0.01
+		y: -0.05
+		z: 0.05
+
+framestamp: 32
+	timestamp: 0:00:02:187
+	world_time: 01:04:29:857
+	accelerometer_values:
+		x: -0.04
+		y: 0.12 
+		z: 9.83
+	gyroscope_values:
+		x: 0.01
+		y: -0.01
+		z: -0.06
+
+framestamp: 33
+	timestamp: 0:00:02:299
+	world_time: 01:04:29:967
+	accelerometer_values:
+		x: 0.57
+		y: 0.19 
+		z: 9.79
+	gyroscope_values:
+		x: 0.00
+		y: 0.01
+		z: 0.03
+
+framestamp: 34
+	timestamp: 0:00:02:349
+	world_time: 01:04:30:030
+	accelerometer_values:
+		x: 0.65
+		y: 0.28 
+		z: 9.80
+	gyroscope_values:
+		x: -0.03
+		y: 0.05
+		z: -0.14
+
+framestamp: 35
+	timestamp: 0:00:02:467
+	world_time: 01:04:30:152
+	accelerometer_values:
+		x: 0.13
+		y: 0.26 
+		z: 9.75
+	gyroscope_values:
+		x: -0.01
+		y: -0.06
+		z: -0.04
+
+framestamp: 36
+	timestamp: 0:00:02:643
+	world_time: 01:04:30:315
+	accelerometer_values:
+		x: -1.02
+		y: -0.17 
+		z: 9.85
+	gyroscope_values:
+		x: -0.07
+		y: -0.02
+		z: -0.40
+
+framestamp: 37
+	timestamp: 0:00:02:721
+	world_time: 01:04:30:409
+	accelerometer_values:
+		x: 0.45
+		y: 0.40 
+		z: 9.69
+	gyroscope_values:
+		x: 0.01
+		y: -0.00
+		z: 0.09
+
+framestamp: 38
+	timestamp: 0:00:02:940
+	world_time: 01:04:30:616
+	accelerometer_values:
+		x: -0.34
+		y: 0.04 
+		z: 9.53
+	gyroscope_values:
+		x: -0.00
+		y: 0.00
+		z: -0.10
+
+framestamp: 39
+	timestamp: 0:00:03:041
+	world_time: 01:04:30:712
+	accelerometer_values:
+		x: -0.29
+		y: 0.27 
+		z: 9.76
+	gyroscope_values:
+		x: 0.00
+		y: 0.07
+		z: 0.16
+
+framestamp: 40
+	timestamp: 0:00:03:127
+	world_time: 01:04:30:799
+	accelerometer_values:
+		x: 0.25
+		y: 0.11 
+		z: 9.69
+	gyroscope_values:
+		x: 0.00
+		y: -0.00
+		z: 0.48
+
+framestamp: 41
+	timestamp: 0:00:03:201
+	world_time: 01:04:30:881
+	accelerometer_values:
+		x: -0.44
+		y: 0.34 
+		z: 9.80
+	gyroscope_values:
+		x: -0.01
+		y: -0.00
+		z: 0.06
+
+framestamp: 42
+	timestamp: 0:00:03:322
+	world_time: 01:04:31:027
+	accelerometer_values:
+		x: -0.14
+		y: -0.14 
+		z: 9.67
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: 0.09
+
+framestamp: 43
+	timestamp: 0:00:03:432
+	world_time: 01:04:31:106
+	accelerometer_values:
+		x: -0.10
+		y: 0.14 
+		z: 9.79
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: 0.24
+
+framestamp: 44
+	timestamp: 0:00:03:503
+	world_time: 01:04:31:174
+	accelerometer_values:
+		x: -0.35
+		y: 0.13 
+		z: 9.88
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: 0.07
+
+framestamp: 45
+	timestamp: 0:00:03:616
+	world_time: 01:04:31:286
+	accelerometer_values:
+		x: -0.01
+		y: 0.12 
+		z: 9.75
+	gyroscope_values:
+		x: -0.01
+		y: -0.03
+		z: 0.06
+
+framestamp: 46
+	timestamp: 0:00:03:667
+	world_time: 01:04:31:340
+	accelerometer_values:
+		x: -0.01
+		y: 0.19 
+		z: 9.78
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: -0.04
+
+framestamp: 47
+	timestamp: 0:00:03:738
+	world_time: 01:04:31:406
+	accelerometer_values:
+		x: 0.13
+		y: 0.28 
+		z: 9.58
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: 0.08
+
+framestamp: 48
+	timestamp: 0:00:03:784
+	world_time: 01:04:31:456
+	accelerometer_values:
+		x: 0.05
+		y: 0.29 
+		z: 9.69
+	gyroscope_values:
+		x: 0.00
+		y: -0.03
+		z: 0.12
+
+framestamp: 49
+	timestamp: 0:00:03:840
+	world_time: 01:04:31:511
+	accelerometer_values:
+		x: 0.55
+		y: 0.24 
+		z: 9.75
+	gyroscope_values:
+		x: -0.00
+		y: 0.02
+		z: 0.03
+
+framestamp: 50
+	timestamp: 0:00:03:923
+	world_time: 01:04:31:596
+	accelerometer_values:
+		x: -0.05
+		y: 0.14 
+		z: 9.82
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: -0.07
+
+framestamp: 51
+	timestamp: 0:00:03:975
+	world_time: 01:04:31:652
+	accelerometer_values:
+		x: 0.51
+		y: 0.11 
+		z: 9.78
+	gyroscope_values:
+		x: -0.02
+		y: -0.01
+		z: -0.18
+
+framestamp: 52
+	timestamp: 0:00:04:022
+	world_time: 01:04:31:695
+	accelerometer_values:
+		x: -0.10
+		y: -0.10 
+		z: 9.80
+	gyroscope_values:
+		x: -0.02
+		y: -0.02
+		z: -0.06
+
+framestamp: 53
+	timestamp: 0:00:04:073
+	world_time: 01:04:31:748
+	accelerometer_values:
+		x: -0.75
+		y: -0.07 
+		z: 9.88
+	gyroscope_values:
+		x: -0.01
+		y: -0.05
+		z: 0.10
+
+framestamp: 54
+	timestamp: 0:00:04:139
+	world_time: 01:04:31:811
+	accelerometer_values:
+		x: 0.45
+		y: 0.38 
+		z: 9.74
+	gyroscope_values:
+		x: 0.00
+		y: -0.01
+		z: 0.12
+
+framestamp: 55
+	timestamp: 0:00:04:192
+	world_time: 01:04:31:866
+	accelerometer_values:
+		x: -0.43
+		y: 0.33 
+		z: 9.86
+	gyroscope_values:
+		x: 0.00
+		y: 0.01
+		z: 0.12
+
+framestamp: 56
+	timestamp: 0:00:04:257
+	world_time: 01:04:31:926
+	accelerometer_values:
+		x: 0.62
+		y: 0.22 
+		z: 9.64
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: 0.03
+
+framestamp: 57
+	timestamp: 0:00:04:310
+	world_time: 01:04:31:982
+	accelerometer_values:
+		x: 0.28
+		y: 0.09 
+		z: 9.79
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: -0.06
+
+framestamp: 58
+	timestamp: 0:00:04:380
+	world_time: 01:04:32:050
+	accelerometer_values:
+		x: -0.20
+		y: 0.34 
+		z: 9.79
+	gyroscope_values:
+		x: -0.01
+		y: 0.01
+		z: -0.01
+
+framestamp: 59
+	timestamp: 0:00:04:426
+	world_time: 01:04:32:096
+	accelerometer_values:
+		x: -0.08
+		y: 0.13 
+		z: 9.68
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: 0.10
+
+framestamp: 60
+	timestamp: 0:00:04:495
+	world_time: 01:04:32:168
+	accelerometer_values:
+		x: 0.14
+		y: 0.13 
+		z: 9.84
+	gyroscope_values:
+		x: -0.01
+		y: -0.03
+		z: -0.05
+
+framestamp: 61
+	timestamp: 0:00:04:563
+	world_time: 01:04:32:233
+	accelerometer_values:
+		x: 0.23
+		y: 0.19 
+		z: 9.71
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: 0.03
+
+framestamp: 62
+	timestamp: 0:00:04:614
+	world_time: 01:04:32:286
+	accelerometer_values:
+		x: 0.43
+		y: 0.08 
+		z: 9.79
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: -0.04
+
+framestamp: 63
+	timestamp: 0:00:04:665
+	world_time: 01:04:32:350
+	accelerometer_values:
+		x: 0.64
+		y: 0.04 
+		z: 9.70
+	gyroscope_values:
+		x: -0.00
+		y: 0.00
+		z: 0.02
+
+framestamp: 64
+	timestamp: 0:00:04:736
+	world_time: 01:04:32:408
+	accelerometer_values:
+		x: 0.35
+		y: 0.15 
+		z: 9.84
+	gyroscope_values:
+		x: -0.01
+		y: -0.00
+		z: 0.02
+
+framestamp: 65
+	timestamp: 0:00:04:786
+	world_time: 01:04:32:455
+	accelerometer_values:
+		x: 0.03
+		y: 0.30 
+		z: 9.67
+	gyroscope_values:
+		x: -0.01
+		y: 0.02
+		z: 0.01
+
+framestamp: 66
+	timestamp: 0:00:04:850
+	world_time: 01:04:32:523
+	accelerometer_values:
+		x: 0.20
+		y: 0.25 
+		z: 9.74
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: -0.09
+
+framestamp: 67
+	timestamp: 0:00:04:918
+	world_time: 01:04:32:590
+	accelerometer_values:
+		x: -0.04
+		y: 0.13 
+		z: 9.73
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: -0.03
+
+framestamp: 68
+	timestamp: 0:00:05:005
+	world_time: 01:04:32:680
+	accelerometer_values:
+		x: 0.23
+		y: 0.07 
+		z: 9.73
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: 0.06
+
+framestamp: 69
+	timestamp: 0:00:05:085
+	world_time: 01:04:32:756
+	accelerometer_values:
+		x: -0.19
+		y: 0.02 
+		z: 9.76
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: -0.01
+
+framestamp: 70
+	timestamp: 0:00:05:154
+	world_time: 01:04:32:828
+	accelerometer_values:
+		x: 0.13
+		y: 0.11 
+		z: 9.74
+	gyroscope_values:
+		x: -0.00
+		y: 0.00
+		z: 0.00
+
+framestamp: 71
+	timestamp: 0:00:05:224
+	world_time: 01:04:32:896
+	accelerometer_values:
+		x: 0.16
+		y: 0.13 
+		z: 9.74
+	gyroscope_values:
+		x: -0.01
+		y: 0.01
+		z: -0.04
+
+framestamp: 72
+	timestamp: 0:00:05:273
+	world_time: 01:04:32:947
+	accelerometer_values:
+		x: 0.14
+		y: 0.13 
+		z: 9.76
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: -0.06
+
+framestamp: 73
+	timestamp: 0:00:05:344
+	world_time: 01:04:33:015
+	accelerometer_values:
+		x: 0.15
+		y: 0.10 
+		z: 9.70
+	gyroscope_values:
+		x: -0.01
+		y: 0.03
+		z: -0.08
+
+framestamp: 74
+	timestamp: 0:00:05:406
+	world_time: 01:04:33:079
+	accelerometer_values:
+		x: -0.10
+		y: 0.07 
+		z: 9.76
+	gyroscope_values:
+		x: -0.00
+		y: 0.06
+		z: -0.07
+
+framestamp: 75
+	timestamp: 0:00:05:461
+	world_time: 01:04:33:132
+	accelerometer_values:
+		x: -0.47
+		y: 0.08 
+		z: 9.77
+	gyroscope_values:
+		x: -0.00
+		y: 0.04
+		z: -0.02
+
+framestamp: 76
+	timestamp: 0:00:05:508
+	world_time: 01:04:33:179
+	accelerometer_values:
+		x: -0.29
+		y: 0.08 
+		z: 9.88
+	gyroscope_values:
+		x: -0.00
+		y: 0.02
+		z: 0.05
+
+framestamp: 77
+	timestamp: 0:00:05:576
+	world_time: 01:04:33:251
+	accelerometer_values:
+		x: -1.48
+		y: 0.13 
+		z: 9.58
+	gyroscope_values:
+		x: 0.01
+		y: 0.07
+		z: -0.08
+
+framestamp: 78
+	timestamp: 0:00:05:643
+	world_time: 01:04:33:314
+	accelerometer_values:
+		x: -0.27
+		y: 0.35 
+		z: 9.36
+	gyroscope_values:
+		x: 0.03
+		y: 0.09
+		z: -0.14
+
+framestamp: 79
+	timestamp: 0:00:05:701
+	world_time: 01:04:33:371
+	accelerometer_values:
+		x: 0.91
+		y: 0.59 
+		z: 9.60
+	gyroscope_values:
+		x: 0.02
+		y: -0.10
+		z: -0.07
+
+framestamp: 80
+	timestamp: 0:00:05:761
+	world_time: 01:04:33:432
+	accelerometer_values:
+		x: -0.63
+		y: -0.18 
+		z: 9.98
+	gyroscope_values:
+		x: 0.02
+		y: 0.04
+		z: -0.18
+
+framestamp: 81
+	timestamp: 0:00:05:813
+	world_time: 01:04:33:488
+	accelerometer_values:
+		x: 0.07
+		y: 0.23 
+		z: 9.59
+	gyroscope_values:
+		x: 0.01
+		y: 0.03
+		z: -0.02
+
+framestamp: 82
+	timestamp: 0:00:05:879
+	world_time: 01:04:33:550
+	accelerometer_values:
+		x: 0.66
+		y: 0.22 
+		z: 9.27
+	gyroscope_values:
+		x: 0.04
+		y: 0.12
+		z: -0.06
+
+framestamp: 83
+	timestamp: 0:00:05:952
+	world_time: 01:04:33:623
+	accelerometer_values:
+		x: -0.73
+		y: 0.20 
+		z: 9.22
+	gyroscope_values:
+		x: 0.02
+		y: 0.01
+		z: -0.08
+
+framestamp: 84
+	timestamp: 0:00:05:998
+	world_time: 01:04:33:674
+	accelerometer_values:
+		x: -0.82
+		y: -0.08 
+		z: 9.73
+	gyroscope_values:
+		x: -0.01
+		y: 0.02
+		z: 0.04
+
+framestamp: 85
+	timestamp: 0:00:06:049
+	world_time: 01:04:33:722
+	accelerometer_values:
+		x: 0.20
+		y: -0.15 
+		z: 10.27
+	gyroscope_values:
+		x: 0.01
+		y: -0.17
+		z: 0.10
+
+framestamp: 86
+	timestamp: 0:00:06:116
+	world_time: 01:04:33:788
+	accelerometer_values:
+		x: 1.22
+		y: 0.34 
+		z: 10.03
+	gyroscope_values:
+		x: -0.02
+		y: 0.01
+		z: 0.20
+
+framestamp: 87
+	timestamp: 0:00:06:184
+	world_time: 01:04:33:858
+	accelerometer_values:
+		x: 0.67
+		y: 0.30 
+		z: 9.70
+	gyroscope_values:
+		x: 0.03
+		y: 0.11
+		z: -0.38
+
+framestamp: 88
+	timestamp: 0:00:06:241
+	world_time: 01:04:33:913
+	accelerometer_values:
+		x: -0.65
+		y: 0.11 
+		z: 9.79
+	gyroscope_values:
+		x: 0.01
+		y: -0.05
+		z: 0.02
+
+framestamp: 89
+	timestamp: 0:00:06:303
+	world_time: 01:04:33:973
+	accelerometer_values:
+		x: 0.28
+		y: 0.03 
+		z: 10.22
+	gyroscope_values:
+		x: 0.02
+		y: 0.08
+		z: -0.31
+
+framestamp: 90
+	timestamp: 0:00:06:354
+	world_time: 01:04:34:027
+	accelerometer_values:
+		x: -0.11
+		y: 0.53 
+		z: 9.60
+	gyroscope_values:
+		x: 0.05
+		y: -0.26
+		z: -0.00
+
+framestamp: 91
+	timestamp: 0:00:06:426
+	world_time: 01:04:34:096
+	accelerometer_values:
+		x: 1.05
+		y: 0.05 
+		z: 11.63
+	gyroscope_values:
+		x: -0.13
+		y: 0.05
+		z: 0.16
+
+framestamp: 92
+	timestamp: 0:00:06:468
+	world_time: 01:04:34:146
+	accelerometer_values:
+		x: 0.05
+		y: -0.41 
+		z: 9.26
+	gyroscope_values:
+		x: 0.09
+		y: -0.04
+		z: -0.04
+
+framestamp: 93
+	timestamp: 0:00:06:540
+	world_time: 01:04:34:210
+	accelerometer_values:
+		x: 0.62
+		y: 0.38 
+		z: 10.31
+	gyroscope_values:
+		x: -0.01
+		y: 0.05
+		z: 0.00
+
+framestamp: 94
+	timestamp: 0:00:06:599
+	world_time: 01:04:34:271
+	accelerometer_values:
+		x: -1.10
+		y: -0.27 
+		z: 9.59
+	gyroscope_values:
+		x: -0.03
+		y: -0.01
+		z: 0.18
+
+framestamp: 95
+	timestamp: 0:00:06:660
+	world_time: 01:04:34:331
+	accelerometer_values:
+		x: 0.86
+		y: 0.26 
+		z: 9.90
+	gyroscope_values:
+		x: 0.00
+		y: 0.07
+		z: 0.00
+
+framestamp: 96
+	timestamp: 0:00:06:725
+	world_time: 01:04:34:398
+	accelerometer_values:
+		x: -0.53
+		y: -0.06 
+		z: 9.53
+	gyroscope_values:
+		x: 0.00
+		y: 0.01
+		z: 0.09
+
+framestamp: 97
+	timestamp: 0:00:06:781
+	world_time: 01:04:34:457
+	accelerometer_values:
+		x: -0.09
+		y: 0.38 
+		z: 9.93
+	gyroscope_values:
+		x: -0.00
+		y: -0.02
+		z: 0.09
+
+framestamp: 98
+	timestamp: 0:00:06:844
+	world_time: 01:04:34:517
+	accelerometer_values:
+		x: -0.36
+		y: 0.07 
+		z: 9.49
+	gyroscope_values:
+		x: 0.01
+		y: 0.05
+		z: 0.00
+
+framestamp: 99
+	timestamp: 0:00:06:903
+	world_time: 01:04:34:576
+	accelerometer_values:
+		x: 0.20
+		y: 0.30 
+		z: 9.70
+	gyroscope_values:
+		x: 0.01
+		y: 0.03
+		z: 0.06
+
+framestamp: 100
+	timestamp: 0:00:06:965
+	world_time: 01:04:34:634
+	accelerometer_values:
+		x: 0.04
+		y: 0.29 
+		z: 10.32
+	gyroscope_values:
+		x: -0.08
+		y: 0.01
+		z: 0.10
+
+framestamp: 101
+	timestamp: 0:00:07:013
+	world_time: 01:04:34:688
+	accelerometer_values:
+		x: -0.72
+		y: 0.23 
+		z: 9.48
+	gyroscope_values:
+		x: -0.03
+		y: -0.01
+		z: -0.03
+
+framestamp: 102
+	timestamp: 0:00:07:085
+	world_time: 01:04:34:756
+	accelerometer_values:
+		x: 0.23
+		y: 0.43 
+		z: 9.71
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: 0.03
+
+framestamp: 103
+	timestamp: 0:00:07:154
+	world_time: 01:04:34:834
+	accelerometer_values:
+		x: -0.78
+		y: -0.00 
+		z: 9.38
+	gyroscope_values:
+		x: -0.00
+		y: -0.02
+		z: 0.04
+
+framestamp: 104
+	timestamp: 0:00:07:200
+	world_time: 01:04:34:873
+	accelerometer_values:
+		x: -0.31
+		y: 0.03 
+		z: 9.35
+	gyroscope_values:
+		x: -0.03
+		y: 0.02
+		z: 0.02
+
+framestamp: 105
+	timestamp: 0:00:07:268
+	world_time: 01:04:34:940
+	accelerometer_values:
+		x: -0.37
+		y: -0.03 
+		z: 10.17
+	gyroscope_values:
+		x: -0.05
+		y: -0.02
+		z: 0.08
+
+framestamp: 106
+	timestamp: 0:00:07:320
+	world_time: 01:04:34:991
+	accelerometer_values:
+		x: 0.24
+		y: -0.34 
+		z: 9.69
+	gyroscope_values:
+		x: -0.00
+		y: 0.01
+		z: 0.06
+
+framestamp: 107
+	timestamp: 0:00:07:387
+	world_time: 01:04:35:057
+	accelerometer_values:
+		x: -0.45
+		y: 0.35 
+		z: 9.90
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: 0.15
+
+framestamp: 108
+	timestamp: 0:00:07:435
+	world_time: 01:04:35:107
+	accelerometer_values:
+		x: 0.43
+		y: 0.47 
+		z: 9.76
+	gyroscope_values:
+		x: -0.06
+		y: 0.02
+		z: 0.27
+
+framestamp: 109
+	timestamp: 0:00:07:493
+	world_time: 01:04:35:166
+	accelerometer_values:
+		x: -0.39
+		y: -0.29 
+		z: 9.69
+	gyroscope_values:
+		x: 0.01
+		y: -0.05
+		z: -0.03
+
+framestamp: 110
+	timestamp: 0:00:07:573
+	world_time: 01:04:35:248
+	accelerometer_values:
+		x: -0.55
+		y: 0.02 
+		z: 9.41
+	gyroscope_values:
+		x: 0.02
+		y: 0.02
+		z: -0.13
+
+framestamp: 111
+	timestamp: 0:00:07:673
+	world_time: 01:04:35:359
+	accelerometer_values:
+		x: 0.68
+		y: -0.05 
+		z: 10.23
+	gyroscope_values:
+		x: 0.02
+		y: -0.03
+		z: 0.09
+
+framestamp: 112
+	timestamp: 0:00:07:754
+	world_time: 01:04:35:426
+	accelerometer_values:
+		x: -0.77
+		y: 0.27 
+		z: 9.52
+	gyroscope_values:
+		x: 0.00
+		y: 0.01
+		z: -0.04
+
+framestamp: 113
+	timestamp: 0:00:07:807
+	world_time: 01:04:35:480
+	accelerometer_values:
+		x: 0.56
+		y: 0.04 
+		z: 9.49
+	gyroscope_values:
+		x: -0.01
+		y: 0.04
+		z: 0.06
+
+framestamp: 114
+	timestamp: 0:00:07:856
+	world_time: 01:04:35:529
+	accelerometer_values:
+		x: -0.59
+		y: 0.13 
+		z: 9.42
+	gyroscope_values:
+		x: -0.00
+		y: -0.05
+		z: -0.09
+
+framestamp: 115
+	timestamp: 0:00:07:909
+	world_time: 01:04:35:583
+	accelerometer_values:
+		x: -0.85
+		y: 0.12 
+		z: 9.98
+	gyroscope_values:
+		x: -0.03
+		y: -0.02
+		z: -0.03
+
+framestamp: 116
+	timestamp: 0:00:07:976
+	world_time: 01:04:35:652
+	accelerometer_values:
+		x: -0.65
+		y: 0.08 
+		z: 9.70
+	gyroscope_values:
+		x: -0.02
+		y: 0.01
+		z: 0.00
+
+framestamp: 117
+	timestamp: 0:00:08:027
+	world_time: 01:04:35:713
+	accelerometer_values:
+		x: 0.80
+		y: 0.06 
+		z: 9.96
+	gyroscope_values:
+		x: -0.04
+		y: 0.01
+		z: 0.09
+
+framestamp: 118
+	timestamp: 0:00:08:094
+	world_time: 01:04:35:768
+	accelerometer_values:
+		x: -0.77
+		y: 0.33 
+		z: 9.75
+	gyroscope_values:
+		x: -0.02
+		y: 0.07
+		z: -0.08
+
+framestamp: 119
+	timestamp: 0:00:08:162
+	world_time: 01:04:35:833
+	accelerometer_values:
+		x: 0.49
+		y: 0.05 
+		z: 9.93
+	gyroscope_values:
+		x: -0.02
+		y: 0.01
+		z: 0.04
+
+framestamp: 120
+	timestamp: 0:00:08:212
+	world_time: 01:04:35:891
+	accelerometer_values:
+		x: -0.74
+		y: 0.19 
+		z: 9.50
+	gyroscope_values:
+		x: -0.03
+		y: 0.02
+		z: -0.08
+
+framestamp: 121
+	timestamp: 0:00:08:300
+	world_time: 01:04:35:971
+	accelerometer_values:
+		x: 0.07
+		y: -0.06 
+		z: 9.64
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: -0.31
+
+framestamp: 122
+	timestamp: 0:00:08:369
+	world_time: 01:04:36:041
+	accelerometer_values:
+		x: 0.03
+		y: 0.10 
+		z: 9.84
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: -0.20
+
+framestamp: 123
+	timestamp: 0:00:08:399
+	world_time: 01:04:36:088
+	accelerometer_values:
+		x: -0.19
+		y: -0.10 
+		z: 9.53
+	gyroscope_values:
+		x: -0.01
+		y: 0.03
+		z: -0.13
+
+framestamp: 124
+	timestamp: 0:00:08:465
+	world_time: 01:04:36:136
+	accelerometer_values:
+		x: -0.72
+		y: 0.06 
+		z: 9.75
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: -0.00
+
+framestamp: 125
+	timestamp: 0:00:08:521
+	world_time: 01:04:36:192
+	accelerometer_values:
+		x: -0.35
+		y: -0.06 
+		z: 9.80
+	gyroscope_values:
+		x: -0.01
+		y: 0.01
+		z: 0.14
+
+framestamp: 126
+	timestamp: 0:00:08:583
+	world_time: 01:04:36:254
+	accelerometer_values:
+		x: 0.31
+		y: 0.42 
+		z: 10.03
+	gyroscope_values:
+		x: -0.01
+		y: 0.06
+		z: 0.01
+
+framestamp: 127
+	timestamp: 0:00:08:641
+	world_time: 01:04:36:312
+	accelerometer_values:
+		x: -1.19
+		y: -0.06 
+		z: 9.46
+	gyroscope_values:
+		x: 0.01
+		y: -0.02
+		z: -0.05
+
+framestamp: 128
+	timestamp: 0:00:08:701
+	world_time: 01:04:36:375
+	accelerometer_values:
+		x: 1.70
+		y: 0.32 
+		z: 9.96
+	gyroscope_values:
+		x: -0.03
+		y: -0.02
+		z: -0.12
+
+framestamp: 129
+	timestamp: 0:00:08:756
+	world_time: 01:04:36:428
+	accelerometer_values:
+		x: -0.39
+		y: 0.06 
+		z: 9.66
+	gyroscope_values:
+		x: -0.01
+		y: 0.06
+		z: -0.13
+
+framestamp: 130
+	timestamp: 0:00:08:827
+	world_time: 01:04:36:498
+	accelerometer_values:
+		x: 0.15
+		y: 0.33 
+		z: 9.36
+	gyroscope_values:
+		x: 0.01
+		y: -0.04
+		z: -0.06
+
+framestamp: 131
+	timestamp: 0:00:08:894
+	world_time: 01:04:36:562
+	accelerometer_values:
+		x: -0.51
+		y: 0.02 
+		z: 9.74
+	gyroscope_values:
+		x: -0.01
+		y: -0.02
+		z: -0.16
+
+framestamp: 132
+	timestamp: 0:00:08:938
+	world_time: 01:04:36:609
+	accelerometer_values:
+		x: -0.22
+		y: 0.27 
+		z: 9.70
+	gyroscope_values:
+		x: -0.01
+		y: -0.06
+		z: -0.04
+
+framestamp: 133
+	timestamp: 0:00:09:006
+	world_time: 01:04:36:676
+	accelerometer_values:
+		x: -0.08
+		y: 0.32 
+		z: 9.90
+	gyroscope_values:
+		x: -0.01
+		y: 0.03
+		z: -0.08
+
+framestamp: 134
+	timestamp: 0:00:09:058
+	world_time: 01:04:36:732
+	accelerometer_values:
+		x: -0.45
+		y: -0.18 
+		z: 9.53
+	gyroscope_values:
+		x: -0.02
+		y: 0.05
+		z: 0.06
+
+framestamp: 135
+	timestamp: 0:00:09:125
+	world_time: 01:04:36:795
+	accelerometer_values:
+		x: -0.76
+		y: 0.08 
+		z: 9.74
+	gyroscope_values:
+		x: 0.00
+		y: 0.01
+		z: -0.12
+
+framestamp: 136
+	timestamp: 0:00:09:176
+	world_time: 01:04:36:849
+	accelerometer_values:
+		x: -0.16
+		y: 0.22 
+		z: 9.80
+	gyroscope_values:
+		x: 0.00
+		y: -0.02
+		z: 0.13
+
+framestamp: 137
+	timestamp: 0:00:09:242
+	world_time: 01:04:36:915
+	accelerometer_values:
+		x: -0.70
+		y: 0.05 
+		z: 9.22
+	gyroscope_values:
+		x: -0.00
+		y: 0.02
+		z: 0.01
+
+framestamp: 138
+	timestamp: 0:00:09:314
+	world_time: 01:04:36:986
+	accelerometer_values:
+		x: -0.14
+		y: 0.15 
+		z: 9.73
+	gyroscope_values:
+		x: 0.00
+		y: 0.04
+		z: -0.05
+
+framestamp: 139
+	timestamp: 0:00:09:365
+	world_time: 01:04:37:036
+	accelerometer_values:
+		x: -0.29
+		y: 0.04 
+		z: 9.38
+	gyroscope_values:
+		x: -0.02
+		y: 0.01
+		z: 0.03
+
+framestamp: 140
+	timestamp: 0:00:09:429
+	world_time: 01:04:37:102
+	accelerometer_values:
+		x: -0.46
+		y: 0.10 
+		z: 10.15
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: -0.05
+
+framestamp: 141
+	timestamp: 0:00:09:474
+	world_time: 01:04:37:152
+	accelerometer_values:
+		x: -0.11
+		y: 0.26 
+		z: 9.70
+	gyroscope_values:
+		x: -0.02
+		y: -0.02
+		z: 0.05
+
+framestamp: 142
+	timestamp: 0:00:09:548
+	world_time: 01:04:37:220
+	accelerometer_values:
+		x: 0.24
+		y: 0.07 
+		z: 9.61
+	gyroscope_values:
+		x: -0.00
+		y: -0.05
+		z: -0.01
+
+framestamp: 143
+	timestamp: 0:00:09:607
+	world_time: 01:04:37:277
+	accelerometer_values:
+		x: 0.13
+		y: 0.25 
+		z: 9.83
+	gyroscope_values:
+		x: -0.02
+		y: -0.02
+		z: -0.06
+
+framestamp: 144
+	timestamp: 0:00:09:666
+	world_time: 01:04:37:336
+	accelerometer_values:
+		x: 0.13
+		y: 0.07 
+		z: 9.70
+	gyroscope_values:
+		x: -0.01
+		y: 0.00
+		z: -0.05
+
+framestamp: 145
+	timestamp: 0:00:09:722
+	world_time: 01:04:37:394
+	accelerometer_values:
+		x: 0.01
+		y: 0.11 
+		z: 9.64
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: -0.09
+
+framestamp: 146
+	timestamp: 0:00:09:788
+	world_time: 01:04:37:456
+	accelerometer_values:
+		x: -0.08
+		y: 0.05 
+		z: 9.74
+	gyroscope_values:
+		x: -0.03
+		y: 0.02
+		z: -0.01
+
+framestamp: 147
+	timestamp: 0:00:09:837
+	world_time: 01:04:37:510
+	accelerometer_values:
+		x: -0.16
+		y: 0.27 
+		z: 9.94
+	gyroscope_values:
+		x: -0.01
+		y: 0.06
+		z: -0.18
+
+framestamp: 148
+	timestamp: 0:00:09:903
+	world_time: 01:04:37:573
+	accelerometer_values:
+		x: -0.20
+		y: 0.15 
+		z: 9.39
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: -0.02
+
+framestamp: 149
+	timestamp: 0:00:09:972
+	world_time: 01:04:37:646
+	accelerometer_values:
+		x: 0.03
+		y: 0.21 
+		z: 10.00
+	gyroscope_values:
+		x: 0.01
+		y: 0.06
+		z: -0.27
+
+framestamp: 150
+	timestamp: 0:00:10:042
+	world_time: 01:04:37:719
+	accelerometer_values:
+		x: 0.33
+		y: 0.17 
+		z: 9.62
+	gyroscope_values:
+		x: 0.01
+		y: 0.01
+		z: 0.10
+
+framestamp: 151
+	timestamp: 0:00:10:089
+	world_time: 01:04:37:761
+	accelerometer_values:
+		x: -0.60
+		y: -0.11 
+		z: 9.58
+	gyroscope_values:
+		x: 0.02
+		y: 0.00
+		z: -0.05
+
+framestamp: 152
+	timestamp: 0:00:10:144
+	world_time: 01:04:37:816
+	accelerometer_values:
+		x: 0.36
+		y: 0.21 
+		z: 9.85
+	gyroscope_values:
+		x: 0.00
+		y: -0.06
+		z: 0.22
+
+framestamp: 153
+	timestamp: 0:00:10:224
+	world_time: 01:04:37:892
+	accelerometer_values:
+		x: -0.76
+		y: 0.06 
+		z: 9.46
+	gyroscope_values:
+		x: -0.02
+		y: 0.01
+		z: 0.01
+
+framestamp: 154
+	timestamp: 0:00:10:296
+	world_time: 01:04:37:967
+	accelerometer_values:
+		x: 0.36
+		y: -0.04 
+		z: 9.86
+	gyroscope_values:
+		x: 0.02
+		y: 0.02
+		z: 0.08
+
+framestamp: 155
+	timestamp: 0:00:10:384
+	world_time: 01:04:38:057
+	accelerometer_values:
+		x: 0.94
+		y: -0.00 
+		z: 9.83
+	gyroscope_values:
+		x: -0.00
+		y: 0.13
+		z: 0.16
+
+framestamp: 156
+	timestamp: 0:00:10:469
+	world_time: 01:04:38:136
+	accelerometer_values:
+		x: -0.69
+		y: 0.10 
+		z: 6.13
+	gyroscope_values:
+		x: 0.08
+		y: 0.90
+		z: -0.09
+
+framestamp: 157
+	timestamp: 0:00:10:515
+	world_time: 01:04:38:186
+	accelerometer_values:
+		x: -0.12
+		y: 0.17 
+		z: 9.40
+	gyroscope_values:
+		x: 0.01
+		y: -0.00
+		z: 0.00
+
+framestamp: 158
+	timestamp: 0:00:10:566
+	world_time: 01:04:38:236
+	accelerometer_values:
+		x: -0.06
+		y: 0.18 
+		z: 9.66
+	gyroscope_values:
+		x: -0.00
+		y: 0.00
+		z: 0.00
+
+framestamp: 159
+	timestamp: 0:00:10:616
+	world_time: 01:04:38:302
+	accelerometer_values:
+		x: -0.06
+		y: 0.18 
+		z: 9.73
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 160
+	timestamp: 0:00:10:680
+	world_time: 01:04:38:355
+	accelerometer_values:
+		x: -0.03
+		y: 0.16 
+		z: 9.76
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 161
+	timestamp: 0:00:10:750
+	world_time: 01:04:38:415
+	accelerometer_values:
+		x: -0.04
+		y: 0.19 
+		z: 9.75
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 162
+	timestamp: 0:00:10:798
+	world_time: 01:04:38:470
+	accelerometer_values:
+		x: -0.02
+		y: 0.17 
+		z: 9.76
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 163
+	timestamp: 0:00:10:871
+	world_time: 01:04:38:543
+	accelerometer_values:
+		x: -0.05
+		y: 0.17 
+		z: 9.75
+	gyroscope_values:
+		x: -0.01
+		y: -0.00
+		z: 0.00
+
+framestamp: 164
+	timestamp: 0:00:10:922
+	world_time: 01:04:38:593
+	accelerometer_values:
+		x: -0.03
+		y: 0.19 
+		z: 9.75
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: 0.00
+
+framestamp: 165
+	timestamp: 0:00:10:983
+	world_time: 01:04:38:653
+	accelerometer_values:
+		x: -0.04
+		y: 0.18 
+		z: 9.73
+	gyroscope_values:
+		x: -0.00
+		y: -0.00
+		z: 0.00
+
+framestamp: 166
+	timestamp: 0:00:11:039
+	world_time: 01:04:38:711
+	accelerometer_values:
+		x: -0.03
+		y: 0.18 
+		z: 9.74
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: 0.00
+
+framestamp: 167
+	timestamp: 0:00:11:108
+	world_time: 01:04:38:777
+	accelerometer_values:
+		x: -0.04
+		y: 0.15 
+		z: 9.74
+	gyroscope_values:
+		x: -0.00
+		y: -0.01
+		z: 0.00
+
+framestamp: 168
+	timestamp: 0:00:11:161
+	world_time: 01:04:38:835
+	accelerometer_values:
+		x: -0.04
+		y: 0.16 
+		z: 9.75
+	gyroscope_values:
+		x: -0.01
+		y: -0.01
+		z: 0.00
+
+framestamp: 169
+	timestamp: 0:00:11:220
+	world_time: 01:04:38:888
+	accelerometer_values:
+		x: 0.01
+		y: 0.17 
+		z: 9.79
+	gyroscope_values:
+		x: -0.01
+		y: -0.05
+		z: 0.01
+
+framestamp: 170
+	timestamp: 0:00:11:272
+	world_time: 01:04:38:941
+	accelerometer_values:
+		x: -0.13
+		y: 0.12 
+		z: 9.61
+	gyroscope_values:
+		x: 0.00
+		y: 0.06
+		z: -0.00
+
