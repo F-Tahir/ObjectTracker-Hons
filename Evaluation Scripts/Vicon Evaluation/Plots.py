@@ -38,6 +38,8 @@ for line in f:
         phone_ty = float(f.next().strip().split(":")[1])
         t_vicon.append((phone_tx, phone_ty))
 
+print opts.yml
+print t_acc
 
 # Plot the points in t_acc
 x_acc = [i[0] for i in t_acc]
@@ -47,15 +49,15 @@ acc_graph.canvas.set_window_title("Accelerometer Readings")
 plt.plot(x_acc, y_acc)
 plt.axis([-1500, 2500, -1500, 2500])
 
-# PLot the points in t_vicon
-x_vicon = [i[0] for i in t_vicon]
-y_vicon = [i[1] for i in t_vicon]
-vicon_graph = plt.figure(2)
-vicon_graph.canvas.set_window_title("Vicon Readings")
-plt.plot(x_vicon, y_vicon)
-plt.axis([-1500, 2500, -1500, 2500])
+# # PLot the points in t_vicon
+# x_vicon = [i[0] for i in t_vicon]
+# y_vicon = [i[1] for i in t_vicon]
+# vicon_graph = plt.figure(2)
+# vicon_graph.canvas.set_window_title("Vicon Readings")
+# plt.plot(x_vicon, y_vicon)
+# plt.axis([-1500, 2500, -1500, 2500])
 
-# plt.show()
+plt.show()
 
 # Step 3: Compute optimal affine transformation between T_acc and T_vicon
 # => Returns a 2x3 matrix containing rotaional matrix and translation matrix
