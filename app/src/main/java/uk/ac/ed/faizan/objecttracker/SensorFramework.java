@@ -11,17 +11,23 @@ import java.io.File;
 import java.util.Arrays;
 
 
+
 public class SensorFramework implements SensorEventListener {
 
 	private static String TAG = SensorFramework.class.getSimpleName();
 	private SensorManager mSensorManager;
 	private Sensor mAccelerometer = null;
 	private Sensor mGyroscope = null;
+	private Sensor mGravity = null;
+
 	private Context mContext = null;
 	private File mDataFile;
 	private CameraPreview mCameraPreview;
-	private static float[] accelValues = new float[3];
-	private static float[] gyroValues = new float[3];
+	private float[] mLinearAccelValues = new float[3];
+	private float[] mGravityValues = new float[3]; // Used to create a low-pass filter to isolate gravity force
+	private float[] mGyroValues = new float[3];
+
+	private boolean initialGravityReading = false;
 
 
 
@@ -46,8 +52,8 @@ public class SensorFramework implements SensorEventListener {
 	 * This getter method is used to access the latest accelerometer readings.
 	 * @return A 3-dimensional array containing the x, y and z components of the accelerometer readings
 	 */
-	public float[] getAccelValues() {
-		return accelValues;
+	public float[] getLinearAccelValues() {
+		return mLinearAccelValues;
 	}
 
 
@@ -56,7 +62,15 @@ public class SensorFramework implements SensorEventListener {
 	 * @return A 3-dimensional array containing the x, y and z components of the gyroscope readings
 	 */
 	public float[] getGyroValues() {
-		return gyroValues;
+		return mGyroValues;
+	}
+
+	/**
+	 * This getter method is used to access the latest gravity readings.
+	 * @return A 3-dimensional array containing the x, y and z components of the gravity readings
+	 */
+	public float[] getGravityValues() {
+		return mGravityValues;
 	}
 
 
@@ -64,13 +78,13 @@ public class SensorFramework implements SensorEventListener {
 	 * This is a setter method used to fill all the accelerometer sensor values to 0. Filling it
 	 * to 0 simply means that there is no change from accelerometer readings, and will allow us
 	 * to calculate camera trajectories more accurately. This is called each time the sensor is polled
-	 * and accelValues is filled in - we then record the accelerometer readings into a yml file, and
+	 * and mLinearAccelValues is filled in - we then record the accelerometer readings into a yml file, and
 	 * then reset the values. This means that if the sensor readings do not change between frames,
 	 * then a value of 0 is recorded, as opposed to the last known reading, as this will make
 	 * calculations inaccurate.
 	 */
 	public void setAccelValues() {
-		Arrays.fill(accelValues, 0);
+		Arrays.fill(mLinearAccelValues, 0);
 	}
 
 
@@ -78,13 +92,13 @@ public class SensorFramework implements SensorEventListener {
 	 * This is a setter method used to fill all the accelerometer sensor values to 0. Filling it
 	 * to 0 simply means that there is no change from accelerometer readings, and will allow us
 	 * to calculate camera trajectories more accurately. This is called each time the sensor is polled
-	 * and accelValues is filled in - we then record the accelerometer readings into a yml file, and
+	 * and mLinearAccelValues is filled in - we then record the accelerometer readings into a yml file, and
 	 * then reset the values. This means that if the sensor readings do not change between frames,
 	 * then a value of 0 is recorded, as opposed to the last known reading, as this will make
 	 * calculations inaccurate.
 	 */
 	public void setGryoValues() {
-		Arrays.fill(gyroValues, 0);
+		Arrays.fill(mGyroValues, 0);
 	}
 
 	/**
@@ -112,6 +126,19 @@ public class SensorFramework implements SensorEventListener {
 		mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 	}
 
+
+	/**
+	 * This method is used to set the mGravity member variable to the devices accelerometer.
+	 * Because this method requires the mSensorManager member variable to be non-null, the SensorFramework
+	 * constructor must be invoked before this method is called.
+	 *
+	 * hasGyroscope() should always be called before this method.
+	 */
+	private void setGravity() {
+		mGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+	}
+
+
 	/**
 	 * Call this method before attempting to poll an accelerometer - as the device may not contain one.
 	 *
@@ -133,6 +160,17 @@ public class SensorFramework implements SensorEventListener {
 
 
 	/**
+	 * Call this method before attempting to poll a gravity sensor - as the device may not contain one.
+	 *
+	 * @return True if device has a gravity sensor, false otherwise.
+	 */
+	private boolean hasGravitySensor() {
+		return mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null;
+	}
+
+
+
+	/**
 	 * This method is called to register the accelerometer and gyroscope's listeners. The method
 	 * ensures that the device does contain the sensors, and if so, call the setAccelerometer()/setGyroscope()
 	 * methods which instantiate the member variables. The sensors are then registered for callback info.
@@ -146,18 +184,21 @@ public class SensorFramework implements SensorEventListener {
 
 		mDataFile = file;
 
-		Log.i(TAG, "Listener has been set");
-
-		if (hasAccelerometer() && hasGyroscope()) {
+		if (hasAccelerometer() && hasGyroscope() && hasGravitySensor()) {
 			setAccelerometer();
 			setGyroscope();
+			setGravity();
+
+			Log.i(TAG, "Listeners have been set");
+
 
 			mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 			mSensorManager.registerListener(this, mGyroscope, SensorManager.SENSOR_DELAY_FASTEST);
+			mSensorManager.registerListener(this, mGravity, SensorManager.SENSOR_DELAY_FASTEST);
 
 		} else {
-			Log.i(TAG, "Attempting to register listener, but device does not have an accelerometer " +
-				"or gyroscope.");
+			Log.i(TAG, "Attempting to register listener, but device does not have an accelerometer, " +
+				"gravity sensor, or gyroscope.");
 		}
 
 	}
@@ -181,12 +222,19 @@ public class SensorFramework implements SensorEventListener {
 		Sensor sensor = event.sensor;
 
 
-		if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-			Log.i(TAG, "Accelerometer readings changed");
-			accelValues = event.values;
+		if (sensor.getType() == Sensor.TYPE_ACCELEROMETER && initialGravityReading) {
+			mLinearAccelValues[0] = event.values[0] - mGravityValues[0];
+			mLinearAccelValues[1] = event.values[1] - mGravityValues[1];
+			mLinearAccelValues[2] = event.values[2] - mGravityValues[2];
+			Log.i(TAG, "Linear acceleration values set");
+
 		} else if (sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-			Log.i(TAG, "Gyroscope readings changed");
-			gyroValues = event.values;
+			mGyroValues = event.values;
+
+		} else if (sensor.getType() == Sensor.TYPE_GRAVITY) {
+			Log.i(TAG, "Gravity values set");
+			mGravityValues = event.values;
+			initialGravityReading = true;
 		}
 
 

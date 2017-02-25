@@ -462,7 +462,7 @@ public class CameraPreview implements View.OnTouchListener,
                 // Add mTemplate.cols()/2.0 because mMatchLoc.x/y returns top left coordinate, we want center
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, (int) (mMatchLoc.x +
                     (mTemplateMat.cols()/2.0f)), (int) (mMatchLoc.y + (mTemplateMat.cols()/2.0f)),
-                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues(),
+                    mSensorFramework.getLinearAccelValues(), mSensorFramework.getGyroValues(),
                     System.currentTimeMillis());
 
                 // TODO: Reset sensor readings to 0 so that in the next frame, if readings do not change,
@@ -502,7 +502,7 @@ public class CameraPreview implements View.OnTouchListener,
                 /* TODO: Possibly append in drawCircle() also, as currently if the user clicks on screen,
                  the values are not appended till next frame, meaning they are out of sync by one frame.*/
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, manualPosX, manualPosY,
-                    mSensorFramework.getAccelValues(), mSensorFramework.getGyroValues(),
+                    mSensorFramework.getLinearAccelValues(), mSensorFramework.getGyroValues(),
                     System.currentTimeMillis());
 
                 // TODO: Reset sensor readings to 0 so that in the next frame, if readings do not change,
