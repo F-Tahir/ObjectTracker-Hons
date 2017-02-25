@@ -499,15 +499,11 @@ public class CameraPreview implements View.OnTouchListener,
                 // These values are set in drawCircle().
             } else {
 
-                /* TODO: Possibly append in drawCircle() also, as currently if the user clicks on screen,
-                 the values are not appended till next frame, meaning they are out of sync by one frame.*/
+
                 Utilities.appendToDataFile(mDataFile, frameCount, mTimer.ymlTimestamp, manualPosX, manualPosY,
                     mSensorFramework.getLinearAccelValues(), mSensorFramework.getGyroValues(),
                     System.currentTimeMillis());
 
-                // TODO: Reset sensor readings to 0 so that in the next frame, if readings do not change,
-                // 0 is recorded as opposed to the last known reading. FIGURE OUT IF THIS IS NEEDED.
-                // mSensorFramework.setAccelValues(); mSensorFramework.setGryoValues();
 
                 // Set them to -1 after so that appendToDataFile()
                 // won't write object positions to file on next frame.
