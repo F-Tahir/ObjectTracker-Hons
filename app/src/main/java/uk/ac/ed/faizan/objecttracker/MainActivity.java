@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		Button startTrackingButton = (Button) findViewById(R.id.start_tracking_button);
 		Button viewRecordingsButton = (Button) findViewById(R.id.view_recordings_button);
 		Button preferencesButton = (Button) findViewById(R.id.preferences_button);
+		Button debugButton = (Button) findViewById(R.id.debug_button);
 
         /* Attach an onClickListener to each of the 3 buttons to detect clicks and carry out
 		relevant actions
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		startTrackingButton.setOnClickListener(this);
 		viewRecordingsButton.setOnClickListener(this);
 		preferencesButton.setOnClickListener(this);
+		debugButton.setOnClickListener(this);
 	}
 
 	@Override
@@ -167,10 +169,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 				break;
 
 			case R.id.preferences_button:
-				Intent i = new Intent(this, SettingsActivity.class);
-				startActivity(i);
+				startActivity(new Intent(this, SettingsActivity.class));
 				break;
 
+			case R.id.debug_button:
+				startActivity(new Intent(this, DebugActivity.class));
+				break;
 			default:
 				break;
 		}

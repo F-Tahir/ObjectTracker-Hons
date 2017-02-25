@@ -25,4 +25,10 @@
         android:id="@+id/view_recordings_button"
         android:drawableStart="@drawable/ic_viewrecording_tablet_landscape" />
 
+    <Button
+        android:id="@+id/debug_button"
+        style="@style/debug_button"
+        android:drawableStart="@drawable/ic_preferences_tablet_landscape" />
+
+
 </LinearLayout>

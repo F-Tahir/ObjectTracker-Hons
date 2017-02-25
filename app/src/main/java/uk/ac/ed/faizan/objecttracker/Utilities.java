@@ -93,7 +93,7 @@ public final class Utilities {
 	 */
 	@Nullable
 	public static File getVideoFile(long time) {
-		return getExternalFile(time, "VID", "mp4");
+		return getExternalFile(time, "VID", "mp4", false);
 	}
 
 	/**
@@ -104,8 +104,20 @@ public final class Utilities {
 	 */
 	@Nullable
 	public static File getDataFile(long time) {
-		return getExternalFile(time, "DATA", "yml");
+		return getExternalFile(time, "DATA", "yml", false);
 	}
+
+	/**
+	 * Creates a non-clashable debug output (.yml) file in the  ObjectTracker/DEBUG folder. This data
+	 * file is used to store sensory readings to debug sensors
+	 *
+	 * @param time This parameter ensures a file with a non-clashable name is created.
+	 */
+	@Nullable
+	public static File getDebugFile(long time) {
+		return getExternalFile(time, "DUMP", "yml", true);
+	}
+
 
 
 
@@ -120,19 +132,29 @@ public final class Utilities {
 	 * @return Returns the path to the newly created .mp4 or .yml file.
 	 */
 	@Nullable
-	private static File getExternalFile(long time, String type, String ext) {
+	private static File getExternalFile(long time, String type, String ext, boolean debug) {
 		if (!isExternalStorageMounted()) {
 			return null;
 		}
 
 		File root = new File(Environment.getExternalStorageDirectory(), "ObjectTracker");
-		File dir = new File(root, sDirDateFormat.get().format(time));
+
+		File dir;
+
+		// If debug is false, create a normal folder for recordings, otherwise create a folder called DEBUG
+		if (!debug) {
+			dir = new File(root, sDirDateFormat.get().format(time));
+		} else {
+			dir = new File(root, "DEBUG");
+		}
 		if (!dir.exists() && !dir.mkdirs()) {
 			return null;
 		}
 
 		return new File(dir, String.format(Locale.ENGLISH, "%s_%s.%s",
-			sFileDateFormat.get().format(time), type, ext));
+				sFileDateFormat.get().format(time), type, ext));
+
+
 	}
 
 

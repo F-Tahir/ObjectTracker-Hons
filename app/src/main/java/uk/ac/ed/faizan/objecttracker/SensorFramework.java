@@ -49,6 +49,23 @@ public class SensorFramework implements SensorEventListener {
 	}
 
 	/**
+	 * Create a SensorFramework object, used in DebugActivity (no CasmeraPreview object)
+	 *
+	 * @see CameraPreview
+	 */
+	public SensorFramework(Context context) {
+		mContext = context;
+
+		if (mContext != null) {
+			mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+		}
+	}
+
+	public SensorManager getSensorManager() {
+		return mSensorManager;
+	}
+
+	/**
 	 * This getter method is used to access the latest accelerometer readings.
 	 * @return A 3-dimensional array containing the x, y and z components of the accelerometer readings
 	 */
@@ -110,9 +127,10 @@ public class SensorFramework implements SensorEventListener {
 	 *
 	 * @
 	 */
-	private void setAccelerometer() {
+	public void setAccelerometer() {
 		mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	}
+
 
 
 	/**
@@ -122,9 +140,10 @@ public class SensorFramework implements SensorEventListener {
 	 *
 	 * hasGyroscope() should always be called before this method.
 	 */
-	private void setGyroscope() {
+	public void setGyroscope() {
 		mGyroscope = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 	}
+
 
 
 	/**
@@ -134,17 +153,30 @@ public class SensorFramework implements SensorEventListener {
 	 *
 	 * hasGyroscope() should always be called before this method.
 	 */
-	private void setGravity() {
+	public void setGravity() {
 		mGravity = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 	}
 
+
+	public Sensor getAccelerometer() {
+		return mAccelerometer;
+	}
+
+
+	public Sensor getGyroscope() {
+		return mGyroscope;
+	}
+
+	public Sensor getGravitySensor() {
+		return mGravity;
+	}
 
 	/**
 	 * Call this method before attempting to poll an accelerometer - as the device may not contain one.
 	 *
 	 * @return True if device has an accelerometer, false otherwise.
 	 */
-	private boolean hasAccelerometer() {
+	public boolean hasAccelerometer() {
 		return mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null;
 	}
 
@@ -154,7 +186,7 @@ public class SensorFramework implements SensorEventListener {
 	 *
 	 * @return True if device has an gyroscope, false otherwise.
 	 */
-	private boolean hasGyroscope() {
+	public boolean hasGyroscope() {
 		return mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) != null;
 	}
 
@@ -164,7 +196,7 @@ public class SensorFramework implements SensorEventListener {
 	 *
 	 * @return True if device has a gravity sensor, false otherwise.
 	 */
-	private boolean hasGravitySensor() {
+	public boolean hasGravitySensor() {
 		return mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY) != null;
 	}
 
