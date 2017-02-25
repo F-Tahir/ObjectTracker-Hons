@@ -145,7 +145,7 @@ public final class Utilities {
 		if (!debug) {
 			dir = new File(root, sDirDateFormat.get().format(time));
 		} else {
-			dir = new File(root, "DEBUG");
+			dir = new File(root, "_DEBUG_");
 		}
 		if (!dir.exists() && !dir.mkdirs()) {
 			return null;
