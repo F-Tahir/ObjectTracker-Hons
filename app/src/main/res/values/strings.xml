@@ -71,13 +71,16 @@
         object*.
         \n\n<b>To select a template for template matching</b>:
         \n\n1) Click the <i>MODE</i> button and select <i>Automatic Tracking</i> (Manual Tracking is default, unless specified in preferences).
-        \n\t\t1.1) Optionally, select a different matching method. Each match methods have their own benefits, explained below.
-        \n 2) Ensure that the object you wish to track is clearly displayed on screen (with no blur).
-        \n 3) Press the <i>Live</i> button to freeze the camera preview. This allows you to select the template
+        \n\t\t1.1) Optionally, select a different matching method by clicking on the "Method" button. Each match methods have their own benefits, explained below.
+        \n 2) Press the record button to initialise template selection.
+        \n 3) Ensure that the object you wish to track is clearly displayed on screen (with no blur).
+        \n 4) Press the <i>Live</i> button to freeze the camera preview. This allows you to select the template
         with ease, as the object will not move.
-        \n 4) Once the camera preview is frozen, hold your finger and drag a box around the object you wish to track.
-        \n 5) Once you are happy with the selection process, press the <i>Freeze</i> button to restart the camera preview.
-        \n 6) Upon pressing the freeze button, the template will be saved, and automatic tracking will start.
+        \n\t\t4.1) If the frozen image appears blurry, you can press the "CANCEL INITIALIZATION" button found on the
+        top edge of the screen, and redo steps 2-4.
+        \n 5) Once the camera preview is frozen, hold your finger and drag a box around the object you wish to track.
+        \n 6) Once you are happy with the selection process, press the <i>Freeze</i> button to restart the camera preview.
+        \n 7) Upon pressing the freeze button, the template will be saved, and automatic tracking will start.
 
         \n\n<b>Updating the template:</b>
         \n\nTo update the template, simply click on the location of the new template. The location
@@ -92,7 +95,7 @@
         \n\nThere may be times where you need to cancel the template initialisation process. For example,
         if you pressed the "Freeze" button and the resultant frame is blurry, you should cancel the initialization and
         start again.
-        \n To cancel the initialization, once the process has started, a "CANCEL INITIALIZATION" button
+        \n\nTo cancel the initialization, once the process has started, a "CANCEL INITIALIZATION" button
         will appear on the top edge of the screen. If you press this, the preview will unfreeze, and
         you will be given the opportunity to reinitialize the whole process, or switch modes.
 
