@@ -14,5 +14,4 @@
 
     <!-- Dimensions for camera preview frame -->
     <dimen name="camera_ui_horizontal_margin">16dp</dimen>
-    <dimen name="camera_ui_vertical_margin">8dp</dimen>
 </resources>
