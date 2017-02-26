@@ -3,13 +3,11 @@
 # sensor noise (i.e. value fluctuations when there is no device movement)
 import numpy as np
 import optparse
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
 optparser = optparse.OptionParser()
-optparser.add_option("-y", "--yml", dest="yml", default="../Data/accelerometer/accel_5000.yml", help="YML file needing to be parsed")
+optparser.add_option("-y", "--yml", dest="yml", default="../Data/accelerometer/accel_1000_ui.yml", help="YML file needing to be parsed")
 optparser.add_option("-a", "--axis", dest="axis", default="x", help="Axis to plot: x, y, z, all")
 opts = optparser.parse_args()[0]
 
@@ -39,22 +37,25 @@ for line in f:
 
 # Plot sensor data for each iteration.
 
-if (opts.axis is "x"):
+if (opts.axis == "x"):
+    print "Hereeee"
     plt.plot(t_iteration, t_x, label="x-axis readings")
 
-if (opts.axis is "y"):
+if (opts.axis == "y"):
     plt.plot(t_iteration, t_y, label="y-axis readings")
 
-if (opts.axis is "z"):
+if (opts.axis == "z"):
     plt.plot(t_iteration, t_z, label="z-axis readings")
 
-if (opts.axis is "all"):
+if (opts.axis == "all"):
+    print "Here"
     plt.plot(t_iteration, t_x, label="x-axis readings")
     plt.plot(t_iteration, t_y, label="y-axis readings")
     plt.plot(t_iteration, t_z, label="z-axis readings")
+    plt.legend()
 
 plt.title("Sensor Data")
 plt.xlabel("Frame Number")
 plt.ylabel("Sensor Value")
-plt.legend()
-matplotlib.pyplot.show(block=True)
+
+plt.show()
