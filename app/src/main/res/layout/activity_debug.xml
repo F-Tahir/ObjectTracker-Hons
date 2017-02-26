@@ -64,12 +64,39 @@
         android:inputType="number"
         android:layout_below="@id/iteration_header"/>
 
+    <TextView
+        android:layout_marginTop="@dimen/default_slider_margin_btw_title"
+        android:id="@+id/frequency_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/number_of_times"
+        android:text="Number of times to poll"/>
+
+
+    <Spinner
+        android:id="@+id/polling_frequency"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/frequency_header"
+        android:entries="@array/debug_polling_frequency_entries"/>
+
+    <EditText
+        android:visibility="invisible"
+        android:id="@+id/userdefined_polling"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="100000"
+        android:inputType="number"
+        android:layout_below="@id/polling_frequency"/>
+
+
+
     <Button
         android:layout_marginTop="@dimen/default_slider_margin_btw_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Polling"
-        android:layout_below="@+id/number_of_times"
+        android:layout_below="@+id/userdefined_polling"
         android:layout_alignParentStart="true"
         android:id="@+id/start_debug"/>
 

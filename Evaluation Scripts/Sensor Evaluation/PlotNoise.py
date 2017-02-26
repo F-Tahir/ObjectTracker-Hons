@@ -2,12 +2,15 @@
 # and plots a graph of the values for each axis. This is initially used to plot the
 # sensor noise (i.e. value fluctuations when there is no device movement)
 import numpy as np
-import matplotlib.pyplot as plt
 import optparse
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
 
 optparser = optparse.OptionParser()
 optparser.add_option("-y", "--yml", dest="yml", default="../Data/accelerometer/accel_5000.yml", help="YML file needing to be parsed")
-optparser.add_option("-a", "--axis", dest="axis", default="../Data/accelerometer/accel_5000.yml", help="Axis to plot: x, y, z, all")
+optparser.add_option("-a", "--axis", dest="axis", default="x", help="Axis to plot: x, y, z, all")
 opts = optparser.parse_args()[0]
 
 f = open(opts.yml, "r")
@@ -54,4 +57,4 @@ plt.title("Sensor Data")
 plt.xlabel("Frame Number")
 plt.ylabel("Sensor Value")
 plt.legend()
-plt.show()
+matplotlib.pyplot.show(block=True)

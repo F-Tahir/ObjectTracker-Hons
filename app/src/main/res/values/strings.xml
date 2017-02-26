@@ -224,4 +224,17 @@
     </string-array>
 
 
+    <string-array name="debug_polling_frequency_entries">
+        <item>Fastest</item>
+        <item>Normal</item>
+        <item>Game</item>
+        <item>UI</item>
+        <item>User-defined (microseconds)</item>
+    </string-array>
+
+
 </resources>
+
+
+
+

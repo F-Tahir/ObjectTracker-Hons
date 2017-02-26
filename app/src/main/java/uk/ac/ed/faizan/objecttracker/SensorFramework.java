@@ -89,34 +89,7 @@ public class SensorFramework implements SensorEventListener {
 	public float[] getGravityValues() {
 		return mGravityValues;
 	}
-
-
-	/**
-	 * This is a setter method used to fill all the accelerometer sensor values to 0. Filling it
-	 * to 0 simply means that there is no change from accelerometer readings, and will allow us
-	 * to calculate camera trajectories more accurately. This is called each time the sensor is polled
-	 * and mLinearAccelValues is filled in - we then record the accelerometer readings into a yml file, and
-	 * then reset the values. This means that if the sensor readings do not change between frames,
-	 * then a value of 0 is recorded, as opposed to the last known reading, as this will make
-	 * calculations inaccurate.
-	 */
-	public void setAccelValues() {
-		Arrays.fill(mLinearAccelValues, 0);
-	}
-
-
-	/**
-	 * This is a setter method used to fill all the accelerometer sensor values to 0. Filling it
-	 * to 0 simply means that there is no change from accelerometer readings, and will allow us
-	 * to calculate camera trajectories more accurately. This is called each time the sensor is polled
-	 * and mLinearAccelValues is filled in - we then record the accelerometer readings into a yml file, and
-	 * then reset the values. This means that if the sensor readings do not change between frames,
-	 * then a value of 0 is recorded, as opposed to the last known reading, as this will make
-	 * calculations inaccurate.
-	 */
-	public void setGryoValues() {
-		Arrays.fill(mGyroValues, 0);
-	}
+	
 
 	/**
 	 * This method is used to set the mAccelerometer member variable to the devices accelerometer.
