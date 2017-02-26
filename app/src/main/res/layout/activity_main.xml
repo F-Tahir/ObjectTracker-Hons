@@ -1,34 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
-    <Button
-        android:id="@+id/start_tracking_button"
-        style="@style/start_tracking_button"
-        android:drawableStart="@drawable/ic_starttracking" />
-
-    <Button
-        android:id="@+id/preferences_button"
-        style="@style/preferences_button"
-        android:drawableStart="@drawable/ic_preferences" />
-
-    <Button
-        android:id="@+id/view_recordings_button"
-        style="@style/view_recordings_button"
-        android:drawableStart="@drawable/ic_viewrecording" />
-
-    <Button
-        android:id="@+id/debug_button"
-        style="@style/debug_button"
-        android:drawableStart="@drawable/ic_preferences" />
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="uk.ac.ed.faizan.objecttracker.MainActivity">
 
 
-</LinearLayout>
+        <Button
+            android:id="@+id/start_tracking_button"
+            style="@style/start_tracking_button"
+            android:drawableStart="@drawable/ic_starttracking" />
+
+        <Button
+            android:id="@+id/preferences_button"
+            style="@style/preferences_button"
+            android:drawableStart="@drawable/ic_preferences" />
+
+        <Button
+            android:id="@+id/view_recordings_button"
+            style="@style/view_recordings_button"
+            android:drawableStart="@drawable/ic_viewrecording" />
+
+        <Button
+            android:id="@+id/debug_button"
+            style="@style/debug_button"
+            android:drawableStart="@drawable/ic_preferences" />
+
+
+    </LinearLayout>

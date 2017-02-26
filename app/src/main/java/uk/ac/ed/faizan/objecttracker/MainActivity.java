@@ -1,12 +1,16 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,6 +23,7 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
+import java.util.List;
 
 
 
@@ -26,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 {
 
 	public final String TAG = MainActivity.class.getSimpleName();
+	public Context mContext;
 	private static final int REQUEST_PERMISSIONS = 1;
 	private String[] permissionList = {
 		Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -93,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		viewRecordingsButton.setOnClickListener(this);
 		preferencesButton.setOnClickListener(this);
 		debugButton.setOnClickListener(this);
+		mContext = this;
 	}
 
 	@Override
@@ -162,9 +169,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 					// If user has no file manager app, notify the user to install one.
 				} else {
-					Toast.makeText(this, "Please install a File Manager application. ES File Explorer " +
-						"works well with this app.", Toast.LENGTH_LONG)
-						.show();
+
+					Snackbar snackbar = Snackbar.make(view, "No file explorer installed. Install" +
+						" ES File Explorer.",
+						Snackbar.LENGTH_LONG);
+					snackbar.setAction("INSTALL", new View.OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							openAppRating(mContext);
+						}
+					});
+					snackbar.show();
+
+//					Toast.makeText(this, "Please install a File Manager application. ES File Explorer " +
+//						"works well with this app.", Toast.LENGTH_LONG)
+//						.show();
 				}
 				break;
 
@@ -177,6 +197,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 				break;
 			default:
 				break;
+		}
+	}
+
+
+	public static void openAppRating(Context context) {
+		// you can also use BuildConfig.APPLICATION_ID
+		String appId = context.getPackageName();
+		Intent rateIntent = new Intent(Intent.ACTION_VIEW,
+			Uri.parse("market://details?id=" + "com.estrongs.android.pop"));
+		boolean marketFound = false;
+
+		// find all applications able to handle our rateIntent
+		final List<ResolveInfo> otherApps = context.getPackageManager()
+			.queryIntentActivities(rateIntent, 0);
+		for (ResolveInfo otherApp: otherApps) {
+			// look for Google Play application
+			if (otherApp.activityInfo.applicationInfo.packageName
+				.equals("com.android.vending")) {
+
+				ActivityInfo otherAppActivity = otherApp.activityInfo;
+				ComponentName componentName = new ComponentName(
+					otherAppActivity.applicationInfo.packageName,
+					otherAppActivity.name
+				);
+				// make sure it does NOT open in the stack of your activity
+				rateIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				// task reparenting if needed
+				rateIntent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+				// if the Google Play was already open in a search result
+				//  this make sure it still go to the app page you requested
+				rateIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				// this make sure only the Google Play app is allowed to
+				// intercept the intent
+				rateIntent.setComponent(componentName);
+				context.startActivity(rateIntent);
+				marketFound = true;
+				break;
+
+			}
+		}
+
+		// if GP not present on device, open web browser
+		if (!marketFound) {
+			Intent webIntent = new Intent(Intent.ACTION_VIEW,
+				Uri.parse("https://play.google.com/store/apps/details?id="+appId));
+			context.startActivity(webIntent);
 		}
 	}
 

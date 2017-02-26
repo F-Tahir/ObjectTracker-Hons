@@ -89,7 +89,7 @@ public class SensorFramework implements SensorEventListener {
 	public float[] getGravityValues() {
 		return mGravityValues;
 	}
-	
+
 
 	/**
 	 * This method is used to set the mAccelerometer member variable to the devices accelerometer.
@@ -218,6 +218,7 @@ public class SensorFramework implements SensorEventListener {
 	public void unsetListeners() {
 		Log.i(TAG, "Listener has been unset");
 		mSensorManager.unregisterListener(this);
+		initialGravityReading = false;
 	}
 
 

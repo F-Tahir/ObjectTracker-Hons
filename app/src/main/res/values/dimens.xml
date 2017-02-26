@@ -8,8 +8,8 @@
 
     <!-- Dimensions for button measurements on activity_main.xml. -->
     <dimen name="main_button_margin">8dp</dimen>  <!-- Controls spacing between buttons -->
-    <dimen name="main_button_padding">16dp</dimen>
-    <dimen name="main_button_textsize">32sp</dimen>
+    <dimen name="main_button_padding">8dp</dimen>
+    <dimen name="main_button_textsize">32dp</dimen>
 
     <!-- Dimensions for camera preview frame -->
     <dimen name="camera_ui_horizontal_margin">16dp</dimen>

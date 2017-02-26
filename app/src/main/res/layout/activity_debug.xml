@@ -70,8 +70,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/number_of_times"
-        android:text="Number of times to poll"/>
-
+        android:text="Polling Frequency"/>
 
     <Spinner
         android:id="@+id/polling_frequency"
