@@ -28,10 +28,5 @@
             style="@style/view_recordings_button"
             android:drawableStart="@drawable/ic_viewrecording" />
 
-        <Button
-            android:id="@+id/debug_button"
-            style="@style/debug_button"
-            android:drawableStart="@drawable/ic_preferences" />
-
 
     </LinearLayout>

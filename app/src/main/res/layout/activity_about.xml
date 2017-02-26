@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <ImageView
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp"
+            android:id="@+id/about_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/email_about"
+            android:textSize="12sp"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/about_icon"/>
+
+        <TextView
+
+            android:id="@+id/developed_by_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/developed_by_about"
+            android:textSize="16sp"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/email"/>
+
+
+        <TextView
+            android:id="@+id/center_text_about"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/object_tracker_about"
+            android:layout_above="@id/developed_by_about"
+            android:layout_centerHorizontal="true"
+            android:textSize="@dimen/main_button_textsize"/>
+
+
+        <TextView
+            android:id="@+id/open_source_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_source_about"
+            android:textAlignment="center"
+            android:gravity="center_horizontal"
+            android:textSize="16sp"
+            android:layout_below="@id/about_icon"
+            android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

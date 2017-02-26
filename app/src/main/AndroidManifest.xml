@@ -29,15 +29,27 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".TrackingActivity"
             android:screenOrientation="landscape"/>
+
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="uk.ac.ed.faizan.objecttracker.MainActivity">
         </activity>
-        <activity android:name=".DebugActivity">
+
+        <activity
+            android:name=".DebugActivity"
+            android:parentActivityName="uk.ac.ed.faizan.objecttracker.MainActivity">
         </activity>
+
+        <activity
+            android:name=".AboutActivity"
+            android:parentActivityName="uk.ac.ed.faizan.objecttracker.MainActivity">
+        </activity>
+
     </application>
 
 </manifest>

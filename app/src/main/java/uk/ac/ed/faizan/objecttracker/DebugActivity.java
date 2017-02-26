@@ -4,11 +4,13 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -56,6 +58,24 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 
 		mPollingFrequency = SensorManager.SENSOR_DELAY_FASTEST; // Default value
 		mSensorFramework = new SensorFramework(this);
+
+		// Add "back" button to ActionBar
+		ActionBar actionBar = getSupportActionBar();
+		if (actionBar != null) {
+			// Show the Up button in the action bar.
+			actionBar.setDisplayHomeAsUpEnabled(true);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				NavUtils.navigateUpFromSameTask(this);
+				return true;
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

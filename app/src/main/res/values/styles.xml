@@ -49,18 +49,6 @@
     </style>
 
 
-    <style name="debug_button">
-        <item name="android:padding">@dimen/main_button_padding</item>
-        <item name="android:layout_marginBottom">@dimen/main_button_margin</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:text">@string/debug</item>
-        <item name="android:textSize">@dimen/main_button_textsize</item>
-        <item name="android:background">@drawable/button_debug</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
 
 
 

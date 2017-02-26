@@ -18,9 +18,6 @@
     <color name="colorViewRecordingsGradEnd">#ff6d00</color>
 
 
-    <color name="colorDebugStart">#40a9ff</color>
-    <color name="colorDebugEnd">#2e63a3</color>
-
     <!-- Camera Preview colours -->
     <color name="helpBackground">#2196f3</color>
 </resources>

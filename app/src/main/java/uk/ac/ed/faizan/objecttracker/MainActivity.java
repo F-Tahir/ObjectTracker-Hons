@@ -1,6 +1,7 @@
 package uk.ac.ed.faizan.objecttracker;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -90,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		Button startTrackingButton = (Button) findViewById(R.id.start_tracking_button);
 		Button viewRecordingsButton = (Button) findViewById(R.id.view_recordings_button);
 		Button preferencesButton = (Button) findViewById(R.id.preferences_button);
-		Button debugButton = (Button) findViewById(R.id.debug_button);
 
         /* Attach an onClickListener to each of the 3 buttons to detect clicks and carry out
 		relevant actions
@@ -98,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		startTrackingButton.setOnClickListener(this);
 		viewRecordingsButton.setOnClickListener(this);
 		preferencesButton.setOnClickListener(this);
-		debugButton.setOnClickListener(this);
 		mContext = this;
 	}
 
@@ -121,6 +122,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			}
 		}
 	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.actionbar_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		int id = item.getItemId();
+
+		if (id == R.id.debug_mode) {
+			startActivity(new Intent(this, DebugActivity.class));
+		} else if (id == R.id.about) {
+			startActivity(new Intent(this, AboutActivity.class));
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+
 
 
 	@Override
@@ -177,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 						@Override
 						public void onClick(View v) {
-							openAppRating(mContext);
+							openFileExplorerApp(mContext);
 						}
 					});
 					snackbar.show();
@@ -192,16 +214,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 				startActivity(new Intent(this, SettingsActivity.class));
 				break;
 
-			case R.id.debug_button:
-				startActivity(new Intent(this, DebugActivity.class));
-				break;
+
 			default:
 				break;
 		}
 	}
 
 
-	public static void openAppRating(Context context) {
+	public static void openFileExplorerApp(Context context) {
 		// you can also use BuildConfig.APPLICATION_ID
 		String appId = context.getPackageName();
 		Intent rateIntent = new Intent(Intent.ACTION_VIEW,
