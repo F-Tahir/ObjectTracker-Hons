@@ -180,6 +180,10 @@
         whilst camera is open. This leads to better viewing, but poorer battery life. If this is disabled, you
         can manually control brightness.</string>
 
+    <string name="pref_tutorial_summary">Select whether or not to show the user-interface tutorial next
+        time the "Start Tracking" screen is started. This will automatically be set to false each time the tutorial is finished.</string>
+    <string name="pref_tutorial_title">Show tutorial on next startup</string>
+
     <string name="pref_matching_method_title">Matching Method</string>
     <string name="pref_matching_method_summary">Set the default template matching method to be used in automatic tracking.</string>
 
@@ -200,6 +204,7 @@
     <string name="developed_by_about">Developed by Faizan Tahir</string>
     <string name="object_tracker_about">Object Tracker</string>
     <string name="open_source_about">Object Tracker is built using various open-source software.</string>
+
 
 
     <string-array name="pref_tracking_mode_entries">

@@ -17,6 +17,8 @@
     <color name="colorViewRecordingsGradStart">#ffab40</color>
     <color name="colorViewRecordingsGradEnd">#ff6d00</color>
 
+    <color name="showcaseView">#333333</color>
+
 
     <!-- Camera Preview colours -->
     <color name="helpBackground">#2196f3</color>

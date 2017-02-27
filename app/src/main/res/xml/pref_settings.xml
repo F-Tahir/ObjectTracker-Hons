@@ -21,6 +21,14 @@
             android:summary="@string/pref_screen_brightness_summary"
             android:defaultValue="false"/>
 
+        <CheckBoxPreference
+            android:key="pref_key_show_tutorial"
+            android:title="@string/pref_tutorial_title"
+            android:summary="@string/pref_tutorial_summary"
+            android:defaultValue="true"/>
+
+
+
     </PreferenceCategory>
 
     <PreferenceCategory

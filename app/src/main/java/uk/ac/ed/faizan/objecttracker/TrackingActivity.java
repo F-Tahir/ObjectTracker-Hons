@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,6 +27,8 @@ import android.widget.PopupMenu;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.getkeepsafe.taptargetview.TapTarget;
+import com.getkeepsafe.taptargetview.TapTargetSequence;
 
 import org.opencv.core.Mat;
 import org.opencv.android.Utils;
@@ -150,6 +153,11 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             }
         });
 
+        // Run UI tutorial if it has not been run before.
+        if(mSharedPreferences.getBoolean("pref_key_show_tutorial", true)) {
+            runTutorial();
+        }
+
 
         mCameraPreview = new CameraPreview(
             this,
@@ -163,6 +171,193 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
             (ImageView) findViewById(R.id.record_button),
             (TextView) findViewById(R.id.storage_space),
             (Button) findViewById(R.id.matching_method_button));
+    }
+
+
+	/**
+     * This method is called in onResume to show a UI tutorial (a how-to wizard). This will not show f
+     * the user has previously seen the tutorial, or has chosen to skip it in the Settings pane.
+     */
+    public void runTutorial() {
+        TapTargetSequence targetSequence = new TapTargetSequence(this)
+            .targets(
+                TapTarget.forView(findViewById(R.id.camera_preview), "Getting Started", "This tutorial will" +
+                    " walk you through the UI. At any time, tap the highlighted circle to continue to the next hint, or tap " +
+                    "any non-blue area to skip the tutorial.")
+                    .transparentTarget(true)
+                    .descriptionTextSize(15)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Recording Modes", "This application supports two recording " +
+                    "modes, automatic and manual.")
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.tracking_mode_button), "Selecting a mode", "To select a mode, press this button. " +
+                    "Manual mode is the default option.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.tracking_mode_button), "Manual Mode", "To record in manual mode, first press " +
+                    "this button to ensure manual mode is selected.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.record_button), "Recording in manual mode", "Next," +
+                    " focus your camera on the object you wish to track, and press the record button.")
+                    .targetRadius(25)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Tracking an object", "Once recording in" +
+                    " manual mode, you can tap on the location of the object at any time. ")
+                    .targetRadius(25)
+                    .descriptionTextSize(16)
+                    .transparentTarget(true)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Tracking an object", "This stores the objects' " +
+                    "position at that specific time of tap in a YML file, and creates a colored overlay on the screen to " +
+                    "show tap location.")
+                    .targetRadius(25)
+                    .descriptionTextSize(16)
+                    .transparentTarget(true)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.select_color_button), "Changing overlay color.", "You can " +
+                    "change this overlay color by pressing this button.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.flash_button), "Using Flash", "If the scene has poor lighting, you can" +
+                    " enable camera flash by pressing this button.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camerazoom), "Zooming", "If the object appears small, you " +
+                    "can zoom in using the controls here.")
+                    .targetRadius(50)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.record_button), "Ending Recording", "To end the " +
+                    "recording, press this button.")
+                    .targetRadius(25)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.tracking_mode_button), "Automatic Mode", "To record in automatic mode, " +
+                    "select the option by clicking here.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.tracking_mode_button), "Selecting Matching Method", "Optionally," +
+                    " select a template match method by clicking here. The default one is the most accurate, but slowest.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.record_button), "Recording in Manual Mode", "Then press the record button.")
+                    .targetRadius(25)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Focusing", "You will be prompted to " +
+                    "focus on the object you wish to record. The object should be in the center of the screen.")
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.freeze_button), "Freezing the preview", "After focusing on the object," +
+                    " press the Live button to freeze the camera preview.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Selecting Template", "Now that the camera preview is" +
+                    " frozen, you can select a template. To do so, drag a box around the object using your finger.")
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.freeze_button), "Starting Recording", "Once you are happy with the template, " +
+                    "un-freeze the preview, and recording will proceed.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Overlay", "In automatic mode, the application will show " +
+                    "an overlay around the area that best matches the template.")
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.camera_preview), "Reinitializing Template", "To reinitialize" +
+                    " the template during recording, simply click on the location of the object.")
+                    .targetRadius(30)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.record_button), "Ending Recording", "To end the recording, press this button.")
+                    .targetRadius(25)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false),
+
+                TapTarget.forView(findViewById(R.id.help_button), "That's all!", "If you need any further help, you can read " +
+                    "detailed instructions by tapping here.")
+                    .targetRadius(20)
+                    .transparentTarget(true)
+                    .descriptionTextSize(16)
+                    .tintTarget(false)
+
+            )
+
+            .listener(new TapTargetSequence.Listener() {
+                // This listener will tell us when interesting(tm) events happen in regards
+                // to the sequence
+                @Override
+                public void onSequenceFinish() {
+
+                    // Set run_tutorial flag to false to indicate we no longer need to run this.
+                    Log.i(TAG, "Tutorial finished");
+                    SharedPreferences.Editor editor = mSharedPreferences.edit();
+                    editor.putBoolean("pref_key_show_tutorial", false).apply();
+                }
+
+                @Override
+                public void onSequenceStep(TapTarget lastTarget) {
+                    // Perfom action for the current target
+                }
+
+                @Override
+                public void onSequenceCanceled(TapTarget lastTarget) {
+                    Log.i(TAG, "Tutorial cancelled");
+                    SharedPreferences.Editor editor = mSharedPreferences.edit();
+                    editor.putBoolean("pref_key_show_tutorial", false).apply();
+                }
+            });
+
+        targetSequence.start();
     }
 
     // Called when activity becomes obscured.
