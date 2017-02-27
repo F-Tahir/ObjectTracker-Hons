@@ -272,7 +272,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     .descriptionTextSize(16)
                     .tintTarget(false),
 
-                TapTarget.forView(findViewById(R.id.record_button), "Recording in Manual Mode", "Then press the record button.")
+                TapTarget.forView(findViewById(R.id.record_button), "Recording in Automatic Mode", "Then press the record button.")
                     .targetRadius(25)
                     .transparentTarget(true)
                     .descriptionTextSize(16)
@@ -324,7 +324,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                     .tintTarget(false),
 
                 TapTarget.forView(findViewById(R.id.help_button), "That's all!", "If you need any further help, you can read " +
-                    "detailed instructions by tapping here.")
+                    "detailed instructions here, or view the tutorial again by going to preferences.")
                     .targetRadius(20)
                     .transparentTarget(true)
                     .descriptionTextSize(16)
