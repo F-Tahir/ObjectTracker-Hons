@@ -38,7 +38,6 @@ for line in f:
 # Plot sensor data for each iteration.
 
 if (opts.axis == "x"):
-    print "Hereeee"
     plt.plot(t_iteration, t_x, label="x-axis readings")
 
 if (opts.axis == "y"):
@@ -48,14 +47,13 @@ if (opts.axis == "z"):
     plt.plot(t_iteration, t_z, label="z-axis readings")
 
 if (opts.axis == "all"):
-    print "Here"
     plt.plot(t_iteration, t_x, label="x-axis readings")
     plt.plot(t_iteration, t_y, label="y-axis readings")
     plt.plot(t_iteration, t_z, label="z-axis readings")
     plt.legend()
 
 plt.title("Sensor Data")
-plt.xlabel("Frame Number")
+plt.xlabel("Polling Iteration")
 plt.ylabel("Sensor Value")
 
 plt.show()
