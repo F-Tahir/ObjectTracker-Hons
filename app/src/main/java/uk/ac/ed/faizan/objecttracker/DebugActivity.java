@@ -68,6 +68,18 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 	}
 
 	@Override
+	protected void onPause() {
+		if (debuggingInProcess) {
+			debuggingInProcess = false;
+			mSensorFramework.getSensorManager().unregisterListener(this);
+			Toast.makeText(this, "Polling finished at " + (mCurrentIteration -1) + " iterations. Sensor " +
+				"dump saved to " + mDumpFile.toString(), Toast.LENGTH_LONG).show();
+			((Button) findViewById(R.id.start_debug)).setText("Start Polling");
+		}
+		super.onPause();
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case android.R.id.home:
@@ -132,8 +144,6 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 				RadioButton gyroButton = (RadioButton) findViewById(R.id.gyroscope_button);
 				RadioButton gravButton = (RadioButton) findViewById(R.id.gravity_button);
 				EditText numIterations = (EditText) findViewById(R.id.number_of_times);
-
-
 
 
 				// Debugging not in process. Need to check which sensor user wishes to debug,
