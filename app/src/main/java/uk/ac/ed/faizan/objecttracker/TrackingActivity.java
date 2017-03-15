@@ -508,7 +508,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                             }
                             findViewById(R.id.select_template).setVisibility(View.VISIBLE);
                             mToast = Toast.makeText(this, "Now select the template. For instructions, click on " +
-                                "Help.", Toast.LENGTH_LONG);
+                                "Help. Once done, press the \"Freeze\" button to start recording.", Toast.LENGTH_LONG);
                             mToast.show();
                         }
 
