@@ -54,18 +54,49 @@
 
         <TextView
             android:layout_marginTop="@dimen/default_slider_margin_btw_title"
-            android:id="@+id/iteration_header"
+            android:id="@+id/poll_units"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/radio_buttons"
-            android:text="Number of times to poll"/>
+            android:text="Polling Units"/>
+
+        <RadioGroup
+            android:id="@+id/poll_units_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/poll_units"
+            android:checkedButton="@+id/time">
+
+            <RadioButton
+                android:layout_marginTop="@dimen/default_slider_margin_btw_title"
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Poll for a certain duration (in seconds)"/>
+
+            <RadioButton
+                android:id="@+id/iterations"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Poll for a certain number of iterations"/>
+
+        </RadioGroup>
+
+
+        <TextView
+            android:layout_marginTop="@dimen/default_slider_margin_btw_title"
+            android:id="@+id/iteration_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/poll_units_selection"
+            android:text="Units"/>
 
 
         <EditText
             android:id="@+id/number_of_times"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="500"
+            android:text="1"
             android:inputType="number"
             android:layout_below="@id/iteration_header"/>
 

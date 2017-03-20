@@ -33,13 +33,20 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 
 	private SensorFramework mSensorFramework;
 	private boolean debuggingInProcess = false;
-	private int mNumberOfIterations;
+	private int mPollDuration;
+	private long mStartTime;
+	private long mEndTime;
 	private int mCurrentIteration;
 	private int mPollingFrequency;
 	private String mPollingFrequencyString;
 	private File mDumpFile;
 	private Spinner mSpinner;
+	private int mMeasurementFlag; // 0 if polling for certain time, 1 if polling for certain iteration
+
+
 	private final static String TAG = DebugActivity.class.getSimpleName();
+
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +100,6 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-		Log.i(TAG, "Here at position " + position);
-
 		if (position == 0) {
 			Log.i(TAG, "Fastest");
 			findViewById(R.id.userdefined_polling).setVisibility(View.INVISIBLE);
@@ -143,18 +148,20 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 				RadioButton accelButton = (RadioButton) findViewById(R.id.accelerometer_button);
 				RadioButton gyroButton = (RadioButton) findViewById(R.id.gyroscope_button);
 				RadioButton gravButton = (RadioButton) findViewById(R.id.gravity_button);
-				EditText numIterations = (EditText) findViewById(R.id.number_of_times);
+				RadioButton timeButton = (RadioButton) findViewById(R.id.time);
+				EditText duration = (EditText) findViewById(R.id.number_of_times);
 
 
 				// Debugging not in process. Need to check which sensor user wishes to debug,
 				// and how many iterations, then register the listener for the appropriate sensor.
 				if (!debuggingInProcess) {
 
-					mNumberOfIterations = Integer.parseInt(numIterations.getText().toString());
+					mPollDuration = Integer.parseInt(duration.getText().toString());
 
 					// User-defined time
 					if (mSpinner.getSelectedItemPosition() == 4) {
-						mPollingFrequency = Integer.parseInt(((EditText) findViewById(R.id.userdefined_polling)).getText().toString());
+						// Defined in milliseconds, so convert to microseconds
+						mPollingFrequency = Integer.parseInt(((EditText) findViewById(R.id.userdefined_polling)).getText().toString())*1000;
 						mPollingFrequencyString = "user-defined (" + mPollingFrequency + " microseconds) ";
 					}
 
@@ -168,7 +175,7 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 					if (accelButton.isChecked()) {
 						if (mSensorFramework.hasAccelerometer()) {
 
-							appendToDataFile(mDumpFile, 0, mNumberOfIterations, mPollingFrequencyString);
+							appendToDataFile(mDumpFile, 0, mPollDuration, mPollingFrequencyString);
 							mSensorFramework.setAccelerometer();
 							mSensorFramework.getSensorManager().registerListener(this, mSensorFramework.getAccelerometer(),
 								mPollingFrequency);
@@ -181,7 +188,7 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 					} else if (gyroButton.isChecked()) {
 						if (mSensorFramework.hasGyroscope()) {
 
-							appendToDataFile(mDumpFile, 1, mNumberOfIterations, mPollingFrequencyString);
+							appendToDataFile(mDumpFile, 1, mPollDuration, mPollingFrequencyString);
 							mSensorFramework.setGyroscope();
 							mSensorFramework.getSensorManager().registerListener(this, mSensorFramework.getGyroscope(),
 								mPollingFrequency);
@@ -194,7 +201,7 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 					} else if (gravButton.isChecked()) {
 						if (mSensorFramework.hasGravitySensor()) {
 
-							appendToDataFile(mDumpFile, 2, mNumberOfIterations, mPollingFrequencyString);
+							appendToDataFile(mDumpFile, 2, mPollDuration, mPollingFrequencyString);
 							mSensorFramework.setGravity();
 							mSensorFramework.getSensorManager().registerListener(this, mSensorFramework.getGravitySensor(),
 								mPollingFrequency);
@@ -202,6 +209,17 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 						} else {
 							Toast.makeText(this, "Device does not have gravity sensor!", Toast.LENGTH_LONG).show();
 						}
+					}
+
+					if (timeButton.isChecked()) {
+						mMeasurementFlag = 0;
+						mStartTime = System.currentTimeMillis();
+						mEndTime = (mPollDuration * 1000) + mStartTime; // extra 20ms for processing
+						Log.i("Polling duration: " + mPollDuration, TAG);
+						Log.i("Start time: "+ mStartTime, TAG);
+						Log.i("End time: "+ mEndTime, TAG);
+					} else {
+						mMeasurementFlag = 1;
 					}
 
 					((Button) v).setText("Stop Polling");
@@ -226,22 +244,42 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 	}
 
 
+
+
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 
-		// Desired number of iterations reached - stop appending data to file
-		if (mCurrentIteration == mNumberOfIterations +1) {
-			Toast.makeText(this, "Polling finished. Sensor dump saved to " + mDumpFile.toString(), Toast.LENGTH_LONG).show();
-			mSensorFramework.getSensorManager().unregisterListener(this);
-			((Button) findViewById(R.id.start_debug)).setText("Start Polling");
-			debuggingInProcess = false;
-			mCurrentIteration = 1;
 
-			// Change UI to show progress, as well as appending new data to the sensor dump file
+		// Measuring in terms of a certain number of iterations
+		if (mMeasurementFlag == 1) {
+			if (mCurrentIteration == mPollDuration + 1) {
+				Toast.makeText(this, "Polling finished. Sensor dump saved to " + mDumpFile.toString(), Toast.LENGTH_LONG).show();
+				mSensorFramework.getSensorManager().unregisterListener(this);
+				((Button) findViewById(R.id.start_debug)).setText("Start Polling");
+				debuggingInProcess = false;
+				mCurrentIteration = 1;
+
+				// Change UI to show progress, as well as appending new data to the sensor dump file
+			} else {
+				((TextView) findViewById(R.id.progress)).setText(String.format(Locale.ENGLISH, "Progress:" +
+					" %d/%d", mCurrentIteration, mPollDuration));
+				appendToDataFile(mDumpFile, event.values, mCurrentIteration);
+			}
 		} else {
-			((TextView) findViewById(R.id.progress)).setText(String.format(Locale.ENGLISH, "Progress:" +
-				" %d/%d", mCurrentIteration, mNumberOfIterations));
-			appendToDataFile(mDumpFile, event.values, mCurrentIteration);
+			Log.i("ere", TAG);
+			if (System.currentTimeMillis() > mEndTime) {
+				Toast.makeText(this, "Polling finished. Sensor dump saved to " + mDumpFile.toString(), Toast.LENGTH_LONG).show();
+				mSensorFramework.getSensorManager().unregisterListener(this);
+				((Button) findViewById(R.id.start_debug)).setText("Start Polling");
+				debuggingInProcess = false;
+				mCurrentIteration = 1;
+
+				// Change UI to show progress, as well as appending new data to the sensor dump file
+			} else {
+				((TextView) findViewById(R.id.progress)).setText(String.format(Locale.ENGLISH, "Number of polls:" +
+					" %d", mCurrentIteration));
+				appendToDataFile(mDumpFile, event.values, mCurrentIteration);
+			}
 		}
 
 		mCurrentIteration += 1;
