@@ -458,6 +458,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
                 } else {
 
                     // Set to true to state that we are in template selection phase
+                    // Next step is done when freeze button is clicked.
                     templateSelectionInitialized = true;
                     mTemplateSelection.setClearCanvas(false);
 
@@ -548,7 +549,7 @@ public class TrackingActivity extends Activity implements View.OnClickListener {
 
                             } else {
                                 Toast.makeText(this, "Template not selected properly, perhaps the template" +
-                                    " was too small.", Toast.LENGTH_LONG).show();
+                                    " was too small. Try again.", Toast.LENGTH_LONG).show();
                             }
                         }
                     }

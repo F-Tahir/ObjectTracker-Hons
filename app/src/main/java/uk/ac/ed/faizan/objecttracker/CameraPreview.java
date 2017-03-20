@@ -251,8 +251,14 @@ public class CameraPreview implements View.OnTouchListener,
             mCameraControl.setRecorder(mMediaRecorder);
 
             // Append tracking info (such as tracking mode etc) to start of yml file.
-            Utilities.appendToDataFile(mDataFile, mTrackingMode, matchMethod, Utilities.getTimeForDataFile(time),
-                mCameraMat.cols(), mCameraMat.rows());
+
+            if (mTrackingMode == 1) {
+                Utilities.appendToDataFile(mDataFile, mTrackingMode, matchMethod, Utilities.getTimeForDataFile(time),
+                    mCameraMat.cols(), mCameraMat.rows(), mTemplateMat.cols(), mTemplateMat.rows());
+            } else {
+                Utilities.appendToDataFile(mDataFile, mTrackingMode, matchMethod, Utilities.getTimeForDataFile(time),
+                    mCameraMat.cols(), mCameraMat.rows(), 0, 0);
+            }
 
 
         } catch (IllegalStateException e) {

@@ -183,17 +183,23 @@ public final class Utilities {
 	 * @param matchingMode		Matching method (if in automatic mode)
 	 * @param resolutionWidth	Resolution (width) of the image being displayed on-screen
 	 * @param resolutionHeight	Resolution (height) of the image being displayed on-screen
+	 * @param templateWidth		Resolution (width) of the template, if automatic tracking
+	 * @param templateHeight	Resolution (height) of the template, if automatic tracking
 	 */
 	public static void appendToDataFile(@NonNull File dataFile, int trackingMode, int matchingMode,
-										String time, int resolutionWidth, int resolutionHeight) {
+										String time, int resolutionWidth, int resolutionHeight,
+										int templateWidth, int templateHeight) {
 
 		String trackingModeString;
 		String matchingModeString;
+		String templateResolutionString;
 
 		if (trackingMode == 0) {
 			trackingModeString = "Manual Tracking";
+			templateResolutionString = "N/A";
 		} else {
 			trackingModeString = "Automatic Tracking";
+			templateResolutionString = String.format(Locale.ENGLISH, "%dx%d", templateWidth, templateHeight);
 		}
 
 		if (matchingMode == 0) {
@@ -225,9 +231,10 @@ public final class Utilities {
 			try {
 				fos = new FileOutputStream(dataFile.toString(), true);
 				byte[] buffer = String.format(Locale.ENGLISH, "# General Recording Information\n\n" +
-					"time_of_recording: %s \ntracking_mode: %s\nmatching_mode: %s\nimage_size: %dx%d\n\n\n\n " +
+					"time_of_recording: %s \ntracking_mode: %s\nmatching_mode: %s\nimage_size: %dx%d" +
+					"\ntemplate_size: %s\n\n\n\n " +
 					"# Tracking Information\n\n", time, trackingModeString, matchingModeString,
-					resolutionWidth, resolutionHeight).getBytes();
+					resolutionWidth, resolutionHeight, templateResolutionString).getBytes();
 
 				fos.write(buffer);
 				fos.flush();
