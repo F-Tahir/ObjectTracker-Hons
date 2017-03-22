@@ -210,8 +210,7 @@ public class CameraPreview implements View.OnTouchListener,
         // Sets to 30 but does not check if phone supports 30, so need to add this
         // Will think about using a CamcorderProfile instead.
         mMediaRecorder.setVideoFrameRate(30);
-
-        mCameraControl.lockAutoExposure();
+        
 
         // Create the data and video file output
         mMediaFile = Utilities.getVideoFile(time);
