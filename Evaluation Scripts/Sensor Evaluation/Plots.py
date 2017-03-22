@@ -42,8 +42,8 @@ print opts.yml
 print t_acc
 
 # Plot the points in t_acc
-x_acc = [i[0] for i in t_acc]
-y_acc = [i[1] for i in t_acc]
+x_acc = [i[0] for i in t_vicon]
+y_acc = [i[1] for i in t_vicon]
 acc_graph = plt.figure(1)
 acc_graph.canvas.set_window_title("Accelerometer Readings")
 plt.plot(x_acc, y_acc)

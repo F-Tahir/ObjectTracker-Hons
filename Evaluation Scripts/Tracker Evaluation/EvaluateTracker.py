@@ -7,9 +7,9 @@ import math
 import matplotlib.pyplot as plt
 
 optparser = optparse.OptionParser()
-optparser.add_option("-m", "--man", dest="man", default="rec2output.yml",
+optparser.add_option("-m", "--man", dest="man", default="../Data/Automatic-Recordings/20170322_194423_GT.yml",
     help="New YML file (with ground truth results from GetFrameData.py)")
-optparser.add_option("-a", "--aut", dest="aut", default="../Data/rec2.yml",
+optparser.add_option("-a", "--aut", dest="aut", default="../Data/Automatic-Recordings/20170322_194423_DATA.yml",
     help="Original YML file (with automatic tracking results from app)")
 optparser.add_option("-k", "--heur", dest="heuristic", default="euclid",
     help="Evaluation heuristic (\"euclid\" or \"accuracy\").")
@@ -45,6 +45,7 @@ for line in autofile:
         # Skip timestamp and object_position header
         autofile.next()
         autofile.next()
+        autofile.next()
 
         x = int(autofile.next().strip().split(":")[1])
         y = int(autofile.next().strip().split(":")[1])
@@ -62,8 +63,11 @@ print "\n\n#####################################################################
 print "                     EVALUATION SUMMMARY"
 print "######################################################################\n"
 print "Evaluation method: %s" % opts.heuristic
+print "Evaluation method: %s" % opts.heuristic
 
 
+print(len(man_results))
+print(len(auto_results))
 # Calculate Euclidean distance between points in same frame correspondence, between
 # automatic and manual tracking. Sum up and take average.
 if opts.heuristic == "euclid":
@@ -86,7 +90,7 @@ elif opts.heuristic == "accuracy":
         rhs = (man_results[i][1][1] - auto_results[i][1][1])**2
         distance = math.sqrt(lhs + rhs)
 
-        if distance <= opts.threshold:
+        if distance <= opts.threshold/2:
             accurate += 1
         else:
             inaccurate += 1

@@ -7,9 +7,9 @@ import optparse
 
 
 optparser = optparse.OptionParser()
-optparser.add_option("-r", "--rec", dest="rec", default="../Data/rec1.mp4", help="Recording to analyse.")
-optparser.add_option("-o", "--out", dest="out", default="rec1output.yml", help="Output file to store data in")
-optparser.add_option("-f", "--frames", dest="frames", default=2000, type="int", help="Number of frames to analyze")
+optparser.add_option("-r", "--rec", dest="rec", default="../Data/Automatic-Recordings/20170322_194653_VID.mp4", help="Recording to analyse.")
+optparser.add_option("-o", "--out", dest="out", default="../Data/Automatic-Recordings/20170322_194653_GT.yml", help="Output file to store data in")
+optparser.add_option("-f", "--frames", dest="frames", default=443, type="int", help="Number of frames to analyze")
 opts = optparser.parse_args()[0]
 
 
