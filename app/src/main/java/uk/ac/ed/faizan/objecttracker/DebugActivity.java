@@ -302,7 +302,7 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 	 * @param numIterations Number of times to poll the sensor
 	 * @param pollingFrequencyString The string representing the sensor polling frequency (predefined or user-defined)
 	 */
-	public static void appendToDataFile(@NonNull File dataFile, int sensor, int numIterations, String pollingFrequencyString) {
+	public void appendToDataFile(@NonNull File dataFile, int sensor, int numIterations, String pollingFrequencyString) {
 
 		String sensorType;
 		if (sensor == 0) {
@@ -327,11 +327,18 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 			FileOutputStream fos = null;
 			try {
 				fos = new FileOutputStream(dataFile.toString(), true);
-				byte[] buffer = String.format(Locale.ENGLISH, "# General Debug Information\n\n" +
-					"sensor: %s\nnumber_of_iterations: %d \npolling_frequency: %s\n\n", sensorType,
-					numIterations, pollingFrequencyString).getBytes();
+				if (mMeasurementFlag == 1) {
+					byte[] buffer = String.format(Locale.ENGLISH, "# General Debug Information\n\n" +
+							"sensor: %s\nnumber_of_iterations: %d \npolling_frequency: %s\n\n", sensorType,
+						numIterations, pollingFrequencyString).getBytes();
+					fos.write(buffer);
+				} else {
+					byte[] buffer = String.format(Locale.ENGLISH, "# General Debug Information\n\n" +
+							"sensor: %s\ntime_to_poll_for: %d \npolling_frequency: %s\n\n", sensorType,
+						mPollDuration, pollingFrequencyString).getBytes();
+					fos.write(buffer);
+				}
 
-				fos.write(buffer);
 				fos.flush();
 
 			} finally {
@@ -355,7 +362,7 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 	 * @param values Values from the sensor being debugged
 	 * @param iteration Current poll iteration
 	 */
-	public static void appendToDataFile(@NonNull File dataFile, float[] values, int iteration) {
+	public void appendToDataFile(@NonNull File dataFile, float[] values, int iteration) {
 
 
 		try {
@@ -370,10 +377,17 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 			FileOutputStream fos = null;
 			try {
 				fos = new FileOutputStream(dataFile.toString(), true);
-				byte[] buffer = String.format(Locale.ENGLISH, "iteration: %d\n\tx: %f\n\ty: %f\n\tz: %f" +
-					"\n\n", iteration, values[0], values[1], values[2]).getBytes();
 
-				fos.write(buffer);
+				if (mMeasurementFlag == 1) {
+					byte[] buffer = String.format(Locale.ENGLISH, "iteration: %d\n\tx: %f\n\ty: %f\n\tz: %f" +
+						"\n\n", iteration, values[0], values[1], values[2]).getBytes();
+					fos.write(buffer);
+
+				} else {
+					byte[] buffer = String.format(Locale.ENGLISH, "time: %d\n\tx: %f\n\ty: %f\n\tz: %f" +
+						"\n\n", System.currentTimeMillis() - mStartTime, values[0], values[1], values[2]).getBytes();
+					fos.write(buffer);
+				}
 				fos.flush();
 
 			} finally {
