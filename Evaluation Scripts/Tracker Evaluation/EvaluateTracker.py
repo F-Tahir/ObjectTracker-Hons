@@ -14,7 +14,8 @@ optparser.add_option("-a", "--aut", dest="aut", default="../Data/Automatic-Recor
 optparser.add_option("-k", "--heur", dest="heuristic", default="euclid",
     help="Evaluation heuristic (\"euclid\" or \"accuracy\").")
 optparser.add_option("-f", "--frames", dest="frames", default=2000, type="int", help="Number of frames to analyze")
-optparser.add_option("-t", "--thresh", dest="threshold", default=20, type="int", help="Threshold for error detection.")
+optparser.add_option("-w", "--width", dest="width", default=100, type="int", help="Width of template (in px).")
+optparser.add_option("-r", "--ratio", dest="ratio", default=0.5, type="float", help="Percentage of width for threshold.")
 opts = optparser.parse_args()[0]
 
 
@@ -90,7 +91,7 @@ elif opts.heuristic == "accuracy":
         rhs = (man_results[i][1][1] - auto_results[i][1][1])**2
         distance = math.sqrt(lhs + rhs)
 
-        if distance <= opts.threshold/2:
+        if distance <= opts.width*opts.ratio:
             accurate += 1
         else:
             inaccurate += 1
