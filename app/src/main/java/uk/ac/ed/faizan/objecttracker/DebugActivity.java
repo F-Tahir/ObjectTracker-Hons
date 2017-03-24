@@ -203,6 +203,7 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 
 							appendToDataFile(mDumpFile, 2, mPollDuration, mPollingFrequencyString);
 							mSensorFramework.setGravity();
+							mSensorFramework.setAccelerometer();
 							mSensorFramework.getSensorManager().registerListener(this, mSensorFramework.getGravitySensor(),
 								mPollingFrequency);
 
