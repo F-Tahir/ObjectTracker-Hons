@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 optparser = optparse.OptionParser()
-optparser.add_option("-y", "--yml", dest="yml", default="../Data/accelerometer/accel_1000_ui.yml", help="YML file needing to be parsed")
+optparser.add_option("-y", "--yml", dest="yml", default="../Data/noise/20170324_192900_DUMP.yml", help="YML file needing to be parsed")
 optparser.add_option("-a", "--axis", dest="axis", default="x", help="Axis to plot: x, y, z, all")
 opts = optparser.parse_args()[0]
 
@@ -28,7 +28,7 @@ f.next()
 for line in f:
     # Loop through all yml blocks and get iterations, and for that iteration,
     # the sensor readings
-    if "iteration" in line:
+    if "time" in line:
         t_iteration.append(int(line.strip().split(":")[1]))
         t_x.append(float(f.next().strip().split(":")[1]))
         t_y.append(float(f.next().strip().split(":")[1]))
@@ -43,6 +43,10 @@ if (opts.axis == "x"):
 if (opts.axis == "y"):
     plt.plot(t_iteration, t_y, label="y-axis readings")
 
+if (opts.axis == "xy"):
+    plt.plot(t_iteration, t_x, label="x-axis readings")
+    plt.plot(t_iteration, t_y, label="y-axis readings")
+
 if (opts.axis == "z"):
     plt.plot(t_iteration, t_z, label="z-axis readings")
 
@@ -52,8 +56,7 @@ if (opts.axis == "all"):
     plt.plot(t_iteration, t_z, label="z-axis readings")
     plt.legend()
 
-plt.title("Sensor Data")
-plt.xlabel("Polling Iteration")
-plt.ylabel("Sensor Value")
+plt.xlabel("Time (milliseconds)")
+plt.ylabel("Accelerometer Values (y-axis)")
 
 plt.show()
