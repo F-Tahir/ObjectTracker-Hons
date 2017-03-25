@@ -110,26 +110,30 @@
         Each method has its own benefits, including speed vs accuracy tradeoffs.\n\n
 
         <b>CCOEFF</b>
-        \nDescription here.\n\n
+        \nCalculated the correlation coeffecient between the pixel values in the template and the pixel
+        values in the source image. This value is not normalized.\n\n
 
         <b>CCOEFF Normed</b>
-        \nThis matching method is default, and for good reason. Although this function involves the
-        most computation compared to the other 5 (and is thus slower), the extra computation results
-        in higher accuracy when template matching. On modern Android phones (2015 and above), this
-        matching method performs well, with acceptable FPS. Older phones may experience some noticeable
-        FPS drops. \n\n
+        \nCalculated the correlation coeffecient between the pixel values in the template and the pixel
+        values in the source image. This value is normalized to return a value between 0 and 1.
+        \nThis matching method is default, as it has been proven to be the most accurate, however
+        it is the slowest, due to the amount of computation required.\n\n
 
         <b>CCORR</b>
-        \nDescription here\n\n
+        \nCalculates the cross-correlation between the pixel values in the template and the pixel
+        values in the source image. This value is not normalized.\n\n
 
         <b>CCORR Normed</b>
-        \nDescription Here\n\n
+        \nCalculates the cross-correlation between the pixel values in the template and the pixel
+        values in the source image. This value is normalized to return a value between 0 and 1.\n\n
 
         <b>SQDIFF</b>
-        \nThis matching method involves the least computation, and as a result, is the fastest.\n\n
+        \nCalculates the difference of two squares when determining the heuristic.
+        This matching method involves the least computation, and as a result, is the fastest.\n\n
 
         <b>SQDIFF Normed</b>
-        \nDescription here\n\n\n\n
+        \nCalculates the difference of two squares when determining the heuristic. The value
+        is normalized to a standard range.\n\n\n\n
 
     </string>
 
