@@ -47,6 +47,8 @@ y_vicon = [i[1] for i in t_vicon]
 vicon_graph = plt.figure(2)
 vicon_graph.canvas.set_window_title("Vicon Readings")
 plt.plot(x_vicon, y_vicon)
+plt.xlabel("in millimetres")
+plt.ylabel("in millimetres")
 plt.axis([-1500, 2500, -1500, 2500])
 
 plt.show()
